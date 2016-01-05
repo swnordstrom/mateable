@@ -2,21 +2,17 @@ This repo provides source code for an R package called
 mateable. This package contains functions that
 help the study of flowering phenology.
 
-To get started using the package, go to the page
-https://github.com/danhan52/mateable
-and download the zip file.
+Using the package devtools, you can use the following code to
+automatically install package mateable.
+This package requires compiling C++ code using Rcpp so if you
+have loaded Rcpp at any point during your current R or RStudio
+session, you'll have to either detach it or close RStudio and
+open it again.
 
-Then open R and select this menu option > Packages > Install
-package(s) from local zip files...
-
-Browse to the file you downloaded and select it. You
-should get a message like this:
-"package ‘mateable’ successfully unpacked and MD5 sums checked"
-
-Then, at the command prompt, type
+install.packages("devtools") # if you don't already have it
+library(devtools)
+install_github("danhan52/mateable"")
 library(mateable)
-
-Type this to see if it loaded
 ?mateable
 
 You should see a help page. Look at the index link to see what
@@ -24,18 +20,6 @@ functions are available. Copy and paste the example code to see what
 happens!
 
 Let me know if you have any questions.
-
-
-If you install package devtools, then you can use the following
-code to automatically install package mateable. This package requires
-compiling C++ code using Rcpp so if you have loaded Rcpp at any point
-during your current R or RStudio session, you'll have to either detach
-it or close RStudio and open it again.
-
-library(devtools)
-install_github("danhan52/mateable"")
-library(mateable)
-?mateable
 
 TODO: Look at all documentation to make sure it's not silly
       update README to have all the information necessary to use this
