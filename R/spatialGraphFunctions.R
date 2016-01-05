@@ -18,7 +18,7 @@ get_point_colors <- function(popn, startOrSync = "start", syncMethod = "aug") {
     rgbValues <- rgb(red = r, green = 0, blue = b, maxColorValue = 255)
 
   } else if (startOrSync == "sync") {
-    syncs <- synchrony(popn, syncMethod, "ind")
+    syncs <- synchrony(popn, method = syncMethod, synchronyType = "ind")
     rb <- syncs$synchrony*510
     r <- ifelse(rb < 255, rb, 255)
     b <- ifelse(rb < 255, 255, 510-rb)
