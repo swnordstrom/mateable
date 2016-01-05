@@ -1,0 +1,6 @@
+# if using roxygen, make sure it doesn't create the NAMESPACE
+# or this will be deleted
+
+useDynLib(mateable)
+exportPattern("^[[:alnum:]]+$")
+importFrom(Rcpp, evalCpp)

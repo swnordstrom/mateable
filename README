@@ -1,0 +1,42 @@
+This repo provides source code for an R package called
+mateable. This package contains functions that
+help the study of flowering phenology.
+
+To get started using the package, go to the page
+https://bitbucket.org/swagenius/echphenology/downloads
+and download the master zip file (for Windows) or gz file
+(for Mac).
+
+Then open R and select this menu option > Packages > Install
+package(s) from local zip files...
+
+Browse to the file you downloaded and select it. You
+should get a message like this:
+"package ‘mateable’ successfully unpacked and MD5 sums checked"
+
+Then, at the command prompt, type
+library(mateable)
+
+Type this to see if it loaded
+?mateable
+
+You should see a help page. Look at the index link to see what
+functions are available. Copy and paste the example code to see what
+happens!
+
+Let me know if you have any questions.
+
+The below information doesn't currently work for Windows. There's a
+compliler error when you try it.
+-------------------------------------------------------------------
+If you install package
+devtools, then you can use the following code to automatically
+install package mateable...
+
+library(devtools)
+install_bitbucket("mateable", "danhan52")
+library(mateable)
+?mateable
+-------------------------------------------------------------------
+
+TODO: Look at all documentation to make sure it's not silly

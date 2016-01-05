@@ -1,0 +1,21 @@
+Package: mateable
+Type: Package
+Title: functions to study flowering phenology
+Version: 0.2.0
+Date: 2015-12-29
+Authors@R: c(
+    person("Stuart", "Wagenius", email = "swagenius@gmail.com", role = c("cre", "aut")),
+    person("Danny", "Hanson", email = "danny.hanson52@gmail.com", role = "aut"),
+    person("Amy", "Waananen", email = "amy.waananen@gmail.com", role = "aut"))
+Maintainer: Stuart Wagenius <stuart.wagenius@gmail.com>
+Description: This package is meant to be used when studying anything that
+  mates. We will add more description later but I just wanted to fix the note
+  and have multiple complete sentences.
+License: GPL
+LazyData: true
+Imports:
+    Rcpp (>= 0.12.1),
+    sn,
+    FNN
+LinkingTo: Rcpp
+RoxygenNote: 5.0.1
