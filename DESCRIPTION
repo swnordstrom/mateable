@@ -9,8 +9,7 @@ Authors@R: c(
     person("Amy", "Waananen", email = "amy.waananen@gmail.com", role = "aut"))
 Maintainer: Stuart Wagenius <stuart.wagenius@gmail.com>
 Description: This package is meant to be used when studying anything that
-  mates. We will add more description later but I just wanted to fix the note
-  and have multiple complete sentences.
+  mates. I'm changing it again because I want to test out something with Git
 License: GPL
 LazyData: true
 Imports:
