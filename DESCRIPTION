@@ -1,6 +1,6 @@
 Package: mateable
 Type: Package
-Title: functions to study flowering phenology
+Title: Tools to Assess Mating Potential in Space and Time
 Version: 0.2.0
 Date: 2015-12-29
 Authors@R: c(
@@ -8,9 +8,12 @@ Authors@R: c(
     person("Danny", "Hanson", email = "danny.hanson52@gmail.com", role = "aut"),
     person("Amy", "Waananen", email = "amy.waananen@gmail.com", role = "aut"))
 Maintainer: Stuart Wagenius <stuart.wagenius@gmail.com>
-Description: This package is meant to be used when studying anything that
-  mates. One more change to see if it's worked. I'll be changing this soon
-  anyways.
+Description: This package can be used while studying anything that mates.
+  With functions in this package, researchers can visualize spatial,
+  temporal, and (not yet implemented) genetic mating potential data.
+  It provides several functions that implement both previously described
+  and novel methods to assess synchrony, proximity, and compatibility
+  in mating populations.
 License: GPL
 LazyData: true
 Imports:
