@@ -9,7 +9,8 @@ Authors@R: c(
     person("Amy", "Waananen", email = "amy.waananen@gmail.com", role = "aut"))
 Maintainer: Stuart Wagenius <stuart.wagenius@gmail.com>
 Description: This package is meant to be used when studying anything that
-  mates. I'm changing it again because I want to test out something with Git
+  mates. One more change to see if it's worked. I'll be changing this soon
+  anyways.
 License: GPL
 LazyData: true
 Imports:
