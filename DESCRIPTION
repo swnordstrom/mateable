@@ -14,7 +14,7 @@ Description: This package is meant to be used when studying anything that
 License: GPL
 LazyData: true
 Imports:
-    Rcpp (>= 0.12.1),
+    Rcpp,
     sn,
     FNN
 LinkingTo: Rcpp
