@@ -135,7 +135,7 @@ makeFS <- function(df, startCol= "startDate", endCol= "endDate", dateFormat = "%
 ##' Get the element out of a dist object or dist-like vector that would be
 ##' in position [i,j] if the dist object was a matrix Depending on whether
 ##' the diagonal is included, the formula to get the [i,j] element is
-##' n*(i-1)-i*(i-1)/2+j if \code{diag} is FALSE or n*(i-1)-i*(i+1)/2+j
+##' n*(i-1)-i*(i-1)/2+j if \code{diag} is TRUE or n*(i-1)-i*(i+1)/2+j
 ##' if \code{diag} is FALSE.
 ##'
 ##' @title Get elements from a dist object
@@ -175,6 +175,57 @@ getDistij <- function(distO, i, j, diag = FALSE) {
   tmp <- ij[inds,1]
   ij[inds,1] <- ij[inds,2]
   ij[inds,2] <- tmp
+
+  # return the appropriate values based on calculated indices
+  if (diag) {
+    # n*(i-1)-i*(i-1)/2+j
+    retVal <- distO[n*(ij[,1]-1) - ij[,1]*(ij[,1]-1)/2 + ij[,2]]
+  } else {
+    # n*(i-1)-i*(i+1)/2+j
+    retVal <- distO[n*(ij[,1]-1) - ij[,1]*(ij[,1]+1)/2 + ij[,2]]
+  }
+  retVal
+}
+
+##' Get i and j given the index within a dist object or dist-like vector
+##'
+##' @title Get i and j from a dist index
+##' @param ind the index within the dist-like vector
+##' @param n the population size. You need either this or distO
+##' @param distO a dist object or vector made in a dist-like manner
+##' @param diag logical, whether or not the diagonal has been included
+##' in the dist-like vector.
+##' @return a vector (i, j) of the indeces of the individuals from the original
+##' population
+##' @export
+##' @author Danny Hanson
+##' @examples
+##' pop <- generatePop(size = 200)
+##' dayEither <- daysEitherFlowering(pop)
+##' highOnes <- which(dayEither > 10)
+##' getIndFromij(highOnes, 200)
+##' getIndFromij(highOnes, distO = dayEither) # should be equal
+getIndFromij <- function(ind, n = -1, distO = NULL, diag = FALSE) {
+  # get size of square matrix (n)
+  if (n == -1) {
+    if (!is.null(distO)) {
+      firstN <- sqrt(1+8*length(distO))/2
+      n <- ifelse(diag, firstN-1/2, firstN+1/2)
+      # check if n is a good number
+      if (!round(n) == n) {
+        warning("distO is not a proper length. It should be n*(n+1)/2 where n is
+            the number of rows/columns in the square distance matrix. Running
+            code with calculated n rounded to nearest integer")
+        n <- round(n)
+      }
+    } else {
+      stop("You must enter a value for either n or distO")
+    }
+  } else {
+    if (!(round(n) == n) | n < 1) {
+      stop("n must be an integer > 0")
+    }
+  }
 
   # return the appropriate values based on calculated indices
   if (diag) {

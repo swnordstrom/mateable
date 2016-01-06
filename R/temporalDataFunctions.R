@@ -367,5 +367,5 @@ synchrony <- function(popn, method = c("augspurger", "kempenaers", "sync/either"
          population = popSync,
          pairwise = pairSync,
          individual = indSync,
-         all = list(popSync, pairSync, indSync))
+         all = list(pop = popSync, pair = pairSync, ind = indSync))
 }
