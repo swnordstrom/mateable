@@ -21,7 +21,7 @@ IntegerVector sync_loop_nodiag(IntegerVector starts, IntegerVector ends, int n) 
       }
 
       int days = finish - begin;
-      if (days > 0) days += 1;
+      if (days >= 0) days += 1;
       if (days < 0) days = 0;
 //       int ind = i+1;
 //       int jnd = j+1;
@@ -53,7 +53,7 @@ IntegerVector sync_loop_diag(IntegerVector starts, IntegerVector ends, int n) {
       }
 
       int days = finish - begin;
-      if (days > 0) days += 1;
+      if (days >= 0) days += 1;
       if (days < 0) days = 0;
 //       int ind = i+1;
 //       int jnd = j+1;
@@ -71,6 +71,12 @@ IntegerVector either_loop_nodiag(IntegerVector starts, IntegerVector ends, int n
   int count = 0;
   for (int i = 0; i < n-1; i++) {
     for (int j = i+1; j < n; j++) {
+      if (starts[i] > ends[j] || starts[j] > ends[i]) {
+        eitherMatrix[count] = ends[i] - starts[i] + ends[j] - starts[j] + 2;
+        count++;
+        continue;
+      }
+
       int begin;
       int finish;
       if (ends[i] > ends[j]) {
@@ -85,7 +91,7 @@ IntegerVector either_loop_nodiag(IntegerVector starts, IntegerVector ends, int n
       }
 
       int days = finish - begin;
-      if (days > 0) days += 1;
+      if (days >= 0) days += 1;
       if (days < 0) days = 0;
 //       int ind = i+1;
 //       int jnd = j+1;
@@ -103,6 +109,12 @@ IntegerVector either_loop_diag(IntegerVector starts, IntegerVector ends, int n) 
   int count = 0;
   for (int i = 0; i < n; i++) {
     for (int j = i; j < n; j++) {
+      if (starts[i] > ends[j] || starts[j] > ends[i]) {
+        eitherMatrix[count] = ends[i] - starts[i] + ends[j] - starts[j] + 2;
+        count++;
+        continue;
+      }
+
       int begin;
       int finish;
       if (ends[i] > ends[j]) {
@@ -117,7 +129,7 @@ IntegerVector either_loop_diag(IntegerVector starts, IntegerVector ends, int n) 
       }
 
       int days = finish - begin;
-      if (days > 0) days += 1;
+      if (days >= 0) days += 1;
       if (days < 0) days = 0;
 //       int ind = i+1;
 //       int jnd = j+1;

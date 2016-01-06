@@ -24,7 +24,7 @@ was a matrix
 Get the element out of a dist object or dist-like vector that would be
 in position [i,j] if the dist object was a matrix Depending on whether
 the diagonal is included, the formula to get the [i,j] element is
-n*(i-1)-i*(i-1)/2+j if \code{diag} is FALSE or n*(i-1)-i*(i+1)/2+j
+n*(i-1)-i*(i-1)/2+j if \code{diag} is TRUE or n*(i-1)-i*(i+1)/2+j
 if \code{diag} is FALSE.
 }
 \examples{

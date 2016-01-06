@@ -189,6 +189,13 @@ getDistij <- function(distO, i, j, diag = FALSE) {
 
 ##' Get i and j given the index within a dist object or dist-like vector
 ##'
+##' I'm going to admit, this function is highly inefficient because I
+##' couldn't come up with way to invert either n*(i-1)-i*(i-1)/2+j or
+##' n*(i-1)-i*(i+1)/2+j to get a deterministic way to find i and j.
+##' I'm sure something with linear algebra could do it, but it's been
+##' a while, and computers are fast. If it's too slow, I'll write it
+##' in C++. This just compares all i, j combos until it gets it right
+##'
 ##' @title Get i and j from a dist index
 ##' @param ind the index within the dist-like vector
 ##' @param n the population size. You need either this or distO
@@ -203,9 +210,9 @@ getDistij <- function(distO, i, j, diag = FALSE) {
 ##' pop <- generatePop(size = 200)
 ##' dayEither <- daysEitherFlowering(pop)
 ##' highOnes <- which(dayEither > 10)
-##' getIndFromij(highOnes, 200)
-##' getIndFromij(highOnes, distO = dayEither) # should be equal
-getIndFromij <- function(ind, n = -1, distO = NULL, diag = FALSE) {
+##' getijFromInd(highOnes[1], 200) # only one at a time
+##' getijFromInd(highOnes[1], distO = dayEither) # should be equal
+getijFromInd <- function(ind, n = -1, distO = NULL, diag = FALSE) {
   # get size of square matrix (n)
   if (n == -1) {
     if (!is.null(distO)) {
@@ -227,13 +234,29 @@ getIndFromij <- function(ind, n = -1, distO = NULL, diag = FALSE) {
     }
   }
 
-  # return the appropriate values based on calculated indices
   if (diag) {
-    # n*(i-1)-i*(i-1)/2+j
-    retVal <- distO[n*(ij[,1]-1) - ij[,1]*(ij[,1]-1)/2 + ij[,2]]
+    getIndFromij <- function(i, j, n) {
+      # return the appropriate values based on calculated indices
+      n*(i-1) - i*(i-1)/2 + j
+    }
+    for (i in 1:n) {
+      for (j in i:n) {
+        if (getIndFromij(i,j,n) == ind) {
+          return(c(i,j))
+        }
+      }
+    }
   } else {
-    # n*(i-1)-i*(i+1)/2+j
-    retVal <- distO[n*(ij[,1]-1) - ij[,1]*(ij[,1]+1)/2 + ij[,2]]
+    getIndFromij <- function(i, j, n) {
+      # return the appropriate values based on calculated indices
+      n*(i-1) - i*(i+1)/2 + j
+    }
+    for (i in 1:(n-1)) {
+      for (j in (i+1):n) {
+        if (getIndFromij(i,j,n) == ind) {
+          return(c(i,j))
+        }
+      }
+    }
   }
-  retVal
 }
