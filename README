@@ -8,6 +8,10 @@ This package requires compiling C++ code using Rcpp so if you
 have loaded Rcpp at any point during your current R or RStudio
 session, you'll have to either detach it or close RStudio and
 open it again.
+Sometimes after the install_github step an error will occur
+usually just restarting RStudio will solve the problem. If
+this happens multiple times, please contact Stuart or Danny
+and in the meantime, download the whole repo and build it.
 
 install.packages("devtools") # if you don't already have it
 library(devtools)
