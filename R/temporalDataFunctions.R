@@ -339,25 +339,23 @@ synchrony <- function(popn, method = c("augspurger", "kempenaers", "sync/either"
 
     popSync <- average(sByE)
   } else if (method == "sync_nn") {
-    if (n < syncNN - 1) {
+    if (syncNN >= n) {
       stop("syncNN must be less than n")
     }
 
-    if (syncOrEither == "synchronous") {
-      syncMatrix <- daysSynchronous(popn, compareToSelf)
-    } else if (syncOrEither == "either") {
-      syncMatrix <- daysEitherFlowering(popn, compareToSelf)
-    }
+    syncMatrix <- daysSynchronous(popn, compareToSelf)
+    eitherMatrix <- daysEitherFlowering(popn, compareToSelf)
+    sByE <- syncMatrix/eitherMatrix
 
     # NOTE: if compareToSelf != TRUE then this will only have 99 columns and
     # indexing pairSync[i,j] where j > i will be done by pairSync[i,j-1]
     # also pairSync won't make much sense because it's being sorted
     pairSync <- t(sapply(1:n, FUN = function(i) {
-      sort(getDistij(syncMatrix, i, 1:n, diag = compareToSelf)/durMatrix[i,2], T)
+      sort(getDistij(sByE, i, 1:n, diag = compareToSelf), T)
     }))
 
     indSync <- data.frame(id = durMatrix$id, synchrony = -1)
-    indSync$synchrony <- rowMeans(pairSync)
+    indSync$synchrony <- pairSync[,syncNN]
 
     popSync <- average(pairSync[,syncNN])
   }
