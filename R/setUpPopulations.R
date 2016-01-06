@@ -260,3 +260,20 @@ getijFromInd <- function(ind, n = -1, distO = NULL, diag = FALSE) {
     }
   }
 }
+
+##' Get the index of an individual with a given id
+##'
+##' @title Find indices by id
+##' @param popn a 3D population object
+##' @param id character. The id(s) of the individual(s) you want to find
+##' @return a integer or vector of integers with the index/indices of
+##' all individuals in the id list
+##' @export
+##' @author Danny Hanson
+##' @examples
+##' pop <- generatePop()
+##' daySync <- daysSynchronous(pop)
+##' getDistij(daySync, 12, 34)
+getIndex <- function(popn, id) {
+  which(popn$df[[popn$id]] %in% id)
+}

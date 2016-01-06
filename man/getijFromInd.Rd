@@ -29,7 +29,7 @@ couldn't come up with way to invert either n*(i-1)-i*(i-1)/2+j or
 n*(i-1)-i*(i+1)/2+j to get a deterministic way to find i and j.
 I'm sure something with linear algebra could do it, but it's been
 a while, and computers are fast. If it's too slow, I'll write it
-in C++
+in C++. This just compares all i, j combos until it gets it right
 }
 \examples{
 pop <- generatePop(size = 200)
