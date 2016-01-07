@@ -27,8 +27,7 @@
 generatePop <- function(size = 30, meanSD = "2012-07-12", sdSD = 6, meanDur = 11,
                         sdDur = 3, sk = 0 ,xRange = c(0, 100), yRange = c(0, 100),
                         distro = "unif", sAlleles = 10) {
-  md <- as.integer(as.Date(strptime(meanSD, "%Y-%m-%d")))
-  md <- as.integer(md)
+  md <- as.integer(as.Date(meanSD, "%Y-%m-%d"))
   sd <- as.integer(md + round(sn::rsn(n = size, 0, omega = sdSD, alpha = sk), 0))
   ed <- as.integer(sd + abs(round(rnorm(size, meanDur, sdDur), 0)))
 
@@ -37,8 +36,7 @@ generatePop <- function(size = 30, meanSD = "2012-07-12", sdSD = 6, meanDur = 11
   xv <- runif(size, min = xRange[1], max = xRange[2])
   yv <- runif(size, min = yRange[1], max = yRange[2])
   sM <- sample(x = 1:sAlleles, size = size, replace = TRUE)
-  sP <- sapply(sM, FUN = function(x) sample((1:sAlleles)[-x],
-                                            1))
+  sP <- sapply(sM, FUN = function(x) sample((1:sAlleles)[-x], 1))
   df <- data.frame(pla = 1:size, start = sd, end = ed, x = xv,
                    y = yv, s1 = sM, s2 = sP)
   make3d(df, startCol = "start", endCol = "end", idcode = "pla",
@@ -64,7 +62,7 @@ generatePop <- function(size = 30, meanSD = "2012-07-12", sdSD = 6, meanDur = 11
 ##' \dontrun{generateFS(NULL)}
 generateFS <- function(size = 30, meanSD = "2012-07-12", sdSD = 6, meanDur = 11,
                        sdDur = 5, sk = 0)  {
-  md <- as.Date(strptime(meanSD, "%Y-%m-%d"))
+  md <- as.Date(meanSD, "%Y-%m-%d")
   sd <- md + round(sn::rsn(n = size, 0, omega = sdSD, alpha = sk), 0)
   ed <- sd + abs(round(rnorm(size, meanDur, sdDur), 0))
   fs <- data.frame(pla = 1:size, start = sd, end = ed)
@@ -100,8 +98,12 @@ make3d <- function (df, startCol = "startDate", endCol = "endDate", xCol = "x",
     df[, idcode] <- 1:dim(df)[1]
   df[, startCol] <- as.integer(as.Date(df[, startCol], dateFormat))
   df[, endCol] <- as.integer(as.Date(df[, endCol], dateFormat))
-  ans <- list(df = df, start = startCol, end = endCol, x = xCol,
-              y = yCol, s1 = s1Col, s2 = s2Col, id = idcode)
+  origin <- ifelse(grepl("[0-9]", dateFormat), dateFormat, "1970-01-01")
+  indexVector <- df[, idcode]
+
+  ans <- list(df = df, start = startCol, end = endCol, x = xCol, y = yCol,
+              s1 = s1Col, s2 = s2Col, id = idcode, origin = origin,
+              indices = indexVector)
   ans
 }
 
@@ -109,7 +111,7 @@ make3d <- function (df, startCol = "startDate", endCol = "endDate", xCol = "x",
 ##'
 ##' A great function
 ##'
-##' @title update a data frame to a flowernig schedule
+##' @title update a data frame to a flowering schedule
 ##' @param df data frame
 ##' @param startCol character name of column with start dates
 ##' @param endCol character name of column with end dates
@@ -125,10 +127,15 @@ make3d <- function (df, startCol = "startDate", endCol = "endDate", xCol = "x",
 ##'                       end = c("2015/08/08", "2015/08/11"))
 ##' makeFS(flowers, "start", "end", "%Y/%m/%d")
 ##' \dontrun{makeFS(NULL)}
-makeFS <- function(df, startCol= "startDate", endCol= "endDate", dateFormat = "%Y-%m-%d") {
+makeFS <- function(df, startCol= "startDate", endCol= "endDate", idcode = "id",
+                   dateFormat = "%Y-%m-%d") {
+  if (!idcode %in% names(df))
+    df[, idcode] <- 1:dim(df)[1]
   df[, startCol] <- as.integer(as.Date(df[, startCol], dateFormat))
   df[, endCol] <- as.integer(as.Date(df[, endCol], dateFormat))
-  ans <- list(df = df, start = startCol, end = endCol)
+  origin <- ifelse(grepl("[0-9]", dateFormat), dateFormat, "1970-01-01")
+  ans <- list(df = df, start = startCol, end = endCol, id = idcode,
+              origin = origin)
   ans
 }
 
@@ -275,5 +282,5 @@ getijFromInd <- function(ind, n = -1, distO = NULL, diag = FALSE) {
 ##' daySync <- daysSynchronous(pop)
 ##' getDistij(daySync, 12, 34)
 getIndex <- function(popn, id) {
-  which(popn$df[[popn$id]] %in% id)
+  which(popn$indices %in% id)
 }
