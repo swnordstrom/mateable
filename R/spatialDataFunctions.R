@@ -55,6 +55,8 @@ getPairwiseDistance <- function(popn) {
 ##' kNearNeighbors(pop, 3)
 kNearNeighbors <- function(popn, k) {
   knnMatrix <- FNN::knn.dist(popn$df[c(popn$x, popn$y)], k = k, algorithm = "brute")
+  rownames(knnMatrix) <- popn$df[, popn$id]
+  colnames(knnMatrix) <- paste("k", 1:k, sep = "")
   knnMatrix
 }
 
