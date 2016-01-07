@@ -115,6 +115,7 @@ make3d <- function (df, startCol = "startDate", endCol = "endDate", xCol = "x",
 ##' @param df data frame
 ##' @param startCol character name of column with start dates
 ##' @param endCol character name of column with end dates
+##' @param idcode character name for column with unique identifier
 ##' @param dateFormat character giving either the format of the start and end
 ##' dates columns if those columns are characters or the origin if those
 ##' columns are numeric (used in as.Date)
@@ -137,6 +138,52 @@ makeFS <- function(df, startCol= "startDate", endCol= "endDate", idcode = "id",
   ans <- list(df = df, start = startCol, end = endCol, id = idcode,
               origin = origin)
   ans
+}
+
+##' Get the element out of a dist object or dist-like vector that would be
+##' in position [i,j] if the dist object was a matrix Depending on whether
+##' the diagonal is included, the formula to get the [i,j] element is
+##' n*(i-1)-i*(i-1)/2+j if \code{diag} is TRUE or n*(i-1)-i*(i+1)/2+j
+##' if \code{diag} is FALSE.
+##'
+##' @title Get elements from a dist object
+##' @param distO a dist object or vector made in a dist-like manner
+##' @param id1 character, the id of one of the individuals of interest
+##' @param id2 character, the id of the other individual of interest
+##' @return the element that would be in position [i,j] if the dist object
+##' was a matrix
+##' @export
+##' @author Danny Hanson
+##' @examples
+##' pop <- generatePop(size = 200)
+##' daySync <- daysSynchronous(pop)
+##' getDistElement(daySync, "20", "30")
+getDistElement <- function(distO, id1, id2) {
+  # get size of square matrix (n)
+  n <- attr(distO, "n")
+  diag <- attr(distO, "includeSelf")
+  if (is.null(diag)) diag <- F
+  i <- which(attr(distO, "indices") %in% id1)
+  j <- which(attr(distO, "indices") %in% id2)
+  # switch anything where i > j
+  ij <- expand.grid(i,j)
+  if (!diag) {
+    ij <- ij[ij[,1] != ij[,2],] # remove i == j if !diag
+  }
+  inds <- ij[,1] > ij[,2]
+  tmp <- ij[inds,1]
+  ij[inds,1] <- ij[inds,2]
+  ij[inds,2] <- tmp
+
+  # return the appropriate values based on calculated indices
+  if (diag) {
+    # n*(i-1)-i*(i-1)/2+j
+    retVal <- distO[n*(ij[,1]-1) - ij[,1]*(ij[,1]-1)/2 + ij[,2]]
+  } else {
+    # n*(i-1)-i*(i+1)/2+j
+    retVal <- distO[n*(ij[,1]-1) - ij[,1]*(ij[,1]+1)/2 + ij[,2]]
+  }
+  retVal
 }
 
 ##' Get the element out of a dist object or dist-like vector that would be

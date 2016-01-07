@@ -129,6 +129,9 @@ daysSynchronous <- function(popn, compareToSelf = FALSE) {
   } else {
     syncMatrix <- sync_loop_nodiag(startV, endV, n)
   }
+  attr(syncMatrix, "n") <- n
+  attr(syncMatrix, "includeSelf") <- compareToSelf
+  attr(syncMatrix, "indices") <- popn$indices
   syncMatrix
 }
 
@@ -159,6 +162,9 @@ daysEitherFlowering <- function(popn, compareToSelf = FALSE) {
   } else {
     eitherMatrix <- either_loop_nodiag(startV, endV, n)
   }
+  attr(eitherMatrix, "n") <- n
+  attr(eitherMatrix, "includeSelf") <- compareToSelf
+  attr(eitherMatrix, "indices") <- popn$indices
   eitherMatrix
 }
 

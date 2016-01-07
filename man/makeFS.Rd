@@ -2,9 +2,9 @@
 % Please edit documentation in R/setUpPopulations.R
 \name{makeFS}
 \alias{makeFS}
-\title{update a data frame to a flowernig schedule}
+\title{update a data frame to a flowering schedule}
 \usage{
-makeFS(df, startCol = "startDate", endCol = "endDate",
+makeFS(df, startCol = "startDate", endCol = "endDate", idcode = "id",
   dateFormat = "\%Y-\%m-\%d")
 }
 \arguments{
@@ -13,6 +13,8 @@ makeFS(df, startCol = "startDate", endCol = "endDate",
 \item{startCol}{character name of column with start dates}
 
 \item{endCol}{character name of column with end dates}
+
+\item{idcode}{character name for column with unique identifier}
 
 \item{dateFormat}{character giving either the format of the start and end
 dates columns if those columns are characters or the origin if those

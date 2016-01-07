@@ -31,7 +31,12 @@ getSpatialDF <- function(popn) {
 ##' getDistij(distance, 14, 15)
 getPairwiseDistance <- function(popn) {
   distances <- dist(popn$df[,c(popn$x, popn$y)])
-  as.numeric(distances)
+  n <- attr(distances, "Size")
+  dist.num <- as.numeric(distances)
+  attr(dist.num, "n") <- n
+  attr(dist.num, "includeSelf") <- F
+  attr(dist.num, "indices") <- popn$indices
+  dist.num
 }
 
 ##' Find the k nearest neighbors for all individuals in a population. This
