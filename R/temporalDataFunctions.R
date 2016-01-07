@@ -131,7 +131,7 @@ daysSynchronous <- function(popn, compareToSelf = FALSE) {
   }
   attr(syncMatrix, "n") <- n
   attr(syncMatrix, "includeSelf") <- compareToSelf
-  attr(syncMatrix, "indices") <- popn$indices
+  attr(syncMatrix, "indices") <- popn$df[[popn$id]]
   syncMatrix
 }
 
@@ -164,7 +164,7 @@ daysEitherFlowering <- function(popn, compareToSelf = FALSE) {
   }
   attr(eitherMatrix, "n") <- n
   attr(eitherMatrix, "includeSelf") <- compareToSelf
-  attr(eitherMatrix, "indices") <- popn$indices
+  attr(eitherMatrix, "indices") <- popn$df[[popn$id]]
   eitherMatrix
 }
 

@@ -35,7 +35,7 @@ getPairwiseDistance <- function(popn) {
   dist.num <- as.numeric(distances)
   attr(dist.num, "n") <- n
   attr(dist.num, "includeSelf") <- F
-  attr(dist.num, "indices") <- popn$indices
+  attr(dist.num, "indices") <- popn$df[[popn$id]]
   dist.num
 }
 

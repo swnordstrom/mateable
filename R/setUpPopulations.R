@@ -99,11 +99,9 @@ make3d <- function (df, startCol = "startDate", endCol = "endDate", xCol = "x",
   df[, startCol] <- as.integer(as.Date(df[, startCol], dateFormat))
   df[, endCol] <- as.integer(as.Date(df[, endCol], dateFormat))
   origin <- ifelse(grepl("[0-9]", dateFormat), dateFormat, "1970-01-01")
-  indexVector <- df[, idcode]
 
   ans <- list(df = df, start = startCol, end = endCol, x = xCol, y = yCol,
-              s1 = s1Col, s2 = s2Col, id = idcode, origin = origin,
-              indices = indexVector)
+              s1 = s1Col, s2 = s2Col, id = idcode, origin = origin)
   ans
 }
 
@@ -159,12 +157,23 @@ makeFS <- function(df, startCol= "startDate", endCol= "endDate", idcode = "id",
 ##' daySync <- daysSynchronous(pop)
 ##' getDistElement(daySync, "20", "30")
 getDistElement <- function(distO, id1, id2) {
-  # get size of square matrix (n)
   n <- attr(distO, "n")
   diag <- attr(distO, "includeSelf")
   if (is.null(diag)) diag <- F
-  i <- which(attr(distO, "indices") %in% id1)
-  j <- which(attr(distO, "indices") %in% id2)
+  indices <- attr(distO, "indices")
+
+  # ensure that the order of the ids stays the same
+  orderById <- function(index.values, ids) {
+    idDF <- data.frame(id = ids, order = 1:length(ids))
+    indexDF <- data.frame(id = indices[index.values], index = index.values)
+    indexMerge <- merge(idDF, indexDF)
+    indexMerge <- indexMerge[order(indexMerge$order),]
+    indexMerge$index
+  }
+
+  i <- orderById(which(indices %in% id1), id1)
+  j <- orderById(which(indices %in% id2), id2)
+
   # switch anything where i > j
   ij <- expand.grid(i,j)
   if (!diag) {
@@ -313,21 +322,4 @@ getijFromInd <- function(ind, n = -1, distO = NULL, diag = FALSE) {
       }
     }
   }
-}
-
-##' Get the index of an individual with a given id
-##'
-##' @title Find indices by id
-##' @param popn a 3D population object
-##' @param id character. The id(s) of the individual(s) you want to find
-##' @return a integer or vector of integers with the index/indices of
-##' all individuals in the id list
-##' @export
-##' @author Danny Hanson
-##' @examples
-##' pop <- generatePop()
-##' daySync <- daysSynchronous(pop)
-##' getDistij(daySync, 12, 34)
-getIndex <- function(popn, id) {
-  which(popn$indices %in% id)
 }
