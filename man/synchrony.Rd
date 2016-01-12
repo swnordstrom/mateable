@@ -5,9 +5,9 @@
 \title{Mating synchrony of a population}
 \usage{
 synchrony(popn, method = c("augspurger", "kempenaers", "sync/either",
-  "sync_nn"), syncOrEither = c("synchronous", "either"),
-  synchronyType = c("population", "pairwise", "individual", "all"),
-  averageType = c("mean", "median"), syncNN = 1, compareToSelf = FALSE)
+  "sync_nn"), synchronyType = c("population", "pairwise", "individual",
+  "all"), averageType = c("mean", "median"), syncNN = 1,
+  compareToSelf = FALSE)
 }
 \arguments{
 \item{popn}{a 3dPop object that has the flowering schedule for the
@@ -21,11 +21,6 @@ value based on the number of days both individuals were flowering divided
 by the number of days either individual was available for mating. "sync_nn"
 gives the average of the kth nearest neighbor, or rather the kth most
 synchronous individual.}
-
-\item{syncOrEither}{character. Applies for methods augspurger, kempenaers,
-and sync_nn. It specicies whether to use the number of days that both
-individuals were flowering or the number of days either individuals was
-flowering when calculating synchrony.}
 
 \item{synchronyType}{one of "population", "pairwise", "individual", or "all"
 - see Value for more details.}
@@ -67,7 +62,7 @@ pop <- generatePop(size = 150)
 synchrony(pop)
 
 pop2 <- generatePop(size = 1234, sdDur = 5, sk = 1)
-syncVals <- synchrony(pop2, "sync_nn", "either", "all", "median", 123)
+syncVals <- synchrony(pop2, "sync_nn", "all", "median", 123)
 }
 \author{
 Danny Hanson

@@ -241,10 +241,6 @@ getDaysFlowering <- function(popn, ind) {
 ##' by the number of days either individual was available for mating. "sync_nn"
 ##' gives the average of the kth nearest neighbor, or rather the kth most
 ##' synchronous individual.
-##' @param syncOrEither character. Applies for methods augspurger, kempenaers,
-##' and sync_nn. It specicies whether to use the number of days that both
-##' individuals were flowering or the number of days either individuals was
-##' flowering when calculating synchrony.
 ##' @param synchronyType one of "population", "pairwise", "individual", or "all"
 ##' - see Value for more details.
 ##' @param averageType character. Identifies whether to take the mean or median
@@ -277,37 +273,38 @@ getDaysFlowering <- function(popn, ind) {
 ##' synchrony(pop)
 ##'
 ##' pop2 <- generatePop(size = 1234, sdDur = 5, sk = 1)
-##' syncVals <- synchrony(pop2, "sync_nn", "either", "all", "median", 123)
+##' syncVals <- synchrony(pop2, "sync_nn", "all", "median", 123)
 synchrony <- function(popn, method = c("augspurger", "kempenaers", "sync/either",
                                        "sync_nn"),
-                      syncOrEither = c("synchronous", "either"),
                       synchronyType = c("population", "pairwise", "individual",
                                         "all"), averageType = c("mean", "median"),
                       syncNN = 1, compareToSelf = FALSE) {
   method <- match.arg(method)
-  syncOrEither <- match.arg(syncOrEither)
   synchronyType <- match.arg(synchronyType)
   averageType <- match.arg(averageType)
 
   # some things that all methods need
   durMatrix <- getDuration(popn)
   n <- nrow(durMatrix) # population size
+  syncMatrix <- daysSynchronous(popn, compareToSelf) # 3 of 4 methods need this
   if (averageType == "mean") {
     average <- mean
   } else if (averageType == "median") {
     average <- median
   }
+  # deal with pop size and transposing matrices
+  if (n < 2) {
+    stop("Can't calculate synchrony for population size less than 2")
+  } else if (n == 2) {
+    transpose <- function(a) { t(t(a)) }
+  } else {
+    transpose <- function(a) { t(a) }
+  }
 
   if (method == "augspurger") {
-    if (syncOrEither == "synchronous") {
-      syncMatrix <- daysSynchronous(popn, compareToSelf)
-    } else if (syncOrEither == "either") {
-      syncMatrix <- daysEitherFlowering(popn, compareToSelf)
-    }
-
     # NOTE: if compareToSelf != TRUE then this will only have 99 columns and
     # indexing pairSync[i,j] where j > i will be done by pairSync[i,j-1]
-    pairSync <- t(sapply(1:n, FUN = function(i) {
+    pairSync <- transpose(sapply(1:n, FUN = function(i) {
       getDistij(syncMatrix, i, 1:n, diag = compareToSelf)/durMatrix[i,2]
     }))
 
@@ -328,13 +325,12 @@ synchrony <- function(popn, method = c("augspurger", "kempenaers", "sync/either"
 
     popSync <- average(indSync[,2])
   } else if (method == "sync/either") {
-    syncMatrix <- daysSynchronous(popn, compareToSelf)
     eitherMatrix <- daysEitherFlowering(popn, compareToSelf)
     sByE <- syncMatrix/eitherMatrix
 
     # NOTE: if compareToSelf != TRUE then this will only have 99 columns and
     # indexing pairSync[i,j] where j > i will be done by pairSync[i,j-1]
-    pairSync <- t(sapply(1:n, FUN = function(i) {
+    pairSync <- transpose(sapply(1:n, FUN = function(i) {
       getDistij(sByE, i, 1:n, diag = compareToSelf)
     }))
 
@@ -349,14 +345,13 @@ synchrony <- function(popn, method = c("augspurger", "kempenaers", "sync/either"
       stop("syncNN must be less than n")
     }
 
-    syncMatrix <- daysSynchronous(popn, compareToSelf)
     eitherMatrix <- daysEitherFlowering(popn, compareToSelf)
     sByE <- syncMatrix/eitherMatrix
 
     # NOTE: if compareToSelf != TRUE then this will only have 99 columns and
     # indexing pairSync[i,j] where j > i will be done by pairSync[i,j-1]
     # also pairSync won't make much sense because it's being sorted
-    pairSync <- t(sapply(1:n, FUN = function(i) {
+    pairSync <- transpose(sapply(1:n, FUN = function(i) {
       sort(getDistij(sByE, i, 1:n, diag = compareToSelf), T)
     }))
 
