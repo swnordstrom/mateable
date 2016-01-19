@@ -5,6 +5,58 @@
 
 using namespace Rcpp;
 
+// pair_sync_aug_noself
+NumericMatrix pair_sync_aug_noself(IntegerVector syncMatrix, IntegerVector durMatrix, int n);
+RcppExport SEXP mateable_pair_sync_aug_noself(SEXP syncMatrixSEXP, SEXP durMatrixSEXP, SEXP nSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< IntegerVector >::type syncMatrix(syncMatrixSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type durMatrix(durMatrixSEXP);
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    __result = Rcpp::wrap(pair_sync_aug_noself(syncMatrix, durMatrix, n));
+    return __result;
+END_RCPP
+}
+// pair_sync_aug_self
+NumericMatrix pair_sync_aug_self(IntegerVector syncMatrix, IntegerVector durMatrix, int n);
+RcppExport SEXP mateable_pair_sync_aug_self(SEXP syncMatrixSEXP, SEXP durMatrixSEXP, SEXP nSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< IntegerVector >::type syncMatrix(syncMatrixSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type durMatrix(durMatrixSEXP);
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    __result = Rcpp::wrap(pair_sync_aug_self(syncMatrix, durMatrix, n));
+    return __result;
+END_RCPP
+}
+// pair_sync_eith_noself
+NumericMatrix pair_sync_eith_noself(IntegerVector syncMatrix, IntegerVector durMatrix, int n);
+RcppExport SEXP mateable_pair_sync_eith_noself(SEXP syncMatrixSEXP, SEXP durMatrixSEXP, SEXP nSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< IntegerVector >::type syncMatrix(syncMatrixSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type durMatrix(durMatrixSEXP);
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    __result = Rcpp::wrap(pair_sync_eith_noself(syncMatrix, durMatrix, n));
+    return __result;
+END_RCPP
+}
+// pair_sync_eith_self
+NumericMatrix pair_sync_eith_self(IntegerVector syncMatrix, IntegerVector durMatrix, int n);
+RcppExport SEXP mateable_pair_sync_eith_self(SEXP syncMatrixSEXP, SEXP durMatrixSEXP, SEXP nSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< IntegerVector >::type syncMatrix(syncMatrixSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type durMatrix(durMatrixSEXP);
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    __result = Rcpp::wrap(pair_sync_eith_self(syncMatrix, durMatrix, n));
+    return __result;
+END_RCPP
+}
 // sync_loop_nodiag
 IntegerVector sync_loop_nodiag(IntegerVector starts, IntegerVector ends, int n);
 RcppExport SEXP mateable_sync_loop_nodiag(SEXP startsSEXP, SEXP endsSEXP, SEXP nSEXP) {

@@ -304,9 +304,11 @@ synchrony <- function(popn, method = c("augspurger", "kempenaers", "sync/either"
   if (method == "augspurger") {
     # NOTE: if compareToSelf != TRUE then this will only have 99 columns and
     # indexing pairSync[i,j] where j > i will be done by pairSync[i,j-1]
-    pairSync <- transpose(sapply(1:n, FUN = function(i) {
-      getDistij(syncMatrix, i, 1:n, diag = compareToSelf)/durMatrix[i,2]
-    }))
+    if (compareToSelf) {
+      pairSync <- pair_sync_aug_self(as.numeric(syncMatrix), durMatrix[,2], n)
+    } else {
+      pairSync <- pair_sync_aug_noself(as.numeric(syncMatrix), durMatrix[,2], n)
+    }
 
     indSync <- data.frame(id = durMatrix$id, synchrony = -1)
     indSync$synchrony <- rowMeans(pairSync)
