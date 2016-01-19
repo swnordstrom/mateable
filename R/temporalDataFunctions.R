@@ -357,9 +357,12 @@ synchrony <- function(popn, method = c("augspurger", "kempenaers", "sync/either"
     # NOTE: if compareToSelf != TRUE then this will only have 99 columns and
     # indexing pairSync[i,j] where j > i will be done by pairSync[i,j-1]
     # also pairSync won't make much sense because it's being sorted
-    pairSync <- transpose(sapply(1:n, FUN = function(i) {
-      sort(getDistij(sByE, i, 1:n, diag = compareToSelf), T)
-    }))
+    if (compareToSelf) {
+      pairSyncInit <- pair_sync_either_self(sByE, n)
+    } else {
+      pairSyncInit <- pair_sync_either_noself(sByE, n)
+    }
+    pairSync <- transpose(apply(pairSyncInit, 1, sort, decreasing = TRUE))
 
     indSync <- data.frame(id = durMatrix$id, synchrony = -1)
     indSync$synchrony <- pairSync[,syncNN]
