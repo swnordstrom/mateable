@@ -311,7 +311,9 @@ synchrony <- function(popn, method = c("augspurger", "kempenaers", "sync/either"
     }
 
     indSync <- data.frame(id = durMatrix$id, synchrony = -1)
-    indSync$synchrony <- rowMeans(pairSync)
+    indSync$synchrony <- sapply(1:n, FUN = function(i) {
+      average(pairSync[i,])
+    })
 
     popSync <- average(indSync[,2])
   } else if (method == "kempenaers") {
@@ -332,9 +334,11 @@ synchrony <- function(popn, method = c("augspurger", "kempenaers", "sync/either"
 
     # NOTE: if compareToSelf != TRUE then this will only have 99 columns and
     # indexing pairSync[i,j] where j > i will be done by pairSync[i,j-1]
-    pairSync <- transpose(sapply(1:n, FUN = function(i) {
-      getDistij(sByE, i, 1:n, diag = compareToSelf)
-    }))
+    if (compareToSelf) {
+      pairSync <- pair_sync_either_self(sByE, n)
+    } else {
+      pairSync <- pair_sync_either_noself(sByE, n)
+    }
 
     indSync <- data.frame(id = durMatrix$id, synchrony = -1)
     indSync$synchrony <- sapply(1:n, FUN = function(i) {

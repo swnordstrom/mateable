@@ -1,9 +1,9 @@
 #include <Rcpp.h>
-#include <std.h>
+#include <stdio.h>
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-NumericMatrix pair_sync_aug_noself(IntegerVector syncMatrix, IntegerVector durMatrix,
+NumericMatrix pair_sync_aug_noself(NumericVector syncMatrix, NumericVector durMatrix,
                             int n) {
   NumericMatrix pairSync(n, n-1);
 
@@ -11,15 +11,15 @@ NumericMatrix pair_sync_aug_noself(IntegerVector syncMatrix, IntegerVector durMa
     for (int j = 0; j < n; j++) {
       if (i == j) continue;
 
-      int ind = i;
-      int jnd = j;
+      int ind = i+1;
+      int jnd = j+1;
       if (ind > jnd) {
-        ind = j;
-        jnd = i;
+        ind = j+1;
+        jnd = i+1;
       }
-      cout << "i " << i;
-      cout << "j " << j;
-      pairSync(i, j) = syncMatrix[n*(ind-1)-ind*(ind+1)/2+jnd]/durMatrix[i];
+      int jmp = j;
+      if (j > i) jmp = j-1;
+      pairSync(i, jmp) = syncMatrix[n*(ind-1)-ind*(ind+1)/2+jnd-1]/durMatrix[i];
     }
   }
 
@@ -27,42 +27,42 @@ NumericMatrix pair_sync_aug_noself(IntegerVector syncMatrix, IntegerVector durMa
 }
 
 // [[Rcpp::export]]
-NumericMatrix pair_sync_aug_self(IntegerVector syncMatrix, IntegerVector durMatrix,
+NumericMatrix pair_sync_aug_self(NumericVector syncMatrix, NumericVector durMatrix,
                                    int n) {
   NumericMatrix pairSync(n, n-1);
 
   for (int i = 0; i < n; i++) {
     for (int j = 0; j < n; j++) {
-      int ind = i;
-      int jnd = j;
+      int ind = i+1;
+      int jnd = j+1;
       if (ind > jnd) {
-        ind = j;
-        jnd = i;
+        ind = j+1;
+        jnd = i+1;
       }
-      pairSync(i, j) = syncMatrix[n*(ind-1)-ind*(ind-1)/2+jnd]/durMatrix[i];
+      pairSync(i, j) = syncMatrix[n*(ind-1)-ind*(ind-1)/2+jnd-1]/durMatrix[i];
     }
   }
 
   return pairSync;
 }
 
-
 // [[Rcpp::export]]
-NumericMatrix pair_sync_eith_noself(IntegerVector syncMatrix, IntegerVector durMatrix,
-                                   int n) {
+NumericMatrix pair_sync_either_noself(NumericVector syncMatrix, int n) {
   NumericMatrix pairSync(n, n-1);
 
   for (int i = 0; i < n; i++) {
     for (int j = 0; j < n; j++) {
       if (i == j) continue;
 
-      int ind = i;
-      int jnd = j;
+      int ind = i+1;
+      int jnd = j+1;
       if (ind > jnd) {
-        ind = j;
-        jnd = i;
+        ind = j+1;
+        jnd = i+1;
       }
-      pairSync(i, j) = syncMatrix[n*(ind-1)-ind*(ind+1)/2+jnd];
+      int jmp = j;
+      if (j > i) jmp = j-1;
+      pairSync(i, jmp) = syncMatrix[n*(ind-1)-ind*(ind+1)/2+jnd-1];
     }
   }
 
@@ -70,19 +70,18 @@ NumericMatrix pair_sync_eith_noself(IntegerVector syncMatrix, IntegerVector durM
 }
 
 // [[Rcpp::export]]
-NumericMatrix pair_sync_eith_self(IntegerVector syncMatrix, IntegerVector durMatrix,
-                                 int n) {
+NumericMatrix pair_sync_either_self(NumericVector syncMatrix, int n) {
   NumericMatrix pairSync(n, n-1);
 
   for (int i = 0; i < n; i++) {
     for (int j = 0; j < n; j++) {
-      int ind = i;
-      int jnd = j;
+      int ind = i+1;
+      int jnd = j+1;
       if (ind > jnd) {
-        ind = j;
-        jnd = i;
+        ind = j+1;
+        jnd = i+1;
       }
-      pairSync(i, j) = syncMatrix[n*(ind-1)-ind*(ind-1)/2+jnd];
+      pairSync(i, j) = syncMatrix[n*(ind-1)-ind*(ind-1)/2+jnd-1];
     }
   }
 

@@ -9,12 +9,12 @@ pair_sync_aug_self <- function(syncMatrix, durMatrix, n) {
     .Call('mateable_pair_sync_aug_self', PACKAGE = 'mateable', syncMatrix, durMatrix, n)
 }
 
-pair_sync_eith_noself <- function(syncMatrix, durMatrix, n) {
-    .Call('mateable_pair_sync_eith_noself', PACKAGE = 'mateable', syncMatrix, durMatrix, n)
+pair_sync_either_noself <- function(syncMatrix, n) {
+    .Call('mateable_pair_sync_either_noself', PACKAGE = 'mateable', syncMatrix, n)
 }
 
-pair_sync_eith_self <- function(syncMatrix, durMatrix, n) {
-    .Call('mateable_pair_sync_eith_self', PACKAGE = 'mateable', syncMatrix, durMatrix, n)
+pair_sync_either_self <- function(syncMatrix, n) {
+    .Call('mateable_pair_sync_either_self', PACKAGE = 'mateable', syncMatrix, n)
 }
 
 sync_loop_nodiag <- function(starts, ends, n) {
