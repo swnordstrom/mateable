@@ -17,7 +17,7 @@ a data frame with only the id, start, and end columns from the
 Extract temporal columns from a 3d population object
 }
 \examples{
-pop <- generatePop()
+pop <- simulateScene()
 flowerSched <- getTemporalDF(pop)
 }
 \author{

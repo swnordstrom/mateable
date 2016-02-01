@@ -19,7 +19,7 @@ is located in position [i,j]
 Create a matrix showing which individuals are flowering on a given day
 }
 \examples{
-pop <- generatePop(size = 10)
+pop <- simulateScene(size = 10)
 individualDailyFlowering(pop)
 }
 \author{

@@ -14,7 +14,7 @@ Add lines to show the positions of the earliest and latest flowering
 individuals within a population to a map
 }
 \examples{
-pop <- generatePop()
+pop <- simulateScene()
 mapWithColors(pop)
 pinpointExtremes(pop)
 }

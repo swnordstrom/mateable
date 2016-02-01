@@ -17,7 +17,7 @@ a data frame with only the id, x, and y columns from the
 Extract spatial columns from a 3d population object
 }
 \examples{
-pop <- generatePop()
+pop <- simulateScene()
 space <- getSpatialDF(pop)
 }
 \author{

@@ -23,7 +23,7 @@ pointsFS adds points to a flowering schedule figure
 A great function. It invisibly returns the same thing as summaryFS.
 }
 \examples{
-pop <- generatePop()
+pop <- simulateScene()
 plotFS(pop)
 pointsFS(pop, type = "b")
 }

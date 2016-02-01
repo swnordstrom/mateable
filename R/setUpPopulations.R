@@ -1,34 +1,30 @@
-##' generatePop generates a 3dpop object -- a simulated population in a standard format with individuals randomly assigned a mating schedule, a random location, and S-alleles
-##'
-##'
-##' A great function
+##' simulateScene generates a matingScene object -- a simulated population
+##' in a standard format with individuals randomly assigned a mating schedule,
+##' a location, and S-alleles
 ##'
 ##' @title simulate a 3d population
 ##' @param size integer number of plants
 ##' @param meanSD date mean start date
 ##' @param sdSD date standard deviation of start date
-##' @param sk skew of the start date of the population
+##' @param skSD skew of the start date of the population
 ##' @param meanDur numeric duration in days
 ##' @param sdDur standard deviation of duration in days
-##'
 ##' @param xRange range of spatial extent of individuals along x-axis
 ##' @param yRange range of spatial extent of individuals along y-axis
 ##' @param distro unimplemented
-##'
 ##' @param sAlleles integer count of S-Alleles that could be in the population
 ##'
-##'
-##' @return 3dpop object -- a data frame with columns identified
-##' @export
+##' @return matingScene object -- see \code{\link{makeScene}}
+##' @seealso \code{\link{makeScene}}
 ##' @author Stuart Wagenius
 ##' @examples
-##' generatePop()
-##' \dontrun{generatePop(NULL)}
-generatePop <- function(size = 30, meanSD = "2012-07-12", sdSD = 6, meanDur = 11,
-                        sdDur = 3, sk = 0 ,xRange = c(0, 100), yRange = c(0, 100),
+##' simulateScene()
+##' \dontrun{simulateScene(NULL)}
+simulateScene <- function(size = 30, meanSD = "2012-07-12", sdSD = 6, meanDur = 11,
+                        sdDur = 3, skSD = 0 ,xRange = c(0, 100), yRange = c(0, 100),
                         distro = "unif", sAlleles = 10) {
   md <- as.integer(as.Date(meanSD, "%Y-%m-%d"))
-  sd <- as.integer(md + round(sn::rsn(n = size, 0, omega = sdSD, alpha = sk), 0))
+  sd <- as.integer(md + round(sn::rsn(n = size, 0, omega = sdSD, alpha = skSD), 0))
   ed <- as.integer(sd + abs(round(rnorm(size, meanDur, sdDur), 0)))
 
   if (distro != "unif")
@@ -37,44 +33,17 @@ generatePop <- function(size = 30, meanSD = "2012-07-12", sdSD = 6, meanDur = 11
   yv <- runif(size, min = yRange[1], max = yRange[2])
   sM <- sample(x = 1:sAlleles, size = size, replace = TRUE)
   sP <- sapply(sM, FUN = function(x) sample((1:sAlleles)[-x], 1))
-  df <- data.frame(pla = 1:size, start = sd, end = ed, x = xv,
+  df <- data.frame(id = 1:size, start = sd, end = ed, x = xv,
                    y = yv, s1 = sM, s2 = sP)
-  make3d(df, startCol = "start", endCol = "end", idcode = "pla",
+  makeScene(df, startCol = "start", endCol = "end", idcode = "pla",
          dateFormat = "1970-01-01")
 }
 
-##' generateFS generates a random flowering schedule with standard format
+##' Turns a data frame with information about temporal, spatial, or
+##' genetic mating data into a matingScene object using a standard format.
 ##'
-##' A great function
-##'
-##' @title simulate a flowering schedule
-##' @param size integer number of plants
-##' @param meanSD date mean start date
-##' @param sdSD date standard deviation of start date
-##' @param sk skew of the start date of the population
-##' @param meanDur numeric duration in days
-##' @param sdDur standard deviation of duration in days
-##' @return data frame with startCol endCol added
-##' @export
-##' @author Stuart Wagenius
-##' @examples
-##' generateFS()
-##' \dontrun{generateFS(NULL)}
-generateFS <- function(size = 30, meanSD = "2012-07-12", sdSD = 6, meanDur = 11,
-                       sdDur = 5, sk = 0)  {
-  md <- as.Date(meanSD, "%Y-%m-%d")
-  sd <- md + round(sn::rsn(n = size, 0, omega = sdSD, alpha = sk), 0)
-  ed <- sd + abs(round(rnorm(size, meanDur, sdDur), 0))
-  fs <- data.frame(pla = 1:size, start = sd, end = ed)
-  makeFS(fs, startCol = "start", endCol = "end", dateFormat = "1970-01-01")
-}
-
-##' make3d edits a dataframe into a 3dpop object with standard format
-##'
-##' A great function
-##'
-##' @title update a data frame to a 3dpop
-##' @param df data frame
+##' @title Create a matingScene object from a data frame
+##' @param df a data frame containing mating information
 ##' @param startCol character name of column with start dates
 ##' @param endCol character name of column with end dates
 ##' @param xCol character name of column with x or E coordinates
@@ -82,244 +51,52 @@ generateFS <- function(size = 30, meanSD = "2012-07-12", sdSD = 6, meanDur = 11,
 ##' @param s1Col character name of one column with S-allele
 ##' @param s2Col character name of another column with S-alleles
 ##' @param idcode character name for column with unique identifier
-##' @param dateFormat character giving either the format of the start and end
-##' dates columns if those columns are characters or the origin if those
-##' columns are numeric (used in as.Date)
+##' @param dateFormat character giving either (1) the format of the start and end
+##' date columns if those columns are characters or (2) the origin for the start
+##' and end date columns if those columns are numeric. It is used in as.Date
 ##'
-##' @return 3dpop object, a data frame with columns identified
-##' @export
-##' @author Stuart Wagenius
+##' @return a matingScene object. A data frame with columns identified with
+##' attributes for each of the column names. See details for more information.
+##' @details
+##' @author Danny Hanson
 ##' @examples
 ##' \dontrun{makeFS(NULL)}
-make3d <- function (df, startCol = "startDate", endCol = "endDate", xCol = "x",
+makeScene <- function (df, startCol = "startDate", endCol = "endDate", xCol = "x",
                     yCol = "y", s1Col = "s1", s2Col = "s2", idcode = "id",
                     dateFormat = "%Y-%m-%d") {
-  if (!idcode %in% names(df))
-    df[, idcode] <- 1:dim(df)[1]
-  df[, startCol] <- as.integer(as.Date(df[, startCol], dateFormat))
-  df[, endCol] <- as.integer(as.Date(df[, endCol], dateFormat))
-  origin <- ifelse(grepl("[0-9]", dateFormat), dateFormat, "1970-01-01")
-
-  ans <- list(df = df, start = startCol, end = endCol, x = xCol, y = yCol,
-              s1 = s1Col, s2 = s2Col, id = idcode, origin = origin)
-  ans
-}
-
-##' makeFS edits a dataframe into a flowering schedule with standard format
-##'
-##' A great function
-##'
-##' @title update a data frame to a flowering schedule
-##' @param df data frame
-##' @param startCol character name of column with start dates
-##' @param endCol character name of column with end dates
-##' @param idcode character name for column with unique identifier
-##' @param dateFormat character giving either the format of the start and end
-##' dates columns if those columns are characters or the origin if those
-##' columns are numeric (used in as.Date)
-##' @return data frame with startCol endCol added
-##' @export
-##' @author Stuart Wagenius
-##' @examples
-##' flowers <- data.frame(id = c("one", "two"),
-##'                       start = c("2015/07/24", "2015/08/05"),
-##'                       end = c("2015/08/08", "2015/08/11"))
-##' makeFS(flowers, "start", "end", "%Y/%m/%d")
-##' \dontrun{makeFS(NULL)}
-makeFS <- function(df, startCol= "startDate", endCol= "endDate", idcode = "id",
-                   dateFormat = "%Y-%m-%d") {
-  if (!idcode %in% names(df))
-    df[, idcode] <- 1:dim(df)[1]
-  df[, startCol] <- as.integer(as.Date(df[, startCol], dateFormat))
-  df[, endCol] <- as.integer(as.Date(df[, endCol], dateFormat))
-  origin <- ifelse(grepl("[0-9]", dateFormat), dateFormat, "1970-01-01")
-  ans <- list(df = df, start = startCol, end = endCol, id = idcode,
-              origin = origin)
-  ans
-}
-
-##' Get the element out of a dist object or dist-like vector that would be
-##' in position [i,j] if the dist object was a matrix Depending on whether
-##' the diagonal is included, the formula to get the [i,j] element is
-##' n*(i-1)-i*(i-1)/2+j if \code{diag} is TRUE or n*(i-1)-i*(i+1)/2+j
-##' if \code{diag} is FALSE.
-##'
-##' @title Get elements from a dist object
-##' @param distO a dist object or vector made in a dist-like manner
-##' @param id1 character, the id of one of the individuals of interest
-##' @param id2 character, the id of the other individual of interest
-##' @return the element that would be in position [i,j] if the dist object
-##' was a matrix
-##' @export
-##' @author Danny Hanson
-##' @examples
-##' pop <- generatePop(size = 200)
-##' daySync <- daysSynchronous(pop)
-##' getDistElement(daySync, "20", "30")
-getDistElement <- function(distO, id1, id2) {
-  n <- attr(distO, "n")
-  diag <- attr(distO, "includeSelf")
-  if (is.null(diag)) diag <- F
-  indices <- attr(distO, "indices")
-
-  # ensure that the order of the ids stays the same
-  orderById <- function(index.values, ids) {
-    idDF <- data.frame(id = ids, order = 1:length(ids))
-    indexDF <- data.frame(id = indices[index.values], index = index.values)
-    indexMerge <- merge(idDF, indexDF)
-    indexMerge <- indexMerge[order(indexMerge$order),]
-    indexMerge$index
+  if (!idcode %in% names(df)) {
+    df[, idcode] <- 1:nrow(df)
   }
 
-  i <- orderById(which(indices %in% id1), id1)
-  j <- orderById(which(indices %in% id2), id2)
+  attr(df, "t") <- FALSE
+  attr(df, "s") <- FALSE
+  attr(df, "c") <- FALSE
+  attr(df, "id") <- idcode
 
-  # switch anything where i > j
-  ij <- expand.grid(i,j)
-  if (!diag) {
-    ij <- ij[ij[,1] != ij[,2],] # remove i == j if !diag
-  }
-  inds <- ij[,1] > ij[,2]
-  tmp <- ij[inds,1]
-  ij[inds,1] <- ij[inds,2]
-  ij[inds,2] <- tmp
+  if (all(c(startCol, endCol) %in% names(df))) {
+    attr(df, "t") <- TRUE
+    df[, startCol] <- as.integer(as.Date(df[, startCol], dateFormat))
+    df[, endCol] <- as.integer(as.Date(df[, endCol], dateFormat))
+    df[, "duration"] <- df[, endCol] - df[, startCol]
+    origin <- ifelse(grepl("[0-9]", dateFormat), dateFormat, "1970-01-01")
 
-  # return the appropriate values based on calculated indices
-  if (diag) {
-    # n*(i-1)-i*(i-1)/2+j
-    retVal <- distO[n*(ij[,1]-1) - ij[,1]*(ij[,1]-1)/2 + ij[,2]]
-  } else {
-    # n*(i-1)-i*(i+1)/2+j
-    retVal <- distO[n*(ij[,1]-1) - ij[,1]*(ij[,1]+1)/2 + ij[,2]]
-  }
-  retVal
-}
-
-##' Get the element out of a dist object or dist-like vector that would be
-##' in position [i,j] if the dist object was a matrix Depending on whether
-##' the diagonal is included, the formula to get the [i,j] element is
-##' n*(i-1)-i*(i-1)/2+j if \code{diag} is TRUE or n*(i-1)-i*(i+1)/2+j
-##' if \code{diag} is FALSE.
-##'
-##' @title Get elements from a dist object
-##' @param distO a dist object or vector made in a dist-like manner
-##' @param i integer, the row of the object of interest
-##' @param j integer, the column of the object of interest
-##' @param diag logical, whether or not the diagonal has been included
-##' in the dist-like vector.
-##' @return the element that would be in position [i,j] if the dist object
-##' was a matrix
-##' @export
-##' @author Danny Hanson
-##' @examples
-##' pop <- generatePop(size = 200)
-##' daySync <- daysSynchronous(pop)
-##' getDistij(daySync, 20, 30)
-##'
-##' daySyncSelf <- daysSynchronous(pop, TRUE)
-##' getDistij(daySync, 20, 30, TRUE)
-getDistij <- function(distO, i, j, diag = FALSE) {
-  # get size of square matrix (n)
-  firstN <- sqrt(1+8*length(distO))/2
-  n <- ifelse(diag, firstN-1/2, firstN+1/2)
-  # check if n is a good number
-  if (!round(n) == n) {
-    warning("distO is not a proper length. It should be n*(n+1)/2 where n is
-            the number of rows/columns in the square distance matrix. Running
-            code with calculated n rounded to nearest integer")
-    n <- round(n)
-  }
-  # switch anything where i > j
-  ij <- expand.grid(i,j)
-  if (!diag) {
-    ij <- ij[ij[,1] != ij[,2],] # remove i == j if !diag
-  }
-  inds <- ij[,1] > ij[,2]
-  tmp <- ij[inds,1]
-  ij[inds,1] <- ij[inds,2]
-  ij[inds,2] <- tmp
-
-  # return the appropriate values based on calculated indices
-  if (diag) {
-    # n*(i-1)-i*(i-1)/2+j
-    retVal <- distO[n*(ij[,1]-1) - ij[,1]*(ij[,1]-1)/2 + ij[,2]]
-  } else {
-    # n*(i-1)-i*(i+1)/2+j
-    retVal <- distO[n*(ij[,1]-1) - ij[,1]*(ij[,1]+1)/2 + ij[,2]]
-  }
-  retVal
-}
-
-##' Get i and j given the index within a dist object or dist-like vector
-##'
-##' I'm going to admit, this function is highly inefficient because I
-##' couldn't come up with way to invert either n*(i-1)-i*(i-1)/2+j or
-##' n*(i-1)-i*(i+1)/2+j to get a deterministic way to find i and j.
-##' I'm sure something with linear algebra could do it, but it's been
-##' a while, and computers are fast. If it's too slow, I'll write it
-##' in C++. This just compares all i, j combos until it gets it right
-##'
-##' @title Get i and j from a dist index
-##' @param ind the index within the dist-like vector
-##' @param n the population size. You need either this or distO
-##' @param distO a dist object or vector made in a dist-like manner
-##' @param diag logical, whether or not the diagonal has been included
-##' in the dist-like vector.
-##' @return a vector (i, j) of the indeces of the individuals from the original
-##' population
-##' @export
-##' @author Danny Hanson
-##' @examples
-##' pop <- generatePop(size = 200)
-##' dayEither <- daysEitherFlowering(pop)
-##' highOnes <- which(dayEither > 10)
-##' getijFromInd(highOnes[1], 200) # only one at a time
-##' getijFromInd(highOnes[1], distO = dayEither) # should be equal
-getijFromInd <- function(ind, n = -1, distO = NULL, diag = FALSE) {
-  # get size of square matrix (n)
-  if (n == -1) {
-    if (!is.null(distO)) {
-      firstN <- sqrt(1+8*length(distO))/2
-      n <- ifelse(diag, firstN-1/2, firstN+1/2)
-      # check if n is a good number
-      if (!round(n) == n) {
-        warning("distO is not a proper length. It should be n*(n+1)/2 where n is
-            the number of rows/columns in the square distance matrix. Running
-            code with calculated n rounded to nearest integer")
-        n <- round(n)
-      }
-    } else {
-      stop("You must enter a value for either n or distO")
-    }
-  } else {
-    if (!(round(n) == n) | n < 1) {
-      stop("n must be an integer > 0")
-    }
+    attr(df, "start") <- startCol
+    attr(df, "end") <- endCol
+    attr(df, "duration") <- "duration"
+    attr(df, "origin") <- origin
   }
 
-  if (diag) {
-    getIndFromij <- function(i, j, n) {
-      # return the appropriate values based on calculated indices
-      n*(i-1) - i*(i-1)/2 + j
-    }
-    for (i in 1:n) {
-      for (j in i:n) {
-        if (getIndFromij(i,j,n) == ind) {
-          return(c(i,j))
-        }
-      }
-    }
-  } else {
-    getIndFromij <- function(i, j, n) {
-      # return the appropriate values based on calculated indices
-      n*(i-1) - i*(i+1)/2 + j
-    }
-    for (i in 1:(n-1)) {
-      for (j in (i+1):n) {
-        if (getIndFromij(i,j,n) == ind) {
-          return(c(i,j))
-        }
-      }
-    }
+  if (all(c(xCol, yCol) %in% names(df))) {
+    attr(df, "s") <- TRUE
+    attr(df, "x") <- xCol
+    attr(df, "y") <- yCol
   }
+
+  if (all(c(s1Col, s2Col) %in% names(df))) {
+    attr(df, "c") <- TRUE
+    attr(df, "s1") <- s1Col
+    attr(df, "s2") <- s2Col
+  }
+
+  df
 }

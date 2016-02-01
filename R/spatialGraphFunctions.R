@@ -39,7 +39,7 @@ get_point_colors <- function(popn, startOrSync = "start", syncMethod = "aug") {
 ##' @export
 ##' @author Danny Hanson
 ##' @examples
-##' pop <- generatePop()
+##' pop <- simulateScene()
 ##' mapWithColors(pop)
 mapWithColors <- function(popn, startOrSync = "start") {
   rgbVals <- get_point_colors(popn, startOrSync)
@@ -60,7 +60,7 @@ mapWithColors <- function(popn, startOrSync = "start") {
 ##' @export
 ##' @author Danny Hanson
 ##' @examples
-##' pop <- generatePop()
+##' pop <- simulateScene()
 ##' mapWithColors(pop)
 ##' pinpointExtremes(pop)
 pinpointExtremes <- function(popn) {
@@ -81,7 +81,7 @@ pinpointExtremes <- function(popn) {
 ##' @export
 ##' @author Danny Hanson
 ##' @examples
-##' pop <- generatePop()
+##' pop <- simulateScene()
 ##' mapForDay(pop, 8)
 mapForDay <- function(popn, day) {
   indDaily <- individualDailyFlowering(popn)
@@ -111,7 +111,7 @@ mapForDay <- function(popn, day) {
 ##' @author Stuart Wagenius
 ##' @seealso see generic function \code{\link{points}} for values of \code{pch}
 ##' @examples
-##' pop <- generatePop()
+##' pop <- simulateScene()
 ##' plotMap(pop)
 ##' \dontrun{plotMap(NULL)}
 plotMap <- function (pp, xlab = "E", ylab = "N", pch = NULL, ...)

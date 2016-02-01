@@ -26,7 +26,7 @@ optional arguments for the plot function
 plotMap makes a map of a population
 }
 \examples{
-pop <- generatePop()
+pop <- simulateScene()
 plotMap(pop)
 \dontrun{plotMap(NULL)}
 }

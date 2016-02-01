@@ -58,10 +58,10 @@ Kempenaers (1983), and from Wagenius (personal observations), as well
 as variations on different factors of those measures.
 }
 \examples{
-pop <- generatePop(size = 150)
+pop <- simulateScene(size = 150)
 synchrony(pop)
 
-pop2 <- generatePop(size = 1234, sdDur = 5, sk = 1)
+pop2 <- simulateScene(size = 1234, sdDur = 5, sk = 1)
 syncVals <- synchrony(pop2, "sync_nn", "all", "median", 123)
 }
 \author{

@@ -19,7 +19,7 @@ day of flowering of the individual(s)
 Get the start and end flowering days of an individual.
 }
 \examples{
-pop <- generatePop()
+pop <- simulateScene()
 getDaysFlowering(pop, 3)
 }
 \author{

@@ -47,7 +47,7 @@ plotFS <- function(fs, opening = NULL, closing = NULL, xlab = "date",
 ##' @author Stuart Wagenius
 ##' @seealso see functions \code{\link{plotFS}} and \code{\link{summaryFS}}
 ##' @examples
-##' pop <- generatePop()
+##' pop <- simulateScene()
 ##' plotFS(pop)
 ##' pointsFS(pop, type = "b")
 pointsFS <- function(fs, peak = FALSE, ...) {

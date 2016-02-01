@@ -7,7 +7,7 @@
 ##' @export
 ##' @author Danny Hanson
 ##' @examples
-##' pop <- generatePop()
+##' pop <- simulateScene()
 ##' space <- getSpatialDF(pop)
 getSpatialDF <- function(popn) {
   id <- popn$df[[popn$id]]
@@ -26,7 +26,7 @@ getSpatialDF <- function(popn) {
 ##' @seealso \code{\link{dist}} \code{\link{getDistij}}
 ##' @author Danny Hanson
 ##' @examples
-##' pop <- generatePop()
+##' pop <- simulateScene()
 ##' distance <- getPairwiseDistance(pop)
 ##' getDistij(distance, 14, 15)
 getPairwiseDistance <- function(popn) {
@@ -51,7 +51,7 @@ getPairwiseDistance <- function(popn) {
 ##' @seealso \code{\link{knn.dist}}
 ##' @author Danny Hanson
 ##' @examples
-##' pop <- generatePop(10)
+##' pop <- simulateScene(10)
 ##' kNearNeighbors(pop, 3)
 kNearNeighbors <- function(popn, k) {
   knnMatrix <- FNN::knn.dist(popn$df[c(popn$x, popn$y)], k = k, algorithm = "brute")
@@ -71,7 +71,7 @@ kNearNeighbors <- function(popn, k) {
 ##' @export
 ##' @author No Body
 ##' @examples
-##' pop <- generatePop()
+##' pop <- simulateScene()
 ##' proximity(pop)
 proximity <- function(popn, proximityFun = NULL,
                       proximityType = c("individual", "population", "both")) {

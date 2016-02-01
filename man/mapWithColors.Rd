@@ -17,7 +17,7 @@ Create a map of the population where the colors of each point represents
 either the start date or the synchrony value of the individual
 }
 \examples{
-pop <- generatePop()
+pop <- simulateScene()
 mapWithColors(pop)
 }
 \author{

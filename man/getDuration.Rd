@@ -16,7 +16,7 @@ a data frame with IDs and durations
 Get the duration for each individual in the population
 }
 \examples{
-pop <- generatePop()
+pop <- simulateScene()
 getDuration(pop)
 }
 \author{

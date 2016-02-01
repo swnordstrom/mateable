@@ -80,7 +80,7 @@ bootstrapFS <- function(fs, nboot = 10, bs.ci = c(0.025, 0.975), returnDF = FALS
 ##' @export
 ##' @author Danny Hanson
 ##' @examples
-##' pop <- generatePop()
+##' pop <- simulateScene()
 ##' flowerSched <- getTemporalDF(pop)
 getTemporalDF <- function(popn) {
   id <- popn$df[[popn$id]]
@@ -96,7 +96,7 @@ getTemporalDF <- function(popn) {
 ##' @return a data frame with IDs and durations
 ##' @author Danny Hanson
 ##' @examples
-##' pop <- generatePop()
+##' pop <- simulateScene()
 ##' getDuration(pop)
 getDuration <- function(popn) {
   dur <- popn$df[[popn$end]] - popn$df[[popn$start]] + 1
@@ -123,7 +123,7 @@ getDuration <- function(popn) {
 ##' @export
 ##' @author Danny Hanson
 ##' @examples
-##' pop <- generatePop()
+##' pop <- simulateScene()
 ##' pop <- pop[order(pop$start),]
 ##' daysSync <- overlap(pop)
 ##' indices <- which(attr(daysSync, "inOrder") %in% c(1, 4))
@@ -168,7 +168,7 @@ overlap <- function(popn, overlapOrTotal = c("overlap", "total"),
 ##' @export
 ##' @author Danny Hanson
 ##' @examples
-##' pop <- generatePop(size = 10)
+##' pop <- simulateScene(size = 10)
 ##' individualDailyFlowering(pop)
 individualDailyFlowering <- function(popn) {
   # get ids and days that flowering occurred
@@ -203,7 +203,7 @@ individualDailyFlowering <- function(popn) {
 ##' @export
 ##' @author Danny Hanson
 ##' @examples
-##' pop <- generatePop()
+##' pop <- simulateScene()
 ##' getDaysFlowering(pop, 3)
 getDaysFlowering <- function(popn, ind) {
   firstDayPop <- min(popn$df[, popn$start])
@@ -257,10 +257,10 @@ getDaysFlowering <- function(popn, ind) {
 ##' Augspurger, C.K. (1983) Phenology, flowering synchrony, and fruit set of
 ##' six neotropical shrubs. \emph{Biotropica} \strong{15}, 257-267.
 ##' @examples
-##' pop <- generatePop(size = 150)
+##' pop <- simulateScene(size = 150)
 ##' synchrony(pop)
 ##'
-##' pop2 <- generatePop(size = 1234, sdDur = 5, sk = 1)
+##' pop2 <- simulateScene(size = 1234, sdDur = 5, sk = 1)
 ##' syncVals <- synchrony(pop2, "sync_nn", "all", "median", 123)
 synchrony <- function(popn, method = c("augspurger", "kempenaers", "sync/either",
                                        "sync_nn"),

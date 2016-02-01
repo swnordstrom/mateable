@@ -28,7 +28,7 @@ This can be useful to find certain elements in the matrix, see examples.
 Get comparisons of mating timing between all pairs
 }
 \examples{
-pop <- generatePop()
+pop <- simulateScene()
 pop <- pop[order(pop$start),]
 daysSync <- overlap(pop)
 indices <- which(attr(daysSync, "inOrder") \%in\% c(1, 4))

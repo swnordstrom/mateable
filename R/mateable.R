@@ -22,7 +22,7 @@
 #' addCIs(bs.x)
 #' summaryFS(x)
 #'
-#' pop <- generatePop()
+#' pop <- simulateScene()
 #' pop
 #' par(mfcol = c(1, 2))
 #' plotFS(pop)

@@ -19,7 +19,7 @@ Currently the function doesn't do anything. If you like returning null,
 I would use it a lot.
 }
 \examples{
-pop <- generatePop()
+pop <- simulateScene()
 proximity(pop)
 }
 \author{

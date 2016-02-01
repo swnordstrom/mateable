@@ -16,7 +16,7 @@ Creates a map that includes all individuals that were flowering on
 a given day or set of days
 }
 \examples{
-pop <- generatePop()
+pop <- simulateScene()
 mapForDay(pop, 8)
 }
 \author{

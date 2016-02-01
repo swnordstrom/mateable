@@ -17,7 +17,7 @@ Compute all pairwise distances for a population. This function
 is simply a wrapper for \code{dist} that only returns the vector
 }
 \examples{
-pop <- generatePop()
+pop <- simulateScene()
 distance <- getPairwiseDistance(pop)
 getDistij(distance, 14, 15)
 }

@@ -20,7 +20,7 @@ Find the k nearest neighbors for all individuals in a population. This
 function is simply a wrapper for \code{FNN::knn.dist}.
 }
 \examples{
-pop <- generatePop(10)
+pop <- simulateScene(10)
 kNearNeighbors(pop, 3)
 }
 \author{
