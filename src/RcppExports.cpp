@@ -55,55 +55,55 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
-// sync_loop_nodiag
-IntegerVector sync_loop_nodiag(IntegerVector starts, IntegerVector ends, int n);
-RcppExport SEXP mateable_sync_loop_nodiag(SEXP startsSEXP, SEXP endsSEXP, SEXP nSEXP) {
+// daysSync_noself
+IntegerMatrix daysSync_noself(IntegerVector starts, IntegerVector ends, int n);
+RcppExport SEXP mateable_daysSync_noself(SEXP startsSEXP, SEXP endsSEXP, SEXP nSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
     Rcpp::traits::input_parameter< IntegerVector >::type starts(startsSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type ends(endsSEXP);
     Rcpp::traits::input_parameter< int >::type n(nSEXP);
-    __result = Rcpp::wrap(sync_loop_nodiag(starts, ends, n));
+    __result = Rcpp::wrap(daysSync_noself(starts, ends, n));
     return __result;
 END_RCPP
 }
-// sync_loop_diag
-IntegerVector sync_loop_diag(IntegerVector starts, IntegerVector ends, int n);
-RcppExport SEXP mateable_sync_loop_diag(SEXP startsSEXP, SEXP endsSEXP, SEXP nSEXP) {
+// daysSync_self
+IntegerMatrix daysSync_self(IntegerVector starts, IntegerVector ends, int n);
+RcppExport SEXP mateable_daysSync_self(SEXP startsSEXP, SEXP endsSEXP, SEXP nSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
     Rcpp::traits::input_parameter< IntegerVector >::type starts(startsSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type ends(endsSEXP);
     Rcpp::traits::input_parameter< int >::type n(nSEXP);
-    __result = Rcpp::wrap(sync_loop_diag(starts, ends, n));
+    __result = Rcpp::wrap(daysSync_self(starts, ends, n));
     return __result;
 END_RCPP
 }
-// either_loop_nodiag
-IntegerVector either_loop_nodiag(IntegerVector starts, IntegerVector ends, int n);
-RcppExport SEXP mateable_either_loop_nodiag(SEXP startsSEXP, SEXP endsSEXP, SEXP nSEXP) {
+// daysEither_noself
+IntegerMatrix daysEither_noself(IntegerVector starts, IntegerVector ends, int n);
+RcppExport SEXP mateable_daysEither_noself(SEXP startsSEXP, SEXP endsSEXP, SEXP nSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
     Rcpp::traits::input_parameter< IntegerVector >::type starts(startsSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type ends(endsSEXP);
     Rcpp::traits::input_parameter< int >::type n(nSEXP);
-    __result = Rcpp::wrap(either_loop_nodiag(starts, ends, n));
+    __result = Rcpp::wrap(daysEither_noself(starts, ends, n));
     return __result;
 END_RCPP
 }
-// either_loop_diag
-IntegerVector either_loop_diag(IntegerVector starts, IntegerVector ends, int n);
-RcppExport SEXP mateable_either_loop_diag(SEXP startsSEXP, SEXP endsSEXP, SEXP nSEXP) {
+// daysEither_self
+IntegerMatrix daysEither_self(IntegerVector starts, IntegerVector ends, int n);
+RcppExport SEXP mateable_daysEither_self(SEXP startsSEXP, SEXP endsSEXP, SEXP nSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
     Rcpp::traits::input_parameter< IntegerVector >::type starts(startsSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type ends(endsSEXP);
     Rcpp::traits::input_parameter< int >::type n(nSEXP);
-    __result = Rcpp::wrap(either_loop_diag(starts, ends, n));
+    __result = Rcpp::wrap(daysEither_self(starts, ends, n));
     return __result;
 END_RCPP
 }

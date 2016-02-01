@@ -104,68 +104,56 @@ getDuration <- function(popn) {
   dur
 }
 
-##' Get comparisons of mating timing overlap between all pairs
+##' Get comparisons of mating timing between all pairs
 ##'
-##' @title Pairwise mating timing overlap
+##' @title Pairwise mating timing comparison
 ##' @param popn a 3D population object
+##' @param overlapOrTotal whether to calculate the number of days that each
+##' pair was overlapping in mating receptivity or the total number of days
+##' that either individual was receptive
 ##' @param compareToSelf whether or not to include self comparisons in the
 ##' return value
-##' @return a dist-like vector that represents the matrix of
-##' pairwise comparisons
+##' @return a matrix containing all pairwise comparisons. If compareToSelf
+##' is FALSE then there will be n rows and n-1 columns and indexing
+##' result[i,j] where j > i must be done with result[i,j-1], whether result
+##' is the return value of overlap. There is one attribute "idOrder" which
+##' gives the order of the id column in popn at the time of the function call.
+##' This can be useful to find certain elements in the matrix, see examples.
 ##' @seealso \code{\link{getDistij}}
 ##' @export
 ##' @author Danny Hanson
 ##' @examples
 ##' pop <- generatePop()
-##' daySync <- daysSynchronous(pop)
-##' getDistij(daySync, 12, 34)
-daysSynchronous <- function(popn, compareToSelf = FALSE) {
+##' pop <- pop[order(pop$start),]
+##' daysSync <- overlap(pop)
+##' indices <- which(attr(daysSync, "inOrder") %in% c(1, 4))
+##' if (indices[1] <= indices[2]) {
+##'   daysSync[indices[1], indices[2]]
+##' } else {
+##'   daysSync[indices[1], indices[2]-1]
+##' }
+overlap <- function(popn, overlapOrTotal = c("overlap", "total"),
+                    compareToSelf = FALSE) {
   n <- nrow(popn$df)
   startV <- popn$df[,popn$start]
   endV <- popn$df[,popn$end]
-  # see matential/temporalLoops.cpp for sync_loop code
-  if (compareToSelf) {
-    syncMatrix <- sync_loop_diag(startV, endV, n)
-  } else {
-    syncMatrix <- sync_loop_nodiag(startV, endV, n)
+  overlapOrTotal <- match.arg(overlapOrTotal)
+  # see src/temporalLoops.cpp for c++ code
+  if (overlapOrTotal == "overlap") {
+    if (compareToSelf) {
+      overlapMatrix <- daysSync_self(startV, endV, n)
+    } else {
+      overlapMatrix <- daysSync_noself(startV, endV, n)
+    }
+  } else if (overlapOrTotal == "total") {
+    if (compareToSelf) {
+      overlapMatrix <- daysEither_self(startV, endV, n)
+    } else {
+      overlapMatrix <- daysEither_noself(startV, endV, n)
+    }
   }
-  attr(syncMatrix, "n") <- n
-  attr(syncMatrix, "includeSelf") <- compareToSelf
-  attr(syncMatrix, "indices") <- popn$df[[popn$id]]
-  syncMatrix
-}
-
-
-##' Get all pairwise comparisons of how many days either individual was
-##' flowering
-##'
-##' @title Pairwise total mating timing
-##' @param popn a 3D population object
-##' @param compareToSelf whether or not to include self comparisons in the
-##' return value
-##' @return a dist-like vector that represents the matrix of
-##' pairwise comparisons
-##' @seealso \code{\link{getDistij}}
-##' @export
-##' @author Danny Hanson
-##' @examples
-##' pop <- generatePop()
-##' daySync <- daysEitherFlowering(pop)
-##' getDistij(daySync, 12, 34)
-daysEitherFlowering <- function(popn, compareToSelf = FALSE) {
-  n <- nrow(popn$df)
-  startV <- popn$df[,popn$start]
-  endV <- popn$df[,popn$end]
-  # see matential/temporalLoops.cpp for either_loop code
-  if (compareToSelf) {
-    eitherMatrix <- either_loop_diag(startV, endV, n)
-  } else {
-    eitherMatrix <- either_loop_nodiag(startV, endV, n)
-  }
-  attr(eitherMatrix, "n") <- n
-  attr(eitherMatrix, "includeSelf") <- compareToSelf
-  attr(eitherMatrix, "indices") <- popn$df[[popn$id]]
-  eitherMatrix
+  attr(overlapMatrix, "idOrder") <- popn$df[[popn$id]]
+  overlapMatrix
 }
 
 
@@ -304,11 +292,12 @@ synchrony <- function(popn, method = c("augspurger", "kempenaers", "sync/either"
   if (method == "augspurger") {
     # NOTE: if compareToSelf != TRUE then this will only have 99 columns and
     # indexing pairSync[i,j] where j > i will be done by pairSync[i,j-1]
-    if (compareToSelf) {
-      pairSync <- pair_sync_aug_self(as.numeric(syncMatrix), durMatrix[,2], n)
-    } else {
-      pairSync <- pair_sync_aug_noself(as.numeric(syncMatrix), durMatrix[,2], n)
-    }
+#     if (compareToSelf) {
+#       pairSync <- pair_sync_aug_self(as.numeric(syncMatrix), durMatrix[,2], n)
+#     } else {
+#       pairSync <- pair_sync_aug_noself(as.numeric(syncMatrix), durMatrix[,2], n)
+#     }
+    pairSync <- syncMatrix/durMatrix[,2]
 
     indSync <- data.frame(id = durMatrix$id, synchrony = -1)
     indSync$synchrony <- sapply(1:n, FUN = function(i) {
@@ -330,38 +319,34 @@ synchrony <- function(popn, method = c("augspurger", "kempenaers", "sync/either"
     popSync <- average(indSync[,2])
   } else if (method == "sync/either") {
     eitherMatrix <- daysEitherFlowering(popn, compareToSelf)
-    sByE <- syncMatrix/eitherMatrix
+    pairSync <- syncMatrix/eitherMatrix
 
     # NOTE: if compareToSelf != TRUE then this will only have 99 columns and
     # indexing pairSync[i,j] where j > i will be done by pairSync[i,j-1]
-    if (compareToSelf) {
-      pairSync <- pair_sync_either_self(sByE, n)
-    } else {
-      pairSync <- pair_sync_either_noself(sByE, n)
-    }
+#     if (compareToSelf) {
+#       pairSync <- pair_sync_either_self(sByE, n)
+#     } else {
+#       pairSync <- pair_sync_either_noself(sByE, n)
+#     }
 
     indSync <- data.frame(id = durMatrix$id, synchrony = -1)
     indSync$synchrony <- sapply(1:n, FUN = function(i) {
       average(pairSync[i,])
     })
 
-    popSync <- average(sByE)
+    popSync <- average(pairSync)
   } else if (method == "sync_nn") {
     if (syncNN >= n) {
       stop("syncNN must be less than n")
     }
 
     eitherMatrix <- daysEitherFlowering(popn, compareToSelf)
-    sByE <- syncMatrix/eitherMatrix
+    pairSyncInit <- syncMatrix/eitherMatrix
 
     # NOTE: if compareToSelf != TRUE then this will only have 99 columns and
     # indexing pairSync[i,j] where j > i will be done by pairSync[i,j-1]
     # also pairSync won't make much sense because it's being sorted
-    if (compareToSelf) {
-      pairSyncInit <- pair_sync_either_self(sByE, n)
-    } else {
-      pairSyncInit <- pair_sync_either_noself(sByE, n)
-    }
+
     pairSync <- transpose(apply(pairSyncInit, 1, sort, decreasing = TRUE))
 
     indSync <- data.frame(id = durMatrix$id, synchrony = -1)

@@ -17,19 +17,19 @@ pair_sync_either_self <- function(syncMatrix, n) {
     .Call('mateable_pair_sync_either_self', PACKAGE = 'mateable', syncMatrix, n)
 }
 
-sync_loop_nodiag <- function(starts, ends, n) {
-    .Call('mateable_sync_loop_nodiag', PACKAGE = 'mateable', starts, ends, n)
+daysSync_noself <- function(starts, ends, n) {
+    .Call('mateable_daysSync_noself', PACKAGE = 'mateable', starts, ends, n)
 }
 
-sync_loop_diag <- function(starts, ends, n) {
-    .Call('mateable_sync_loop_diag', PACKAGE = 'mateable', starts, ends, n)
+daysSync_self <- function(starts, ends, n) {
+    .Call('mateable_daysSync_self', PACKAGE = 'mateable', starts, ends, n)
 }
 
-either_loop_nodiag <- function(starts, ends, n) {
-    .Call('mateable_either_loop_nodiag', PACKAGE = 'mateable', starts, ends, n)
+daysEither_noself <- function(starts, ends, n) {
+    .Call('mateable_daysEither_noself', PACKAGE = 'mateable', starts, ends, n)
 }
 
-either_loop_diag <- function(starts, ends, n) {
-    .Call('mateable_either_loop_diag', PACKAGE = 'mateable', starts, ends, n)
+daysEither_self <- function(starts, ends, n) {
+    .Call('mateable_daysEither_self', PACKAGE = 'mateable', starts, ends, n)
 }
 
