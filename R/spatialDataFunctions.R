@@ -1,42 +1,17 @@
-##' Extract spatial columns from a 3d population object
-##'
-##' @title Get a data frame with only spatial data
-##' @param popn a 3d population object
-##' @return a data frame with only the id, x, and y columns from the
-##' 3d population object
-##' @export
-##' @author Danny Hanson
-##' @examples
-##' pop <- simulateScene()
-##' space <- getSpatialDF(pop)
-getSpatialDF <- function(popn) {
-  id <- popn$df[[popn$id]]
-  x <- popn$df[[popn$x]]
-  y <- popn$df[[popn$y]]
-  data.frame(id = id, x = x, y = y)
-}
-
 ##' Compute all pairwise distances for a population. This function
-##' is simply a wrapper for \code{dist} that only returns the vector
+##' is simply a wrapper for \code{dist} that only returns a matrix
 ##'
 ##' @title Distance matrix for a population
 ##' @param popn a 3D population object
 ##' @return a vector representing the lower triangle of the distance matrix
 ##' @export
-##' @seealso \code{\link{dist}} \code{\link{getDistij}}
+##' @seealso \code{\link{dist}}
 ##' @author Danny Hanson
 ##' @examples
 ##' pop <- simulateScene()
-##' distance <- getPairwiseDistance(pop)
-##' getDistij(distance, 14, 15)
-getPairwiseDistance <- function(popn) {
-  distances <- dist(popn$df[,c(popn$x, popn$y)])
-  n <- attr(distances, "Size")
-  dist.num <- as.numeric(distances)
-  attr(dist.num, "n") <- n
-  attr(dist.num, "includeSelf") <- F
-  attr(dist.num, "indices") <- popn$df[[popn$id]]
-  dist.num
+##' distance <- pairDist(pop)
+pairDist <- function(popn) {
+  as.matrix(dist(popn[, c("x", "y")]))
 }
 
 ##' Find the k nearest neighbors for all individuals in a population. This
@@ -54,8 +29,8 @@ getPairwiseDistance <- function(popn) {
 ##' pop <- simulateScene(10)
 ##' kNearNeighbors(pop, 3)
 kNearNeighbors <- function(popn, k) {
-  knnMatrix <- FNN::knn.dist(popn$df[c(popn$x, popn$y)], k = k, algorithm = "brute")
-  rownames(knnMatrix) <- popn$df[, popn$id]
+  knnMatrix <- FNN::knn.dist(popn[c("x", "y")], k = k, algorithm = "brute")
+  rownames(knnMatrix) <- popn$id
   colnames(knnMatrix) <- paste("k", 1:k, sep = "")
   knnMatrix
 }

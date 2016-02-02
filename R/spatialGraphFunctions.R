@@ -52,26 +52,6 @@ mapWithColors <- function(popn, startOrSync = "start") {
          col = c(rgb(0,0,1), rgb(1,0,1),  rgb(1,0,0)))
 }
 
-##' Add lines to show the positions of the earliest and latest flowering
-##' individuals within a population to a map
-##'
-##' @title Find earliest and latest flowering
-##' @param popn a 3D population object
-##' @export
-##' @author Danny Hanson
-##' @examples
-##' pop <- simulateScene()
-##' mapWithColors(pop)
-##' pinpointExtremes(pop)
-pinpointExtremes <- function(popn) {
-  first <- popn$df[which.min(popn$df[[popn$start]]),]
-  last <- popn$df[which.max(popn$df[[popn$start]]),]
-  abline(v = first[[popn$x]], col = "blue")
-  abline(h = first[[popn$y]], col = "blue")
-  abline(v = last[[popn$x]], col = "red")
-  abline(h = last[[popn$y]], col = "red")
-}
-
 ##' Creates a map that includes all individuals that were flowering on
 ##' a given day or set of days
 ##'
@@ -84,16 +64,16 @@ pinpointExtremes <- function(popn) {
 ##' pop <- simulateScene()
 ##' mapForDay(pop, 8)
 mapForDay <- function(popn, day) {
-  indDaily <- individualDailyFlowering(popn)
+  indDaily <- receptivityByDay(popn)
   if (length(day) > 1) {
-    popnOnDay <- popn$df[rowSums(indDaily[,day]) > 0,]
+    popnOnDay <- popn[rowSums(indDaily[,day]) > 0,]
   } else {
-    popnOnDay <- popn$df[indDaily[,day],]
+    popnOnDay <- popn[indDaily[,day],]
   }
-  xax <- c(min(popn$df[[popn$x]]), max(popn$df[[popn$x]]))
-  yax <- c(min(popn$df[[popn$y]]), max(popn$df[[popn$y]]))
-  plot(popnOnDay[[popn$x]],popnOnDay[[popn$y]], xlim = xax, ylim = yax,
-       xlab = popn$x, ylab = popn$y, asp = 1, pch = 16, cex = 0.5,
+  xax <- c(min(popn$x), max(popn$x))
+  yax <- c(min(popn$y), max(popn$y))
+  plot(popnOnDay$x,popnOnDay$y, xlim = xax, ylim = yax,
+       xlab = "x", ylab = "y", asp = 1, pch = 16, cex = 0.5,
        col = rgb(60,141,13, maxColorValue = 255)) # Christmas green
 }
 
