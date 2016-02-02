@@ -71,39 +71,6 @@ bootstrapFS <- function(fs, nboot = 10, bs.ci = c(0.025, 0.975), returnDF = FALS
   ans
 }
 
-##' Extract temporal columns from a 3d population object
-##'
-##' @title Get a data frame with only temporal data
-##' @param popn a 3d population object
-##' @return a data frame with only the id, start, and end columns from the
-##' 3d population object
-##' @export
-##' @author Danny Hanson
-##' @examples
-##' pop <- simulateScene()
-##' flowerSched <- getTemporalDF(pop)
-getTemporalDF <- function(popn) {
-  id <- popn$df[[popn$id]]
-  start <- popn$df[[popn$start]]
-  end <- popn$df[[popn$end]]
-  data.frame(id = id, start = start, end = end)
-}
-
-##' Get the duration for each individual in the population
-##'
-##' @title duration for each individual
-##' @param popn a 3D population object
-##' @return a data frame with IDs and durations
-##' @author Danny Hanson
-##' @examples
-##' pop <- simulateScene()
-##' getDuration(pop)
-getDuration <- function(popn) {
-  dur <- popn$df[[popn$end]] - popn$df[[popn$start]] + 1
-  dur <- data.frame(id = popn$df[[popn$id]], duration = dur)
-  dur
-}
-
 ##' Get comparisons of mating timing between all pairs
 ##'
 ##' @title Pairwise mating timing comparison
@@ -192,25 +159,6 @@ receptivityByDay <- function(popn) {
   dailyMatrix
 }
 
-##' Get the start and end flowering days of an individual.
-##'
-##' @title Get flowering days of an individual
-##' @param popn a 3D population object
-##' @param ind integer. The index/indices of the individual(s) to examine
-##' @return a vector containing the start and end days relative to the first
-##' day of flowering of the individual(s)
-##' @export
-##' @author Danny Hanson
-##' @examples
-##' pop <- simulateScene()
-##' getDaysFlowering(pop, 3)
-getDaysFlowering <- function(popn, ind) {
-  firstDayPop <- min(popn$df[, popn$start])
-  startInd <- min(popn$df[ind, popn$start]) - firstDayPop + 1
-  endInd <- max(popn$df[ind, popn$end]) - firstDayPop + 1
-  c(startInd, endInd)
-}
-
 ##' Calculate one of a variety of measures of mating synchrony for a population.
 ##'
 ##' Measures of synchrony are based on methods described in Augspurger (1983),
@@ -244,11 +192,12 @@ getDaysFlowering <- function(popn, ind) {
 ##' [1] if \code{method} is set to "sync_nn" then the pairwise comparisons will
 ##' be in descending order and cannot be indexed by ID order. [2] if
 ##' \code{compareToSelf} is set to FALSE, the matrix will have dimensions 100
-##' rows by 99 columns. Again, indexing will be affected. If \code{synchronyType}
-##' is "individual" \code{synchrony} will returns a data frame with a row for
-##' id and a row for individual synchrony. If \code{synchronyType} is "all"
-##' \code{synchrony} will return a list containing the values described above for
-##' population, pairwise, and individual synchrony.
+##' rows by 99 columns. Similar to \code{\link{overlap}}, indexing will be
+##' affected. If \code{synchronyType} is "individual" \code{synchrony} will
+##' returns a data frame with a row for id and a row for individual synchrony.
+##' If \code{synchronyType} is "all" \code{synchrony} will return a list
+##' containing the values described above for population, pairwise, and
+##' individual synchrony.
 ##' @export
 ##' @author Danny Hanson
 ##' @references Kempenaers, B. (1993) The use of a breeding synchrony index.
@@ -261,19 +210,18 @@ getDaysFlowering <- function(popn, ind) {
 ##'
 ##' pop2 <- simulateScene(size = 1234, sdDur = 5, sk = 1)
 ##' syncVals <- synchrony(pop2, "sync_nn", "all", "median", 123)
-synchrony <- function(popn, method = c("augspurger", "kempenaers", "sync/either",
-                                       "sync_nn"),
-                      synchronyType = c("population", "pairwise", "individual",
-                                        "all"), averageType = c("mean", "median"),
+synchrony <- function(popn, method, synchronyType = "all", averageType = "mean",
                       syncNN = 1, compareToSelf = FALSE) {
-  method <- match.arg(method)
-  synchronyType <- match.arg(synchronyType)
-  averageType <- match.arg(averageType)
+
+  method <- match.arg(method, c("augspurger", "kempenaers", "overlap",
+                                "sync_nn"))
+  synchronyType <- match.arg(synchronyType, c("population", "pairwise",
+                                              "individual", "all"),
+                             several.ok = T)
+  averageType <- match.arg(averageType, c("mean", "median"))
 
   # some things that all methods need
-  durMatrix <- popn[, c("id", "duration")]
-  n <- nrow(durMatrix) # population size
-  syncMatrix <- daysSynchronous(popn, compareToSelf) # 3 of 4 methods need this
+  n <- nrow(popn) # population size
   if (averageType == "mean") {
     average <- mean
   } else if (averageType == "median") {
@@ -282,82 +230,86 @@ synchrony <- function(popn, method = c("augspurger", "kempenaers", "sync/either"
   # deal with pop size and transposing matrices
   if (n < 2) {
     stop("Can't calculate synchrony for population size less than 2")
-  } else if (n == 2) {
-    transpose <- function(a) { t(t(a)) }
-  } else {
-    transpose <- function(a) { t(a) }
   }
 
   if (method == "augspurger") {
-    # NOTE: if compareToSelf != TRUE then this will only have 99 columns and
-    # indexing pairSync[i,j] where j > i will be done by pairSync[i,j-1]
-#     if (compareToSelf) {
-#       pairSync <- pair_sync_aug_self(as.numeric(syncMatrix), durMatrix[,2], n)
-#     } else {
-#       pairSync <- pair_sync_aug_noself(as.numeric(syncMatrix), durMatrix[,2], n)
-#     }
-    pairSync <- syncMatrix/durMatrix[,2]
+    syncMatrix <- overlap(popn, "overlap", compareToSelf)
+    pairSync <- syncMatrix/popn$duration
 
-    indSync <- data.frame(id = durMatrix$id, synchrony = -1)
+    indSync <- data.frame(id = popn$id, synchrony = -1)
     indSync$synchrony <- sapply(1:n, FUN = function(i) {
       average(pairSync[i,])
     })
 
     popSync <- average(indSync[,2])
+
   } else if (method == "kempenaers") {
-    indDaily <- individualDailyFlowering(popn)
+    indDaily <- receptivityByDay(popn)
 
     pairSync <- NULL
 
-    indSync <- data.frame(id = durMatrix$id, synchrony = -1)
+    indSync <- data.frame(id = popn$id, synchrony = -1)
     indSync$synchrony <- sapply(1:n, FUN = function(i) {
-      sAndE <- getDaysFlowering(popn, i)
-      sum(indDaily[,sAndE[1]:sAndE[2]]) - durMatrix[i,2]
-    })/(durMatrix[,2]*(n-1))
+      inds <- as.character(popn[i, "start"]:popn[i, "end"])
+      sum(indDaily[,inds]) - popn[i,"duration"]
+    })/(popn[,"duration"]*(n-1))
 
     popSync <- average(indSync[,2])
-  } else if (method == "sync/either") {
-    eitherMatrix <- daysEitherFlowering(popn, compareToSelf)
+
+  } else if (method == "overlap") {
+    syncMatrix <- overlap(popn, "overlap", compareToSelf)
+    eitherMatrix <- overlap(popn, "total", compareToSelf)
     pairSync <- syncMatrix/eitherMatrix
 
-    # NOTE: if compareToSelf != TRUE then this will only have 99 columns and
-    # indexing pairSync[i,j] where j > i will be done by pairSync[i,j-1]
-#     if (compareToSelf) {
-#       pairSync <- pair_sync_either_self(sByE, n)
-#     } else {
-#       pairSync <- pair_sync_either_noself(sByE, n)
-#     }
-
-    indSync <- data.frame(id = durMatrix$id, synchrony = -1)
+    indSync <- data.frame(id = popn$id, synchrony = -1)
     indSync$synchrony <- sapply(1:n, FUN = function(i) {
       average(pairSync[i,])
     })
 
     popSync <- average(pairSync)
+
   } else if (method == "sync_nn") {
     if (syncNN >= n) {
       stop("syncNN must be less than n")
     }
 
-    eitherMatrix <- daysEitherFlowering(popn, compareToSelf)
+    syncMatrix <- overlap(popn, "overlap", compareToSelf)
+    eitherMatrix <- overlap(popn, "total", compareToSelf)
     pairSyncInit <- syncMatrix/eitherMatrix
 
-    # NOTE: if compareToSelf != TRUE then this will only have 99 columns and
-    # indexing pairSync[i,j] where j > i will be done by pairSync[i,j-1]
-    # also pairSync won't make much sense because it's being sorted
+    pairSync <- matrix(nrow = n, ncol = n-1)
+    for (i in 1:n) {
+      pairSync[i,] <- sort(pairSyncInit[i,], decreasing = T)
+    }
 
-    pairSync <- transpose(apply(pairSyncInit, 1, sort, decreasing = TRUE))
-
-    indSync <- data.frame(id = durMatrix$id, synchrony = -1)
+    indSync <- data.frame(id = popn$id, synchrony = -1)
     indSync$synchrony <- pairSync[,syncNN]
 
     popSync <- average(pairSync[,syncNN])
+
   }
 
   # return
-  switch(synchronyType,
-         population = popSync,
-         pairwise = pairSync,
-         individual = indSync,
-         all = list(pop = popSync, pair = pairSync, ind = indSync))
+  potential <- list()
+  if ("population" %in% synchronyType) {
+    potential$pop <- popSync
+  }
+  if ("individual" %in% synchronyType) {
+    potential$ind <- indSync
+  }
+  if ("pairwise" %in% synchronyType) {
+    potential$pair <- pairSync
+  }
+  if ("all" %in% synchronyType) {
+    potential$pop <- popSync
+    potential$ind <- indSync
+    potential$pair <- pairSync
+  }
+  attr(potential, "t") <- TRUE
+  attr(potential, "s") <- FALSE
+  attr(potential, "c") <- FALSE
+  potential
 }
+
+
+
