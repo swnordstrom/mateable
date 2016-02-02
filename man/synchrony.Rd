@@ -4,10 +4,8 @@
 \alias{synchrony}
 \title{Mating synchrony of a population}
 \usage{
-synchrony(popn, method = c("augspurger", "kempenaers", "sync/either",
-  "sync_nn"), synchronyType = c("population", "pairwise", "individual",
-  "all"), averageType = c("mean", "median"), syncNN = 1,
-  compareToSelf = FALSE)
+synchrony(popn, method, synchronyType = "all", averageType = "mean",
+  syncNN = 1, compareToSelf = FALSE)
 }
 \arguments{
 \item{popn}{a 3dPop object that has the flowering schedule for the
@@ -43,11 +41,12 @@ with all pairwise synchrony comparisons. It is important to note two things:
 [1] if \code{method} is set to "sync_nn" then the pairwise comparisons will
 be in descending order and cannot be indexed by ID order. [2] if
 \code{compareToSelf} is set to FALSE, the matrix will have dimensions 100
-rows by 99 columns. Again, indexing will be affected. If \code{synchronyType}
-is "individual" \code{synchrony} will returns a data frame with a row for
-id and a row for individual synchrony. If \code{synchronyType} is "all"
-\code{synchrony} will return a list containing the values described above for
-population, pairwise, and individual synchrony.
+rows by 99 columns. Similar to \code{\link{overlap}}, indexing will be
+affected. If \code{synchronyType} is "individual" \code{synchrony} will
+returns a data frame with a row for id and a row for individual synchrony.
+If \code{synchronyType} is "all" \code{synchrony} will return a list
+containing the values described above for population, pairwise, and
+individual synchrony.
 }
 \description{
 Calculate one of a variety of measures of mating synchrony for a population.

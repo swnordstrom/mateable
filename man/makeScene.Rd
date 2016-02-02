@@ -4,8 +4,8 @@
 \alias{makeScene}
 \title{Create a matingScene object from a data frame}
 \usage{
-makeScene(df, startCol = "startDate", endCol = "endDate", xCol = "x",
-  yCol = "y", s1Col = "s1", s2Col = "s2", idcode = "id",
+makeScene(df, startCol = "start", endCol = "end", xCol = "x",
+  yCol = "y", s1Col = "s1", s2Col = "s2", idCol = "id",
   dateFormat = "\%Y-\%m-\%d")
 }
 \arguments{
@@ -23,19 +23,34 @@ makeScene(df, startCol = "startDate", endCol = "endDate", xCol = "x",
 
 \item{s2Col}{character name of another column with S-alleles}
 
-\item{idcode}{character name for column with unique identifier}
+\item{idCol}{character name for column with unique identifier}
 
 \item{dateFormat}{character giving either (1) the format of the start and end
 date columns if those columns are characters or (2) the origin for the start
 and end date columns if those columns are numeric. It is used in as.Date}
 }
 \value{
-a matingScene object. A data frame with columns identified with
-attributes for each of the column names. See details for more information.
+a matingScene data frame. A data frame with column names in a
+specific format. There are also attributes giving what type of mating
+information is in the data frame, what the original column names were,
+and the origin of the date columns. See details for more information.
 }
 \description{
 Turns a data frame with information about temporal, spatial, or
 genetic mating data into a matingScene object using a standard format.
+}
+\details{
+The columns are named id, start, end, x, y, s1, and s2 for
+idCol, startCol, endCol, xCol, yCol, s1Col, and s2Col respectively.
+The attributes "t", "s", and "c" will be set to TRUE if the data frame
+has temporal, spatial, or genetic compatibility data, respectively and
+will be FALSE otherwise. The attribute originalNames contains all the
+names of the original data frame.
+The start and end columns will be changed to integers relative to the start
+day of the population. So the first day of the first individual to become
+receptive will be one and so on. The attribute origin contains the
+origin that can be used when converting the columns start and end
+from integers to dates.
 }
 \examples{
 \dontrun{makeFS(NULL)}

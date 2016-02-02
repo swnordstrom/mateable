@@ -30,7 +30,7 @@ simulateScene(size = 30, meanSD = "2012-07-12", sdSD = 6, meanDur = 11,
 \item{sAlleles}{integer count of S-Alleles that could be in the population}
 }
 \value{
-matingScene object -- see \code{\link{makeScene}}
+matingScene data frame -- see \code{\link{makeScene}}
 }
 \description{
 simulateScene generates a matingScene object -- a simulated population

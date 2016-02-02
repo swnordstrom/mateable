@@ -41,7 +41,4 @@ if (indices[1] <= indices[2]) {
 \author{
 Danny Hanson
 }
-\seealso{
-\code{\link{getDistij}}
-}
 
