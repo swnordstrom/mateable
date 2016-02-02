@@ -119,7 +119,6 @@ getDuration <- function(popn) {
 ##' is the return value of overlap. There is one attribute "idOrder" which
 ##' gives the order of the id column in popn at the time of the function call.
 ##' This can be useful to find certain elements in the matrix, see examples.
-##' @seealso \code{\link{getDistij}}
 ##' @export
 ##' @author Danny Hanson
 ##' @examples
@@ -134,9 +133,9 @@ getDuration <- function(popn) {
 ##' }
 overlap <- function(popn, overlapOrTotal = c("overlap", "total"),
                     compareToSelf = FALSE) {
-  n <- nrow(popn$df)
-  startV <- popn$df[,popn$start]
-  endV <- popn$df[,popn$end]
+  n <- nrow(popn)
+  startV <- popn$start
+  endV <- popn$end
   overlapOrTotal <- match.arg(overlapOrTotal)
   # see src/temporalLoops.cpp for c++ code
   if (overlapOrTotal == "overlap") {
@@ -152,7 +151,7 @@ overlap <- function(popn, overlapOrTotal = c("overlap", "total"),
       overlapMatrix <- daysEither_noself(startV, endV, n)
     }
   }
-  attr(overlapMatrix, "idOrder") <- popn$df[[popn$id]]
+  attr(overlapMatrix, "idOrder") <- popn$id
   overlapMatrix
 }
 
@@ -169,19 +168,19 @@ overlap <- function(popn, overlapOrTotal = c("overlap", "total"),
 ##' @author Danny Hanson
 ##' @examples
 ##' pop <- simulateScene(size = 10)
-##' individualDailyFlowering(pop)
-individualDailyFlowering <- function(popn) {
+##' receptivityByDay(pop)
+receptivityByDay <- function(popn) {
   # get ids and days that flowering occurred
-  ids <- popn$df[, popn$id]
-  days <- seq(min(popn$df[, popn$start]), max(popn$df[, popn$end]), 1)
+  ids <- popn$id
+  days <- seq(min(popn$start), max(popn$end), 1)
   nID <- length(ids)
   nDay <- length(days)
-  firstDayPop <- min(popn$df[, popn$start])
+  firstDayPop <- min(popn$start)
 
   # for a given individual, say what days it was flowering on
   makeDayRow <- function(i) {
-    startInd <- min(popn$df[i, popn$start]) - firstDayPop + 1
-    endInd <- max(popn$df[i, popn$end]) - firstDayPop + 1
+    startInd <- min(popn[i, "start"]) - firstDayPop + 1
+    endInd <- max(popn[i, "end"]) - firstDayPop + 1
     dayRow <- rep(F, nDay) # initialize days as false
     dayRow[startInd:endInd] <- T # for days it was flowering, set to true
     dayRow
@@ -272,7 +271,7 @@ synchrony <- function(popn, method = c("augspurger", "kempenaers", "sync/either"
   averageType <- match.arg(averageType)
 
   # some things that all methods need
-  durMatrix <- getDuration(popn)
+  durMatrix <- popn[, c("id", "duration")]
   n <- nrow(durMatrix) # population size
   syncMatrix <- daysSynchronous(popn, compareToSelf) # 3 of 4 methods need this
   if (averageType == "mean") {
