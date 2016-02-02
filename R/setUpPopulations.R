@@ -64,9 +64,12 @@ simulateScene <- function(size = 30, meanSD = "2012-07-12", sdSD = 6, meanDur = 
 ##' The attributes "t", "s", and "c" will be set to TRUE if the data frame
 ##' has temporal, spatial, or genetic compatibility data, respectively and
 ##' will be FALSE otherwise. The attribute originalNames contains all the
-##' names of the original data frame. The attribute origin contains the
+##' names of the original data frame.
+##' The start and end columns will be changed to integers relative to the start
+##' day of the population. So the first day of the first individual to become
+##' receptive will be one and so on. The attribute origin contains the
 ##' origin that can be used when converting the columns start and end
-##' from integers to date.
+##' from integers to dates.
 ##' @author Danny Hanson
 ##' @examples
 ##' \dontrun{makeFS(NULL)}
@@ -89,9 +92,11 @@ makeScene <- function (df, startCol = "start", endCol = "end", xCol = "x",
   if (all(c(startCol, endCol) %in% names(df))) {
     attr(newScene, "t") <- TRUE
     newScene$start <- as.integer(as.Date(df[, startCol], dateFormat))
-    newScene$end <- as.integer(as.Date(df[, endCol], dateFormat))
+    firstDay <- min(newScene$start)
+    newScene$start <- newScene$start - firstDay + 1
+    newScene$end <- as.integer(as.Date(df[, endCol], dateFormat)) - firstDay + 1
     newScene$duration <- newScene$end - newScene$start + 1
-    origin <- ifelse(grepl("[0-9]", dateFormat), dateFormat, "1970-01-01")
+    origin <- as.Date(firstDay-1, "1970-01-01")
 
     attr(newScene, "origin") <- origin
   }
