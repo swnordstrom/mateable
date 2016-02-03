@@ -44,6 +44,8 @@ simulateScene <- function(size = 30, meanSD = "2012-07-12", sdSD = 6, meanDur = 
 ##'
 ##' @title Create a matingScene object from a data frame
 ##' @param df a data frame containing mating information
+##' @param multiYear logical giving whether or not to split the result into
+##' a list by year
 ##' @param startCol character name of column with start dates
 ##' @param endCol character name of column with end dates
 ##' @param xCol character name of column with x or E coordinates
@@ -55,66 +57,90 @@ simulateScene <- function(size = 30, meanSD = "2012-07-12", sdSD = 6, meanDur = 
 ##' date columns if those columns are characters or (2) the origin for the start
 ##' and end date columns if those columns are numeric. It is used in as.Date
 ##'
-##' @return a matingScene data frame. A data frame with column names in a
+##' @return a matingScene data frame or a list of matingScene data frames.
+##' A data frame with column names in a
 ##' specific format. There are also attributes giving what type of mating
 ##' information is in the data frame, what the original column names were,
-##' and the origin of the date columns. See details for more information.
+##' and the origin of the date columns. If it multiYear = TRUE,
+##' the return value will be a list of matingScene data frames where each
+##' element in the list represents one year. See details for more information
+##' on attributes and how to do multi year data.
 ##' @details The columns are named id, start, end, x, y, s1, and s2 for
 ##' idCol, startCol, endCol, xCol, yCol, s1Col, and s2Col respectively.
-##' The attributes "t", "s", and "c" will be set to TRUE if the data frame
-##' has temporal, spatial, or genetic compatibility data, respectively and
+##' The attributes "t", "s", and "mt" will be set to TRUE if the data frame
+##' has temporal, spatial, or mating type data, respectively and
 ##' will be FALSE otherwise. The attribute originalNames contains all the
-##' names of the original data frame.
+##' names of the original data frame.\cr
 ##' The start and end columns will be changed to integers relative to the start
 ##' day of the population. So the first day of the first individual to become
-##' receptive will be one and so on. The attribute origin contains the
+##' receptive will be 1 and so on. The attribute origin contains the
 ##' origin that can be used when converting the columns start and end
-##' from integers to dates.
+##' from integers to dates.\cr
+##' If there is no temporal data available except the year in which it was
+##' collect and df is a multi-year data set, put the collection year into the
+##' column labelled as startCol and set dateFormat = "%Y" and that will split
+##' the data appropriately.
 ##' @author Danny Hanson
 ##' @examples
 ##' \dontrun{makeFS(NULL)}
-makeScene <- function (df, startCol = "start", endCol = "end", xCol = "x",
+makeScene <- function (df, multiYear = FALSE, startCol = "start", endCol = "end", xCol = "x",
                        yCol = "y", s1Col = "s1", s2Col = "s2", idCol = "id",
                        dateFormat = "%Y-%m-%d") {
-  newScene <- data.frame(id = character(nrow(df)))
-
-  if (idCol %in% names(df)) {
-    newScene$id <- df[, idCol]
+  if (multiYear) {
+    if (dateFormat == "%Y") {
+      dates <- as.Date(as.character(df[, startCol]), dateFormat)
+    } else {
+      dates <- as.Date(df[, startCol], dateFormat)
+    }
+    df$year <- as.numeric(format(dates, "%Y"))
+    years <- levels(as.factor(df$year))
+    newScene <- list()
+    for (i in 1:length(years)) {
+      newScene[[paste("y", years[i], sep = "")]] <-
+        makeScene(df[df$year %in% years[i],], F, startCol, endCol, xCol, yCol,
+                  s1Col, s2Col, idCol, dateFormat)
+    }
   } else {
-    newScene$id <- 1:nrow(df)
+    newScene <- data.frame(id = character(nrow(df)))
+
+    if (idCol %in% names(df)) {
+      newScene$id <- df[, idCol]
+    } else {
+      newScene$id <- 1:nrow(df)
+    }
+
+    attr(newScene, "t") <- FALSE
+    attr(newScene, "s") <- FALSE
+    attr(newScene, "mt") <- FALSE
+    attr(newScene, "originalNames") <- names(df)
+
+    if (all(c(startCol, endCol) %in% names(df))) {
+      attr(newScene, "t") <- TRUE
+      newScene$start <- as.integer(as.Date(df[, startCol], dateFormat))
+      firstDay <- min(newScene$start)
+      newScene$start <- newScene$start - firstDay + 1
+      newScene$end <- as.integer(as.Date(df[, endCol], dateFormat)) - firstDay + 1
+      newScene$duration <- newScene$end - newScene$start + 1
+      origin <- as.Date(firstDay-1, "1970-01-01")
+
+      attr(newScene, "origin") <- origin
+    }
+
+    if (all(c(xCol, yCol) %in% names(df))) {
+      attr(newScene, "s") <- TRUE
+      newScene$x <- df[, xCol]
+      newScene$y <- df[, yCol]
+    }
+
+    if (all(c(s1Col, s2Col) %in% names(df))) {
+      attr(newScene, "mt") <- TRUE
+      newScene$s1 <- as.factor(df[, s1Col])
+      newScene$s2 <- as.factor(df[, s2Col])
+    }
+
+    # not going to add this for now because it's unlikely we'll make our
+    # own generics or use oop
+    # class(newScene) <- "matingScene"
   }
-
-  attr(newScene, "t") <- FALSE
-  attr(newScene, "s") <- FALSE
-  attr(newScene, "c") <- FALSE
-  attr(newScene, "originalNames") <- names(df)
-
-  if (all(c(startCol, endCol) %in% names(df))) {
-    attr(newScene, "t") <- TRUE
-    newScene$start <- as.integer(as.Date(df[, startCol], dateFormat))
-    firstDay <- min(newScene$start)
-    newScene$start <- newScene$start - firstDay + 1
-    newScene$end <- as.integer(as.Date(df[, endCol], dateFormat)) - firstDay + 1
-    newScene$duration <- newScene$end - newScene$start + 1
-    origin <- as.Date(firstDay-1, "1970-01-01")
-
-    attr(newScene, "origin") <- origin
-  }
-
-  if (all(c(xCol, yCol) %in% names(df))) {
-    attr(newScene, "s") <- TRUE
-    newScene$x <- df[, xCol]
-    newScene$y <- df[, yCol]
-  }
-
-  if (all(c(s1Col, s2Col) %in% names(df))) {
-    attr(newScene, "c") <- TRUE
-    newScene$s1 <- df[, s1Col]
-    newScene$s2 <- df[, s2Col]
-  }
-
-  # not going to add this for now because it's unlikely we'll make our
-  # own generics or use oop
-  # class(newScene) <- "matingScene"
   newScene
 }

@@ -4,12 +4,15 @@
 \alias{makeScene}
 \title{Create a matingScene object from a data frame}
 \usage{
-makeScene(df, startCol = "start", endCol = "end", xCol = "x",
-  yCol = "y", s1Col = "s1", s2Col = "s2", idCol = "id",
+makeScene(df, multiYear = FALSE, startCol = "start", endCol = "end",
+  xCol = "x", yCol = "y", s1Col = "s1", s2Col = "s2", idCol = "id",
   dateFormat = "\%Y-\%m-\%d")
 }
 \arguments{
 \item{df}{a data frame containing mating information}
+
+\item{multiYear}{logical giving whether or not to split the result into
+a list by year}
 
 \item{startCol}{character name of column with start dates}
 
@@ -30,10 +33,14 @@ date columns if those columns are characters or (2) the origin for the start
 and end date columns if those columns are numeric. It is used in as.Date}
 }
 \value{
-a matingScene data frame. A data frame with column names in a
+a matingScene data frame or a list of matingScene data frames.
+A data frame with column names in a
 specific format. There are also attributes giving what type of mating
 information is in the data frame, what the original column names were,
-and the origin of the date columns. See details for more information.
+and the origin of the date columns. If it multiYear = TRUE,
+the return value will be a list of matingScene data frames where each
+element in the list represents one year. See details for more information
+on attributes and how to do multi year data.
 }
 \description{
 Turns a data frame with information about temporal, spatial, or
@@ -42,15 +49,19 @@ genetic mating data into a matingScene object using a standard format.
 \details{
 The columns are named id, start, end, x, y, s1, and s2 for
 idCol, startCol, endCol, xCol, yCol, s1Col, and s2Col respectively.
-The attributes "t", "s", and "c" will be set to TRUE if the data frame
-has temporal, spatial, or genetic compatibility data, respectively and
+The attributes "t", "s", and "mt" will be set to TRUE if the data frame
+has temporal, spatial, or mating type data, respectively and
 will be FALSE otherwise. The attribute originalNames contains all the
-names of the original data frame.
+names of the original data frame.\cr
 The start and end columns will be changed to integers relative to the start
 day of the population. So the first day of the first individual to become
-receptive will be one and so on. The attribute origin contains the
+receptive will be 1 and so on. The attribute origin contains the
 origin that can be used when converting the columns start and end
-from integers to dates.
+from integers to dates.\cr
+If there is no temporal data available except the year in which it was
+collect and df is a multi-year data set, put the collection year into the
+column labelled as startCol and set dateFormat = "%Y" and that will split
+the data appropriately.
 }
 \examples{
 \dontrun{makeFS(NULL)}
