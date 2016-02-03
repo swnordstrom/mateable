@@ -1,33 +1,89 @@
-##' summaryFS returns standard info about a flowering schedule
+##' Summarize a mating scene
 ##'
-##' A great function
+##' Create a summary of data contained within a matingScene data frame.
 ##'
-##' @title summary of a flowering schedule
-##' @param fs, a data frame in flowering schedule format
-##' @param opening optional date to specify first date of interest
-##' @param closing optional date to specify last date of interest
-##' @return a names list with info about the flowering schedule
-##' @export
-##' @author Stuart Wagenius
-##' @examples
-##' fs <- generateFS()
-##' summaryFS(fs)
-##' \dontrun{summaryFS(NULL)}
-summaryFS <- function(fs, opening = NULL, closing = NULL) {
-  if(is.null(opening)) opening <- as.Date(min(fs$df[, fs$start]), "1970-01-01")
-  if(is.null(closing)) closing <- as.Date(max(fs$df[, fs$end]), "1970-01-01")
-  count <- dim(fs$df)[1]
-  season <- seq(opening, closing, 1)
-  dailyCount <- integer(length(season))
-  for (i in 1:length(season)){
-    dailyCount[i] <- sum(season[i] >= fs$df[, fs$start] & season[i] <= fs$df[, fs$end])
+##' @param popn a matingScene data frame or list
+##' @param type character. whether to do a temporal (t), spatial (s), or mating
+##' type (mt) summary. The default is "auto" which will automatically summarize
+##' all mating information in popn
+##' @param k integer. which nearest neighbor to calculate (only for type == "s")
+##' @return a list or a list of lists containing summary information
+##' including:\cr
+##' temporal - year (year), population start date (popSt), mean individual start date
+##' (meanSD), standard deviation of start (sdSD), mean duration (meanDur),
+##' standard deviation of duration (sdDur), peakDay - day on which highest
+##' number of individuals were receptive (peak), mean end date (meanED),
+##' standard deviation of end date (sdED), population end date (popEnd)\cr
+##' spatial - minimum x (minX), minimum y (minY), maximum x (maxX),
+##' maximum y (maxY), average distance to kth nearest neighbor as specified
+##' by k (k<n> where n is the input for k)\cr
+##' compatibility - number of mating types (nMatType), average number of
+##' compatible mates (meanComp)\cr
+##' If popn is a multi-year mating scene, then the output will be a list
+##' of lists, otherwise the output will be a single list
+matingSummary <- function(popn, type = "auto", k = 1) {
+  if (is.list(popn) & !is.data.frame(popn)) {
+    matSum <- lapply(popn, matingSummary)
+  } else {
+    type <- match.arg(type, c("auto", "t", "s", "mt"))
+    matSum <- list()
+    if (type == "auto") {
+      temp <- attr(popn, "t")
+      spat <- attr(popn, "s")
+      comp <- attr(popn, "mt")
+    } else {
+      temp <- F
+      spat <- F
+      comp <- F
+      if (type == "t") {
+        temp <- T
+      } else if (type == "s") {
+        spat <- T
+      } else if (type == "mt") {
+        comp <- T
+      }
+    }
+    if (temp) {
+      org <- attr(popn, "origin")
+      matSum$year <- as.numeric(format(org, "%Y"))
+      matSum$popSt <- as.Date(1, org)
+      matSum$meanSD <- as.Date(mean(popn$start), org)
+      matSum$sdSD <- sd(popn$start)
+      matSum$meanDur <- mean(popn$duration)
+      matSum$sdDur <- sd(popn$duration)
+      matSum$peak <-
+        as.Date(as.integer(which.max(colSums(receptivityByDay(popn)))), org)
+      matSum$meanED <- as.Date(mean(popn$end), org)
+      matSum$sdED <- sd(popn$end)
+      matSum$popEnd <- as.Date(max(popn$end), org)
+    }
+    if (spat) {
+      matSum$minX <- min(popn$x)
+      matSum$minY <- min(popn$y)
+      matSum$maxX <- max(popn$x)
+      matSum$maxY <- max(popn$y)
+      matSum[[paste("k", k, sep = "")]] <-
+        mean(kNearNeighbors(popn, k)[k])
+    }
+    if (comp) {
+      matSum$nMatType <- length(union(levels(popn$s1), levels(popn$s2)))
+      popn$s1 <- as.character(popn$s1)
+      popn$s2 <- as.character(popn$s2)
+      s <- numeric(nrow(popn))
+      for (i in 1:(nrow(popn)-1)) {
+        for (j in (i+1):nrow(popn)) {
+          same1 <- popn[i, "s1"] == popn[j, "s1"] & popn[i, "s2"] == popn[j, "s2"]
+          same2 <- popn[i, "s1"] == popn[j, "s2"] & popn[i, "s2"] == popn[j, "s1"]
+          if (!(same1 | same2)) {
+            s[i] <- s[i]+1
+            s[j] <- s[j]+1
+          }
+        }
+      }
+      matSum$meanComp <- mean(s)
+    }
   }
-  fd <- data.frame(day = season, count = dailyCount)
-  peak <- fd[mean(which.max(fd$count)), "day"]
-  range50 <- c(as.Date(median(fs$df[ , fs$start]), "1970-01-01"),
-               as.Date(median(fs$df[ , fs$end]), "1970-01-01"))
-  ans <- list(opening = opening, closing = closing, peakDate = peak, range50 = range50, fl.density = fd)
-  ans
+  matSum
 }
 
 ##' Calculate bootstrap confidence intervals for
@@ -142,17 +198,13 @@ receptivityByDay <- function(popn) {
   days <- seq(min(popn$start), max(popn$end), 1)
   nID <- length(ids)
   nDay <- length(days)
-  firstDayPop <- min(popn$start)
 
+  dailyMatrix <- matrix(F, nrow = nID, ncol = nDay)
   # for a given individual, say what days it was flowering on
-  makeDayRow <- function(i) {
-    startInd <- min(popn[i, "start"]) - firstDayPop + 1
-    endInd <- max(popn[i, "end"]) - firstDayPop + 1
-    dayRow <- rep(F, nDay) # initialize days as false
-    dayRow[startInd:endInd] <- T # for days it was flowering, set to true
-    dayRow
+  for (i in 1:nID) {
+    dailyMatrix[i, popn[i, "start"]:popn[i, "end"]] <- T
   }
-  dailyMatrix <- t(sapply(1:nID, makeDayRow))
+
   rownames(dailyMatrix) <- ids
   colnames(dailyMatrix) <- days
 
