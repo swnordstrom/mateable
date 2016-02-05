@@ -48,7 +48,62 @@ kNearNeighbors <- function(popn, k) {
 ##' @examples
 ##' pop <- simulateScene()
 ##' proximity(pop)
-proximity <- function(popn, proximityFun = NULL,
-                      proximityType = c("individual", "population", "both")) {
-  NULL
+proximity <- function(popn, method, proximityFun = NULL, averageType = "mean",
+                      proximityType = "all") {
+  method <- match.arg(method, c("maxProp", "maxPropSqrd"))
+  n <- nrow(popn)
+  distMatrix <- pairDist(popn)
+  maxDist <- max(distMatrix)
+  if (averageType == "mean") {
+    average <- mean
+  } else if (averageType == "median") {
+    average <- median
+  }
+  # deal with pop size
+  if (n < 2) {
+    stop("Can't calculate proximity for population size less than 2")
+  }
+
+  if (method == "maxProp") {
+    distNoDiag <- matrix(distMatrix[-seq(1, n^2, n+1)], nrow = n, byrow = T)
+    pairProx <- 1 - distNoDiag/maxDist
+
+    indProx <- data.frame(id = popn$id, proximity = -1)
+    indProx$proximity <- sapply(1:n, FUN = function(i) {
+      average(pairProx[i,])
+    })
+
+    popProx <- average(indProx[,2])
+  } else if (method == "maxPropSqrd") {
+    distNoDiag <- matrix(distMatrix[-seq(1, n^2, n+1)], nrow = n, byrow = T)
+    pairProx <- (1 - distNoDiag/maxDist)^2
+
+    indProx <- data.frame(id = popn$id, synchrony = -1)
+    indProx$synchrony <- sapply(1:n, FUN = function(i) {
+      average(pairProx[i,])
+    })
+
+    popProx <- average(indProx[,2])
+  }
+
+  # return
+  potential <- list()
+  if ("population" %in% proximityType) {
+    potential$pop <- popProx
+  }
+  if ("individual" %in% proximityType) {
+    potential$ind <- indProx
+  }
+  if ("pairwise" %in% proximityType) {
+    potential$pair <- pairProx
+  }
+  if ("all" %in% proximityType) {
+    potential$pop <- popProx
+    potential$ind <- indProx
+    potential$pair <- pairProx
+  }
+  attr(potential, "t") <- FALSE
+  attr(potential, "s") <- TRUE
+  attr(potential, "c") <- FALSE
+  potential
 }
