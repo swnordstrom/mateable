@@ -86,51 +86,10 @@ matingSummary <- function(popn, type = "auto", k = 1) {
   matSum
 }
 
-##' Calculate bootstrap confidence intervals for
-##'
-##' A great function
-##'
-##' This function reads draws lines in desirable places
-##'
-##' @param fs a flowering schedule or 3dpop object.
-##' @param nboot integer number of times to resample FS.
-##' @param bs.ci numeric vector of probabilities with values in [0,1].
-##' @param returnDF logical indicating whether to return dataframe of all resampled parameters.
-##' @export
-##' @author Stuart Wagenius
-##' @examples
-##' \dontrun{bootstrapFS(NULL)}
-##'
-bootstrapFS <- function(fs, nboot = 10, bs.ci = c(0.025, 0.975), returnDF = FALSE){
-  df.size <- dim(fs$df)[1]
-  tmp <- fs
-  d <- rep(as.Date("2013-01-01"), nboot)
-  bs <- data.frame(peakDate = d, firstDay = d, lastDay = d, range50.1 = d, range50.2 = d)
-  for(i in 1: nboot){
-    tmp$df <- fs$df[sample(1:df.size, replace = TRUE), ]
-    sfs <- summaryFS(tmp)
-    bs$peakDate[i] <- sfs$peakDate
-    bs$firstDay[i] <- sfs$opening
-    bs$lastDay[i]  <- sfs$closing
-    bs$range50.1[i]  <- sfs$range50[1]
-    bs$range50.2[i]  <- sfs$range50[2]
-  }
-  y <- apply(bs, 2, probs = bs.ci, type = 1, FUN = quantile)
-  w <- attributes(y)$dimnames
-  attributes(y)$dimnames <- NULL
-  y <- data.frame(y, stringsAsFactors= FALSE)
-  ci <- data.frame(lapply(y, as.Date))
-  row.names(ci) <- w[[1]]
-  colnames(ci) <- w[[2]]
-  ans <- list(CI = ci, nboot = nboot, n = df.size)
-  if(returnDF) ans <- list(bootstrapDF = df, CI = ci, nboot = nboot, n = df.size)
-  ans
-}
-
 ##' Get comparisons of mating timing between all pairs
 ##'
 ##' @title Pairwise mating timing comparison
-##' @param popn a 3D population object
+##' @param popn a matingScene data frame or list
 ##' @param overlapOrTotal whether to calculate the number of days that each
 ##' pair was overlapping in mating receptivity or the total number of days
 ##' that either individual was receptive
@@ -156,33 +115,39 @@ bootstrapFS <- function(fs, nboot = 10, bs.ci = c(0.025, 0.975), returnDF = FALS
 ##' }
 overlap <- function(popn, overlapOrTotal = c("overlap", "total"),
                     compareToSelf = FALSE) {
-  n <- nrow(popn)
-  startV <- popn$start
-  endV <- popn$end
-  overlapOrTotal <- match.arg(overlapOrTotal)
-  # see src/temporalLoops.cpp for c++ code
-  if (overlapOrTotal == "overlap") {
-    if (compareToSelf) {
-      overlapMatrix <- daysSync_self(startV, endV, n)
-    } else {
-      overlapMatrix <- daysSync_noself(startV, endV, n)
+  if (is.list(popn) & !is.data.frame(popn)) {
+    overlapMatrix <- lapply(popn, overlap)
+  } else {
+    n <- nrow(popn)
+    startV <- popn$start
+    endV <- popn$end
+    overlapOrTotal <- match.arg(overlapOrTotal)
+
+    if (overlapOrTotal == "overlap") {
+      if (compareToSelf) {
+        overlapMatrix <- daysSync_self(startV, endV, n)
+      } else {
+        overlapMatrix <- daysSync_noself(startV, endV, n)
+      }
+    } else if (overlapOrTotal == "total") {
+      if (compareToSelf) {
+        overlapMatrix <- daysEither_self(startV, endV, n)
+      } else {
+        overlapMatrix <- daysEither_noself(startV, endV, n)
+      }
     }
-  } else if (overlapOrTotal == "total") {
-    if (compareToSelf) {
-      overlapMatrix <- daysEither_self(startV, endV, n)
-    } else {
-      overlapMatrix <- daysEither_noself(startV, endV, n)
-    }
+    attr(overlapMatrix, "idOrder") <- popn$id
   }
-  attr(overlapMatrix, "idOrder") <- popn$id
   overlapMatrix
 }
 
 
-##' Create a matrix showing which individuals are flowering on a given day
+##' Mating receptivity by day
 ##'
-##' @title Flowering by day in a populations
-##' @param popn a 3D population object
+##' Create a matrix showing which individuals are receptive on a given day.
+##'
+##' @title
+##' @param popn a matingScene data frame or list
 ##' @return a matrix where the columns represent all mating days and the rows
 ##' represent all individuals in the population. The value for day i and
 ##' individual j will be TRUE if that individual was flowering on that day and
@@ -193,21 +158,24 @@ overlap <- function(popn, overlapOrTotal = c("overlap", "total"),
 ##' pop <- simulateScene(size = 10)
 ##' receptivityByDay(pop)
 receptivityByDay <- function(popn) {
-  # get ids and days that flowering occurred
-  ids <- popn$id
-  days <- seq(min(popn$start), max(popn$end), 1)
-  nID <- length(ids)
-  nDay <- length(days)
+  if (is.list(popn) & !is.data.frame(popn)) {
+    dailyMatrix <- lapply(popn, receptivityByDay)
+  } else {
+    # get ids and days that flowering occurred
+    ids <- popn$id
+    days <- seq(min(popn$start), max(popn$end), 1)
+    nID <- length(ids)
+    nDay <- length(days)
 
-  dailyMatrix <- matrix(F, nrow = nID, ncol = nDay)
-  # for a given individual, say what days it was flowering on
-  for (i in 1:nID) {
-    dailyMatrix[i, popn[i, "start"]:popn[i, "end"]] <- T
+    dailyMatrix <- matrix(F, nrow = nID, ncol = nDay)
+    # for a given individual, say what days it was flowering on
+    for (i in 1:nID) {
+      dailyMatrix[i, popn[i, "start"]:popn[i, "end"]] <- T
+    }
+
+    rownames(dailyMatrix) <- ids
+    colnames(dailyMatrix) <- days
   }
-
-  rownames(dailyMatrix) <- ids
-  colnames(dailyMatrix) <- days
-
   dailyMatrix
 }
 
