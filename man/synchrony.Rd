@@ -58,7 +58,7 @@ as variations on different factors of those measures.
 }
 \examples{
 pop <- simulateScene(size = 150)
-synchrony(pop)
+synchrony(pop, "augs")
 
 pop2 <- simulateScene(size = 1234, sdDur = 5, sk = 1)
 syncVals <- synchrony(pop2, "sync_nn", "all", "median", 123)

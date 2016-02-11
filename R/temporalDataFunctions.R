@@ -148,7 +148,7 @@ bootstrapFS <- function(fs, nboot = 10, bs.ci = c(0.025, 0.975), returnDF = FALS
 ##' pop <- simulateScene()
 ##' pop <- pop[order(pop$start),]
 ##' daysSync <- overlap(pop)
-##' indices <- which(attr(daysSync, "inOrder") %in% c(1, 4))
+##' indices <- which(attr(daysSync, "idOrder") %in% c(1, 4))
 ##' if (indices[1] <= indices[2]) {
 ##'   daysSync[indices[1], indices[2]]
 ##' } else {
@@ -258,7 +258,7 @@ receptivityByDay <- function(popn) {
 ##' six neotropical shrubs. \emph{Biotropica} \strong{15}, 257-267.
 ##' @examples
 ##' pop <- simulateScene(size = 150)
-##' synchrony(pop)
+##' synchrony(pop, "augs")
 ##'
 ##' pop2 <- simulateScene(size = 1234, sdDur = 5, sk = 1)
 ##' syncVals <- synchrony(pop2, "sync_nn", "all", "median", 123)
