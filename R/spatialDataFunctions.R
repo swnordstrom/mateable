@@ -3,7 +3,8 @@
 ##'
 ##' @title Distance matrix for a population
 ##' @param popn a 3D population object
-##' @return a vector representing the lower triangle of the distance matrix
+##' @return a matrix of all pairwise comparisons with attribute for order of
+##' ids (idOrder)
 ##' @export
 ##' @seealso \code{\link{dist}}
 ##' @author Danny Hanson
@@ -11,7 +12,10 @@
 ##' pop <- simulateScene()
 ##' distance <- pairDist(pop)
 pairDist <- function(popn) {
-  as.matrix(dist(popn[, c("x", "y")]))
+  distMat <- as.matrix(dist(popn[, c("x", "y")]))
+  attr(distMat, "idOrder") <- attr(distMat, "dimnames")[[1]]
+  attr(distMat, "dimnames") <- NULL
+  distMat
 }
 
 ##' Find the k nearest neighbors for all individuals in a population. This
