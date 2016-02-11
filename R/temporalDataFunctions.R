@@ -285,12 +285,15 @@ synchrony <- function(popn, method, synchronyType = "all", averageType = "mean",
   }
 
   if (method == "augspurger") {
-    syncMatrix <- overlap(popn, "overlap", compareToSelf)
+    syncMatrix <- overlap(popn, "overlap", compareToSelf = T)
     pairSync <- syncMatrix/popn$duration
+
+    syncMatrix2 <- overlap(popn, "overlap", compareToSelf)
+    pairSync2 <- syncMatrix2/popn$duration
 
     indSync <- data.frame(id = popn$id, synchrony = -1)
     indSync$synchrony <- sapply(1:n, FUN = function(i) {
-      average(pairSync[i,])
+      average(pairSync2[i,])
     })
 
     popSync <- average(indSync[,2])
@@ -309,13 +312,17 @@ synchrony <- function(popn, method, synchronyType = "all", averageType = "mean",
     popSync <- average(indSync[,2])
 
   } else if (method == "overlap") {
-    syncMatrix <- overlap(popn, "overlap", compareToSelf)
-    eitherMatrix <- overlap(popn, "total", compareToSelf)
+    syncMatrix <- overlap(popn, "overlap", compareToSelf = T)
+    eitherMatrix <- overlap(popn, "total", compareToSelf = T)
     pairSync <- syncMatrix/eitherMatrix
+
+    syncMatrix2 <- overlap(popn, "overlap", compareToSelf)
+    eitherMatrix2 <- overlap(popn, "total", compareToSelf)
+    pairSync2 <- syncMatrix2/eitherMatrix2
 
     indSync <- data.frame(id = popn$id, synchrony = -1)
     indSync$synchrony <- sapply(1:n, FUN = function(i) {
-      average(pairSync[i,])
+      average(pairSync2[i,])
     })
 
     popSync <- average(pairSync)
@@ -325,13 +332,20 @@ synchrony <- function(popn, method, synchronyType = "all", averageType = "mean",
       stop("syncNN must be less than n")
     }
 
-    syncMatrix <- overlap(popn, "overlap", compareToSelf)
-    eitherMatrix <- overlap(popn, "total", compareToSelf)
+    syncMatrix <- overlap(popn, "overlap", compareToSelf = T)
+    eitherMatrix <- overlap(popn, "total", compareToSelf = T)
     pairSyncInit <- syncMatrix/eitherMatrix
 
-    pairSync <- matrix(nrow = n, ncol = n-1)
+    syncMatrix2 <- overlap(popn, "overlap", compareToSelf)
+    eitherMatrix2 <- overlap(popn, "total", compareToSelf)
+    pairSyncInit2 <- syncMatrix2/eitherMatrix2
+
+    m <- ifelse(compareToSelf, n, n-1)
+    pairSync <- matrix(nrow = n, ncol = n)
+    pairSync2 <- matrix(nrow = n, ncol = m)
     for (i in 1:n) {
       pairSync[i,] <- sort(pairSyncInit[i,], decreasing = T)
+      pairSync2[i,] <- sort(pairSyncInit2[i,], decreasing = T)
     }
 
     indSync <- data.frame(id = popn$id, synchrony = -1)
