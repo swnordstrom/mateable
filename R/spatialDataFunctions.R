@@ -66,21 +66,23 @@ proximity <- function(popn, method, proximityFun = NULL, averageType = "mean",
 
   if (method == "maxProp") {
     distNoDiag <- matrix(distMatrix[-seq(1, n^2, n+1)], nrow = n, byrow = T)
-    pairProx <- 1 - distNoDiag/maxDist
+    pairProx <- 1 - distMatrix/maxDist
+    pairProx2 <- 1 - distNoDiag/maxDist
 
     indProx <- data.frame(id = popn$id, proximity = -1)
     indProx$proximity <- sapply(1:n, FUN = function(i) {
-      average(pairProx[i,])
+      average(pairProx2[i,])
     })
 
     popProx <- average(indProx[,2])
   } else if (method == "maxPropSqrd") {
     distNoDiag <- matrix(distMatrix[-seq(1, n^2, n+1)], nrow = n, byrow = T)
-    pairProx <- (1 - distNoDiag/maxDist)^2
+    pairProx <- (1 - distMatrix/maxDist)^2
+    pairProx2 <- (1 - distNoDiag/maxDist)^2
 
     indProx <- data.frame(id = popn$id, synchrony = -1)
     indProx$synchrony <- sapply(1:n, FUN = function(i) {
-      average(pairProx[i,])
+      average(pairProx2[i,])
     })
 
     popProx <- average(indProx[,2])
