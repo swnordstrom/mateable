@@ -232,7 +232,7 @@ potentialPlot <-   function(matPot,
 # #
 # ## test it out:
 # potentialPlot(syncPot, potentialType = 'pair')
-potentialPlot(syncList, potentialType = 'pair')
+# potentialPlot(syncList, potentialType = 'pair')
 # potentialPlot(syncList, potentialType = 'pair', plotType = 'net')
 #
 
