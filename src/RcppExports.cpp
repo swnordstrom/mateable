@@ -5,6 +5,18 @@
 
 using namespace Rcpp;
 
+// pair_compat
+NumericMatrix pair_compat(IntegerVector s1, IntegerVector s2);
+RcppExport SEXP mateable_pair_compat(SEXP s1SEXP, SEXP s2SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< IntegerVector >::type s1(s1SEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type s2(s2SEXP);
+    __result = Rcpp::wrap(pair_compat(s1, s2));
+    return __result;
+END_RCPP
+}
 // daysSync_noself
 IntegerMatrix daysSync_noself(IntegerVector starts, IntegerVector ends, int n);
 RcppExport SEXP mateable_daysSync_noself(SEXP startsSEXP, SEXP endsSEXP, SEXP nSEXP) {
