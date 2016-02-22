@@ -1,17 +1,17 @@
-##' Summarize a mating scene
+##' Summarize a Mating Scene
 ##'
 ##' Create a summary of data contained within a matingScene data frame.
 ##'
-##' @param popn a matingScene data frame or list
+##' @param popn a mating scene data frame or list
 ##' @param type character. whether to do a temporal (t), spatial (s), or mating
 ##' type (mt) summary. The default is "auto" which will automatically summarize
 ##' all mating information in popn
-##' @param k integer. which nearest neighbor to calculate (only for type == "s")
+##' @param k integer. Which nearest neighbor to calculate (only for type == "s")
 ##' @return a list or a list of lists containing summary information
 ##' including:\cr
 ##' temporal - year (year), population start date (popSt), mean individual start date
 ##' (meanSD), standard deviation of start (sdSD), mean duration (meanDur),
-##' standard deviation of duration (sdDur), peakDay - day on which highest
+##' standard deviation of duration (sdDur), peakDay - day(s) on which highest
 ##' number of individuals were receptive (peak), mean end date (meanED),
 ##' standard deviation of end date (sdED), population end date (popEnd)\cr
 ##' spatial - minimum x (minX), minimum y (minY), maximum x (maxX),
@@ -20,7 +20,12 @@
 ##' compatibility - number of mating types (nMatType), average number of
 ##' compatible mates (meanComp)\cr
 ##' If popn is a multi-year mating scene, then the output will be a list
-##' of lists, otherwise the output will be a single list
+##' of lists, one list for each year.
+##' @examples
+##' eelr <- makeScene(eelr2012, startCol = "firstDay", endCol = "lastDay",
+##'   xCol = "Ecoord", yCol = "Ncoord", idCol = "tagNo")
+##' eelrSum <- matingSummary(eelr)
+##' eelrSum[c("minX", "minY", "maxX", "maxY")]
 matingSummary <- function(popn, type = "auto", k = 1) {
   if (is.list(popn) & !is.data.frame(popn)) {
     matSum <- lapply(popn, matingSummary)
@@ -67,41 +72,32 @@ matingSummary <- function(popn, type = "auto", k = 1) {
     }
     if (comp) {
       matSum$nMatType <- length(union(levels(popn$s1), levels(popn$s2)))
-      popn$s1 <- as.character(popn$s1)
-      popn$s2 <- as.character(popn$s2)
-      s <- numeric(nrow(popn))
-      for (i in 1:(nrow(popn)-1)) {
-        for (j in (i+1):nrow(popn)) {
-          same1 <- popn[i, "s1"] == popn[j, "s1"] & popn[i, "s2"] == popn[j, "s2"]
-          same2 <- popn[i, "s1"] == popn[j, "s2"] & popn[i, "s2"] == popn[j, "s1"]
-          if (!(same1 | same2)) {
-            s[i] <- s[i]+1
-            s[j] <- s[j]+1
-          }
-        }
-      }
-      matSum$meanComp <- mean(s)
+
+      pairComp <- pair_compat(popn$s1, popn$s2)
+      matSum$meanComp <- mean(rowSums(pairComp))
     }
   }
   matSum
 }
 
+##' Pairwise Mating Timing Comparison
+##'
 ##' Get comparisons of mating timing between all pairs
 ##'
-##' @title Pairwise mating timing comparison
-##' @param popn a matingScene data frame or list
+##' @param popn a mating scene data frame or list
 ##' @param overlapOrTotal whether to calculate the number of days that each
 ##' pair was overlapping in mating receptivity or the total number of days
 ##' that either individual was receptive
 ##' @param compareToSelf whether or not to include self comparisons in the
 ##' return value
 ##' @return a matrix containing all pairwise comparisons. If compareToSelf
-##' is FALSE then there will be n rows and n-1 columns and indexing
-##' result[i,j] where j > i must be done with result[i,j-1], whether result
-##' is the return value of overlap. There is one attribute "idOrder" which
-##' gives the order of the id column in popn at the time of the function call.
-##' This can be useful to find certain elements in the matrix, see examples.
-##' @export
+##' is FALSE then there will be n rows and n-1 columns. \cr
+##' To index result[i,j] where j > i, use result[i,j-1], where result
+##' is the return value of overlap. There is one attribute "idOrder"
+##' which holds the order of the id column in popn at the time of the function call.
+##' This can be useful to find certain elements in the matrix (see examples). \cr
+##' If popn is a multi-year mating scene, then overlap will return a list of matrices
+##' (as described above) where each matrix represents one year.
 ##' @author Danny Hanson
 ##' @examples
 ##' pop <- simulateScene()
@@ -119,21 +115,19 @@ overlap <- function(popn, overlapOrTotal = c("overlap", "total"),
     overlapMatrix <- lapply(popn, overlap)
   } else {
     n <- nrow(popn)
-    startV <- popn$start
-    endV <- popn$end
     overlapOrTotal <- match.arg(overlapOrTotal)
 
     if (overlapOrTotal == "overlap") {
       if (compareToSelf) {
-        overlapMatrix <- daysSync_self(startV, endV, n)
+        overlapMatrix <- daysSync_self(popn$start, popn$end, n)
       } else {
-        overlapMatrix <- daysSync_noself(startV, endV, n)
+        overlapMatrix <- daysSync_noself(popn$start, popn$end, n)
       }
     } else if (overlapOrTotal == "total") {
       if (compareToSelf) {
-        overlapMatrix <- daysEither_self(startV, endV, n)
+        overlapMatrix <- daysEither_self(popn$start, popn$end, n)
       } else {
-        overlapMatrix <- daysEither_noself(startV, endV, n)
+        overlapMatrix <- daysEither_noself(popn$start, popn$end, n)
       }
     }
     attr(overlapMatrix, "idOrder") <- popn$id
@@ -142,17 +136,17 @@ overlap <- function(popn, overlapOrTotal = c("overlap", "total"),
 }
 
 
-##' Mating receptivity by day
+##' Mating Receptivity by Day
 ##'
 ##' Create a matrix showing which individuals are receptive on a given day.
 ##'
-##' @title
 ##' @param popn a matingScene data frame or list
 ##' @return a matrix where the columns represent all mating days and the rows
 ##' represent all individuals in the population. The value for day i and
 ##' individual j will be TRUE if that individual was flowering on that day and
-##' is located in position [i,j]
-##' @export
+##' is located in position [i,j] \cr
+##' If popn is a multi-year mating scene, then overlap will return a list of matrices
+##' (as described above) where each matrix represents one year.
 ##' @author Danny Hanson
 ##' @examples
 ##' pop <- simulateScene(size = 10)

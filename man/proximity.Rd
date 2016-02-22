@@ -2,27 +2,31 @@
 % Please edit documentation in R/spatialDataFunctions.R
 \name{proximity}
 \alias{proximity}
-\title{Spatial proximity of a population}
+\title{Spatial Proximity of a Population}
 \usage{
-proximity(popn, proximityFun = NULL, proximityType = c("individual",
-  "population", "both"))
+proximity(popn, method, proximityFun = NULL, averageType = "mean",
+  subject = "all")
 }
 \arguments{
 \item{popn}{a 3D population object}
 
+\item{method}{currently one of "maxProp", and "maxPropSqrd"}
+
 \item{proximityFun}{a function used to calculate proximity}
 
-\item{proximityType}{whether you want individual, population, or both}
+\item{averageType}{whether to calculate individual and population proximity
+using the mean or median}
+
+\item{subject}{whether you want pair, individual, population, or all}
 }
 \description{
-Currently the function doesn't do anything. If you like returning null,
-I would use it a lot.
+Calculate one of several of measures of mating synchrony for a population.
 }
 \examples{
 pop <- simulateScene()
 proximity(pop)
 }
 \author{
-No Body
+Danny Hanson
 }
 

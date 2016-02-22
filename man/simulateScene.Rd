@@ -2,7 +2,7 @@
 % Please edit documentation in R/setUpPopulations.R
 \name{simulateScene}
 \alias{simulateScene}
-\title{simulate a 3d population}
+\title{Simulate a Mating Scene}
 \usage{
 simulateScene(size = 30, meanSD = "2012-07-12", sdSD = 6, meanDur = 11,
   sdDur = 3, skSD = 0, xRange = c(0, 100), yRange = c(0, 100),

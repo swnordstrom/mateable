@@ -1,6 +1,19 @@
-# #### mating type compatibility ####
-
-compatibility <- function(popn, method = "singleLocus", subject = "all", averageType = "mean", diallel, dominance){
+##' Calculate one of several of measures of mating synchrony for a population.
+##'
+##' @title Mating Type Compatibility of a Population
+##' @param popn a mating scene object
+##' @param method currently onlu "singleLocus"
+##' @param subject whether you want pair, individual, population, or all
+##' @param averageType whether to calculate individual and population proximity
+##' using the mean or median
+##' @return NULL
+##' @export
+##' @author Danny Hanson
+##' @examples
+##' pop <- simulateScene()
+##' compatibility(pop)
+compatibility <- function(popn, method = "singleLocus", subject = "all",
+                          averageType = "mean"){
 
   method <- match.arg(method, c("singleLocus"))
   subject <- match.arg(subject, c("population", "pairwise",

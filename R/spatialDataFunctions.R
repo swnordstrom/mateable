@@ -1,7 +1,7 @@
 ##' Compute all pairwise distances for a population. This function
 ##' is simply a wrapper for \code{dist} that only returns a matrix
 ##'
-##' @title Distance matrix for a population
+##' @title Distance Matrix for a Population
 ##' @param popn a 3D population object
 ##' @return a matrix of all pairwise comparisons with attribute for order of
 ##' ids (idOrder)
@@ -39,21 +39,23 @@ kNearNeighbors <- function(popn, k) {
   knnMatrix
 }
 
-##' Currently the function doesn't do anything. If you like returning null,
-##' I would use it a lot.
+##' Calculate one of several of measures of mating synchrony for a population.
 ##'
-##' @title Spatial proximity of a population
+##' @title Spatial Proximity of a Population
 ##' @param popn a 3D population object
+##' @param method currently one of "maxProp", and "maxPropSqrd"
 ##' @param proximityFun a function used to calculate proximity
-##' @param proximityType whether you want individual, population, or both
+##' @param averageType whether to calculate individual and population proximity
+##' using the mean or median
+##' @param subject whether you want pair, individual, population, or all
 ##' @return NULL
 ##' @export
-##' @author No Body
+##' @author Danny Hanson
 ##' @examples
 ##' pop <- simulateScene()
 ##' proximity(pop)
 proximity <- function(popn, method, proximityFun = NULL, averageType = "mean",
-                      proximityType = "all") {
+                      subject = "all") {
   method <- match.arg(method, c("maxProp", "maxPropSqrd"))
   n <- nrow(popn)
   distMatrix <- pairDist(popn)
