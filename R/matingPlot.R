@@ -1,11 +1,39 @@
+#### function to make mating scene plots ####
 
+##' Visualize a mating scene
+##'
+##' @title graphical visualization of a mating scene object
+##' @param popn
+##' @param dimension
+##' @param opening
+##' @param closing
+##' @param dailyPoints
+##' @param drawQuartiles
+##' @param includeID
+##' @param sub
+##' @param xlab
+##' @param ylab
+##' @param pch
+##' @param quartileWt
+##' @param quartileColor
+##' @param peakColor
+##' @param ...
+##' @return nothing
+##' @return optional arguments for the plot function
+##' @export
+##' @author Amy Waananen
+##' @seealso see generic function \code{\link{points}} for values of \code{pch}
+##' @examples
+##' pop <- simulateScene()
+##' matingPlot(pop)
+##' \dontrun{plotMap(NULL)}
+##'
+##'
 matingPlot <- function(popn, dimension = "auto",
                        opening = NULL, closing = NULL,
-                       multiYear = TRUE,
                        dailyPoints = TRUE, drawQuartiles = TRUE,
                        includeID = FALSE,
                        sub= NULL, xlab = 'xlab', ylab = 'ylab', pch = 19,
-                       ptSize = 1,
                        quartileWt = 2,
                        quartileColor = 'gray81',
                        peakColor = 'gray27', ...){
@@ -299,44 +327,4 @@ matingPlot <- function(popn, dimension = "auto",
     }
   }
   par(mar = nm, mfrow = nmfrow, oma = noma)
-}
-
-
-
-### TODO:
-# 1. DONE multi-year plots: make axes the same in all plots
-# 2. DONE axes of compatibility plot should have tick mark/labels at all values
-# 3. allow non-numeric input to compatibility plot?? Should axes only have unique values of s1 s2 ranter than min:max
-# 4. determine good presets (pch = 19 rather than 1?)
-# 5. are the plot margins good??
-# 6. want axis labels??
-# 7. add CI to quartiles?
-
-
-test <- simulateScene(size = 300)
-matingPlot(test, pch = 19, dailyPoints = T, drawQuartiles = T)
-
-test2 <- simulateScene(size = 100)
-test3 <- simulateScene(size = 400)
-testList <- list('2010' = test, '2011' = test2, '2012' = test3, '2013' = test2)
-matingPlot(testList)
-
-mixedMatingPlot <- function(popn, dimension = "auto",
-                            opening = NULL, closing = NULL,
-                            multiYear = TRUE,
-                            dailyPoints = FALSE, drawQuartiles = FALSE,
-                            includeID = FALSE,
-                            sub= NULL, xlab = 'xlab', ylab = 'ylab', pch = NULL,
-                            ptSize = 1, segWt = 3,
-                            quartileWt = 2,
-                            quartileColor = 'gray81',
-                            peakColor = 'gray27', ...){
-  # time series of maps?
-
-  # time series of compatibility plots?
-
-
-
-
-
 }
