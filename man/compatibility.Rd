@@ -4,25 +4,46 @@
 \alias{compatibility}
 \title{Mating Type Compatibility of a Population}
 \usage{
-compatibility(popn, method = "singleLocus", subject = "all",
-  averageType = "mean")
+compatibility(popn, method, subject = "all", averageType = "mean")
 }
 \arguments{
 \item{popn}{a mating scene object}
 
-\item{method}{currently onlu "singleLocus"}
+\item{method}{either "si_echinacea" or "dioecious" see details for
+further description}
 
-\item{subject}{whether you want pair, individual, population, or all}
+\item{subject}{whether you want pair, individual, population, or all.
+Specifying more than one is allowed.}
 
 \item{averageType}{whether to calculate individual and population proximity
 using the mean or median}
 }
+\value{
+A list containing one more more of the following, depending the
+input for subject: \cr
+If \code{subject} is "population" the return list will contain a numeric
+value that has a range depending on the \code{method}. If
+\code{subject} is "pair" the return list will contain a matrix
+with all pairwise compatibilities. If \code{subject} is "individual"
+the return list will contain a dataframe with a column containing IDs and
+a column containing compatibility averages. If \code{subject} is "all"
+the return list will contain all three of the items above.
+}
 \description{
 Calculate one of several of measures of mating synchrony for a population.
 }
+\details{
+When \code{method} is "si_echinacea" compatibility will be
+calculated as self incompatible (si) in the same manner as Echinacea
+(and many other plants). For two individuals, they are incompatible if
+they share any S alleles (columns s1 and s2) and they compatible otherwise.
+When \code{method} is "dioecious" it is assumed that the column s1 will
+contain either a 1 or 2 depending sex. Thus, when comparing two individuals,
+they are compatible is s1 of the first != s1 of the second, and s2 is ignored.
+}
 \examples{
 pop <- simulateScene()
-compatibility(pop)
+compatibility(pop, "si_echinacea")
 }
 \author{
 Danny Hanson

@@ -13,28 +13,12 @@ dataset.
 }
 \examples{
 library(mateable)
-x <- generateFS()
-x
-plotFS(x)
-pointsFS(x)
-vlinesFS(x)
-bs.x <- bootstrapFS(x)
-addCIs(bs.x)
-summaryFS(x)
 
 pop <- simulateScene()
 pop
-par(mfcol = c(1, 2))
-plotFS(pop)
-plotMap(pop)
-par(mfcol = c(1, 1))
 
 str(eelr2012)
-ee <- make3d(eelr2012, "firstDay", "lastDay", "Ecoord", "Ncoord", idcode = "tagNo")
-plotFS(ee)
-pointsFS(ee, type = "b")
-plotMap(ee, cex = 0.5)
-plotMap(ee, pch = 1, cex = 4)
+ee <- makeScene(eelr2012, FALSE, "firstDay", "lastDay", "Ecoord", "Ncoord", idCol = "tagNo")
 
 }
 \author{

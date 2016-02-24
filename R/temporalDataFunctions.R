@@ -7,6 +7,8 @@
 ##' type (mt) summary. The default is "auto" which will automatically summarize
 ##' all mating information in popn
 ##' @param k integer. Which nearest neighbor to calculate (only for type == "s")
+##' @param compatMethod character. What method to use when calculating
+##' compatiblity. Defaults to "si_echinacea"
 ##' @return a list or a list of lists containing summary information
 ##' including:\cr
 ##' temporal - year (year), population start date (popSt), mean individual start date
@@ -26,7 +28,8 @@
 ##'   xCol = "Ecoord", yCol = "Ncoord", idCol = "tagNo")
 ##' eelrSum <- matingSummary(eelr)
 ##' eelrSum[c("minX", "minY", "maxX", "maxY")]
-matingSummary <- function(popn, type = "auto", k = 1) {
+matingSummary <- function(popn, type = "auto", k = 1,
+                          compatMethod = "si_echinacea") {
   if (is.list(popn) & !is.data.frame(popn)) {
     matSum <- lapply(popn, matingSummary)
   } else {
@@ -73,8 +76,7 @@ matingSummary <- function(popn, type = "auto", k = 1) {
     if (comp) {
       matSum$nMatType <- length(union(levels(popn$s1), levels(popn$s2)))
 
-      pairComp <- pair_compat(popn$s1, popn$s2)
-      matSum$meanComp <- mean(rowSums(pairComp))
+      matSum$meanComp <- compatibility(popn, compatMethod)$pop * 100
     }
   }
   matSum
@@ -198,18 +200,18 @@ receptivityByDay <- function(popn) {
 ##' calculating population synchrony
 ##' @param compareToSelf logical. Whether or not to include self comparisons
 ##' when calculation synchrony. Defaults to FALSE.
-##' @return The result depends on the input for \code{synchronyType}. If
-##' \code{synchronyType} is "population" \code{synchrony} will return a numeric
+##' @return The result depends on the input for \code{subject}. If
+##' \code{subject} is "population" \code{synchrony} will return a numeric
 ##' value that has a range depending on the \code{method}. If
-##' \code{synchronyType} is "pairwise" \code{synchrony} will return a matrix
+##' \code{subject} is "pairwise" \code{synchrony} will return a matrix
 ##' with all pairwise synchrony comparisons. It is important to note two things:
 ##' [1] if \code{method} is set to "sync_nn" then the pairwise comparisons will
 ##' be in descending order and cannot be indexed by ID order. [2] if
 ##' \code{compareToSelf} is set to FALSE, the matrix will have dimensions 100
 ##' rows by 99 columns. Similar to \code{\link{overlap}}, indexing will be
-##' affected. If \code{synchronyType} is "individual" \code{synchrony} will
+##' affected. If \code{subject} is "individual" \code{synchrony} will
 ##' returns a data frame with a row for id and a row for individual synchrony.
-##' If \code{synchronyType} is "all" \code{synchrony} will return a list
+##' If \code{subject} is "all" \code{synchrony} will return a list
 ##' containing the values described above for population, pairwise, and
 ##' individual synchrony.
 ##' @export

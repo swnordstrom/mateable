@@ -1,21 +1,38 @@
+##' Mating Type Compatibility of a Population
+##'
 ##' Calculate one of several of measures of mating synchrony for a population.
 ##'
-##' @title Mating Type Compatibility of a Population
 ##' @param popn a mating scene object
-##' @param method currently onlu "singleLocus"
-##' @param subject whether you want pair, individual, population, or all
+##' @param method either "si_echinacea" or "dioecious" see details for
+##' further description
+##' @param subject whether you want pair, individual, population, or all.
+##' Specifying more than one is allowed.
 ##' @param averageType whether to calculate individual and population proximity
 ##' using the mean or median
-##' @return NULL
-##' @export
+##' @return A list containing one more more of the following, depending the
+##' input for subject: \cr
+##' If \code{subject} is "population" the return list will contain a numeric
+##' value that has a range depending on the \code{method}. If
+##' \code{subject} is "pair" the return list will contain a matrix
+##' with all pairwise compatibilities. If \code{subject} is "individual"
+##' the return list will contain a dataframe with a column containing IDs and
+##' a column containing compatibility averages. If \code{subject} is "all"
+##' the return list will contain all three of the items above.
+##' @details When \code{method} is "si_echinacea" compatibility will be
+##' calculated as self incompatible (si) in the same manner as Echinacea
+##' (and many other plants). For two individuals, they are incompatible if
+##' they share any S alleles (columns s1 and s2) and they compatible otherwise.
+##' When \code{method} is "dioecious" it is assumed that the column s1 will
+##' contain either a 1 or 2 depending sex. Thus, when comparing two individuals,
+##' they are compatible is s1 of the first != s1 of the second, and s2 is ignored.
 ##' @author Danny Hanson
 ##' @examples
 ##' pop <- simulateScene()
-##' compatibility(pop)
-compatibility <- function(popn, method = "singleLocus", subject = "all",
+##' compatibility(pop, "si_echinacea")
+compatibility <- function(popn, method, subject = "all",
                           averageType = "mean"){
 
-  method <- match.arg(method, c("singleLocus"))
+  method <- match.arg(method, c("si_echinacea", "dioecious"))
   subject <- match.arg(subject, c("population", "pairwise",
                                   "individual", "all"), several.ok = T)
   averageType <- match.arg(averageType, c("mean", "median"))
@@ -26,11 +43,16 @@ compatibility <- function(popn, method = "singleLocus", subject = "all",
     average <- median
   }
 
-  pairCompat <- pair_compat(popn$s1, popn$s2)
+  if (method == "si_echinacea") {
+    pairCompat <- pair_si_ech(popn$s1, popn$s2)
 
-  indCompat <- data.frame(id = popn$id, compatibility = -1)
-  indCompat$compatibility <- apply(pairCompat, 1, average, na.rm = T)
-  popCompat <- average(indCompat$compatibility)
+    indCompat <- data.frame(id = popn$id, compatibility = -1)
+    indCompat$compatibility <- apply(pairCompat, 1, average, na.rm = T)
+
+    popCompat <- average(indCompat$compatibility)
+  } else if (method == "dioecious") {
+
+  }
 
     # return
     potential <- list()

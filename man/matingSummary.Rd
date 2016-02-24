@@ -4,7 +4,7 @@
 \alias{matingSummary}
 \title{Summarize a Mating Scene}
 \usage{
-matingSummary(popn, type = "auto", k = 1)
+matingSummary(popn, type = "auto", k = 1, compatMethod = "si_echinacea")
 }
 \arguments{
 \item{popn}{a mating scene data frame or list}
@@ -14,6 +14,9 @@ type (mt) summary. The default is "auto" which will automatically summarize
 all mating information in popn}
 
 \item{k}{integer. Which nearest neighbor to calculate (only for type == "s")}
+
+\item{compatMethod}{character. What method to use when calculating
+compatiblity. Defaults to "si_echinacea"}
 }
 \value{
 a list or a list of lists containing summary information

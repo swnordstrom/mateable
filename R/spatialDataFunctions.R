@@ -43,20 +43,36 @@ kNearNeighbors <- function(popn, k) {
 ##'
 ##' @title Spatial Proximity of a Population
 ##' @param popn a 3D population object
-##' @param method currently one of "maxProp", and "maxPropSqrd"
-##' @param proximityFun a function used to calculate proximity
+##' @param method one of "maxProp", and "maxPropSqrd" see details for
+##' further description
+##' @param proximityFun a function used to calculate proximity. Not yet
+##' implemented
 ##' @param averageType whether to calculate individual and population proximity
 ##' using the mean or median
-##' @param subject whether you want pair, individual, population, or all
-##' @return NULL
-##' @export
+##' @param subject whether you want pair, individual, population, or all.
+##' Specifying more than one is allowed.
+##' @return A list containing one more more of the following, depending the
+##' input for subject: \cr
+##' If \code{subject} is "population" the return list will contain a numeric
+##' value that has a range depending on the \code{method}. If
+##' \code{subject} is "pair" the return list will contain a matrix
+##' with all pairwise proximity comparisons. If \code{subject} is "individual"
+##' the return list will contain a dataframe with a column containing IDs and
+##' a column containing proximity values. If \code{subject} is "all"
+##' the return list will contain all three of the items above.
+##' @details If \code{method} is "maxProp" then proximity between two
+##' individuals will be calculated as 1 - distance/max(distance).
+##' If \code{method} is "maxPropSqrd" then proximity between two
+##' individuals will be calculated as (1 - distance/max(distance))^2.
 ##' @author Danny Hanson
 ##' @examples
 ##' pop <- simulateScene()
-##' proximity(pop)
+##' proximity(pop, "maxProp")
 proximity <- function(popn, method, proximityFun = NULL, averageType = "mean",
                       subject = "all") {
   method <- match.arg(method, c("maxProp", "maxPropSqrd"))
+  subject <- match.arg(subject, c("all", "pair", "population", "individual"),
+                       several.ok = TRUE)
   n <- nrow(popn)
   distMatrix <- pairDist(popn)
   maxDist <- max(distMatrix)
@@ -71,41 +87,43 @@ proximity <- function(popn, method, proximityFun = NULL, averageType = "mean",
   }
 
   if (method == "maxProp") {
+    if (subject %in% c("all", "pair")) {
+      pairProx <- 1 - distMatrix/maxDist
+    }
+
     distNoDiag <- matrix(distMatrix[-seq(1, n^2, n+1)], nrow = n, byrow = T)
-    pairProx <- 1 - distMatrix/maxDist
     pairProx2 <- 1 - distNoDiag/maxDist
 
     indProx <- data.frame(id = popn$id, proximity = -1)
-    indProx$proximity <- sapply(1:n, FUN = function(i) {
-      average(pairProx2[i,])
-    })
+    indProx$proximity <- apply(pairProx2, 1, average)
 
     popProx <- average(indProx[,2])
   } else if (method == "maxPropSqrd") {
+    if (subject %in% c("all", "pair")) {
+      pairProx <- (1 - distMatrix/maxDist)^2
+    }
+
     distNoDiag <- matrix(distMatrix[-seq(1, n^2, n+1)], nrow = n, byrow = T)
-    pairProx <- (1 - distMatrix/maxDist)^2
     pairProx2 <- (1 - distNoDiag/maxDist)^2
 
-    indProx <- data.frame(id = popn$id, synchrony = -1)
-    indProx$synchrony <- sapply(1:n, FUN = function(i) {
-      average(pairProx2[i,])
-    })
+    indProx <- data.frame(id = popn$id, proximity = -1)
+    indProx$proximity <- apply(pairProx2, 1, average)
 
     popProx <- average(indProx[,2])
   }
 
   # return
   potential <- list()
-  if ("population" %in% proximityType) {
+  if ("population" %in% subject) {
     potential$pop <- popProx
   }
-  if ("individual" %in% proximityType) {
+  if ("individual" %in% subject) {
     potential$ind <- indProx
   }
-  if ("pairwise" %in% proximityType) {
+  if ("pair" %in% subject) {
     potential$pair <- pairProx
   }
-  if ("all" %in% proximityType) {
+  if ("all" %in% subject) {
     potential$pop <- popProx
     potential$ind <- indProx
     potential$pair <- pairProx
