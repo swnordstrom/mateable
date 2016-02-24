@@ -9,6 +9,14 @@ pair_dioecious <- function(s1, s2) {
     .Call('mateable_pair_dioecious', PACKAGE = 'mateable', s1, s2)
 }
 
+row_medians <- function(toSort) {
+    .Call('mateable_row_medians', PACKAGE = 'mateable', toSort)
+}
+
+kemp_ind <- function(byDay, starts, ends, durs, compSelf = FALSE) {
+    .Call('mateable_kemp_ind', PACKAGE = 'mateable', byDay, starts, ends, durs, compSelf)
+}
+
 daysSync_noself <- function(starts, ends, n) {
     .Call('mateable_daysSync_noself', PACKAGE = 'mateable', starts, ends, n)
 }

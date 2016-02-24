@@ -258,9 +258,11 @@ synchrony <- function(popn, method, synchronyType = "all", averageType = "mean",
     pairSync2 <- syncMatrix2/popn$duration
 
     indSync <- data.frame(id = popn$id, synchrony = -1)
-    indSync$synchrony <- sapply(1:n, FUN = function(i) {
-      average(pairSync2[i,])
-    })
+    if (averageType == "mean") {
+      indSync$synchrony <- rowMeans(pairSync2)
+    } else if (averageType == "median") {
+      indSync$synchrony <- row_medians(pairSync2)
+    }
 
     popSync <- average(indSync[,2])
 
@@ -269,11 +271,14 @@ synchrony <- function(popn, method, synchronyType = "all", averageType = "mean",
 
     pairSync <- NULL
 
+    indCols <- colSums(indDaily)
     indSync <- data.frame(id = popn$id, synchrony = -1)
-    indSync$synchrony <- sapply(1:n, FUN = function(i) {
-      inds <- as.character(popn[i, "start"]:popn[i, "end"])
-      sum(indDaily[,inds]) - popn[i,"duration"]
-    })/(popn[,"duration"]*(n-1))
+    indSync$synchrony <- kemp_ind(indCols, popn$start, popn$end, popn$duration,
+                                  compareToSelf)
+#     indSync$synchrony <- sapply(1:n, FUN = function(i) {
+#       inds <- as.character(popn[i, "start"]:popn[i, "end"])
+#       sum(indDaily[,inds]) - popn[i,"duration"]
+#     })/(popn[,"duration"]*(n-1))
 
     popSync <- average(indSync[,2])
 
@@ -289,9 +294,11 @@ synchrony <- function(popn, method, synchronyType = "all", averageType = "mean",
     pairSync2 <- syncMatrix2/eitherMatrix2
 
     indSync <- data.frame(id = popn$id, synchrony = -1)
-    indSync$synchrony <- sapply(1:n, FUN = function(i) {
-      average(pairSync2[i,])
-    })
+    if (averageType == "mean") {
+      indSync$synchrony <- rowMeans(pairSync2)
+    } else if (averageType == "median") {
+      indSync$synchrony <- row_medians(pairSync2)
+    }
 
     popSync <- average(pairSync)
 

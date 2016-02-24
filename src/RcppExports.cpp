@@ -29,6 +29,32 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// row_medians
+NumericVector row_medians(NumericMatrix toSort);
+RcppExport SEXP mateable_row_medians(SEXP toSortSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type toSort(toSortSEXP);
+    __result = Rcpp::wrap(row_medians(toSort));
+    return __result;
+END_RCPP
+}
+// kemp_ind
+NumericVector kemp_ind(IntegerVector byDay, IntegerVector starts, IntegerVector ends, IntegerVector durs, bool compSelf);
+RcppExport SEXP mateable_kemp_ind(SEXP byDaySEXP, SEXP startsSEXP, SEXP endsSEXP, SEXP dursSEXP, SEXP compSelfSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< IntegerVector >::type byDay(byDaySEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type starts(startsSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type ends(endsSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type durs(dursSEXP);
+    Rcpp::traits::input_parameter< bool >::type compSelf(compSelfSEXP);
+    __result = Rcpp::wrap(kemp_ind(byDay, starts, ends, durs, compSelf));
+    return __result;
+END_RCPP
+}
 // daysSync_noself
 IntegerMatrix daysSync_noself(IntegerVector starts, IntegerVector ends, int n);
 RcppExport SEXP mateable_daysSync_noself(SEXP startsSEXP, SEXP endsSEXP, SEXP nSEXP) {
