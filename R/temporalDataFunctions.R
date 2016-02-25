@@ -300,7 +300,7 @@ synchrony <- function(popn, method, synchronyType = "all", averageType = "mean",
       indSync$synchrony <- row_medians(pairSync2)
     }
 
-    popSync <- average(pairSync)
+    popSync <- average(indSync[,2])
 
   } else if (method == "sync_nn") {
     if (syncNN >= n) {
@@ -330,7 +330,7 @@ synchrony <- function(popn, method, synchronyType = "all", averageType = "mean",
     indSync <- data.frame(id = popn$id, synchrony = -1)
     indSync$synchrony <- pairSync2[,syncNN]
 
-    popSync <- average(pairSync2[,syncNN])
+    popSync <- average(indSync[,2])
 
   }
 
