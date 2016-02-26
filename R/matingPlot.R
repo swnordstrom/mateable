@@ -1,39 +1,35 @@
-#### function to make mating scene plots ####
-
 ##' Visualize a mating scene
 ##'
 ##' @title graphical visualization of a mating scene object
-##' @param popn
-##' @param dimension
-##' @param opening
-##' @param closing
-##' @param dailyPoints
-##' @param drawQuartiles
-##' @param includeID
-##' @param sub
-##' @param xlab
-##' @param ylab
-##' @param pch
-##' @param quartileWt
-##' @param quartileColor
-##' @param peakColor
-##' @param ...
+##' @param scene a mating scene object
+##' @param dimension what dimension(s) of the mating scene should be visualized. Possible dimensions are 't' for temporal, 's' for spatial, 'mt' for mating type, and 'auto' (the default). For dimension = 'auto', all dimensions represented in the mating scene object will be plotted.
+##' @param opening the number of days to adjust the start date displayed for the temporal dimension. If NULL, opening defaults to the minimum start date of the mating scene object.
+##' @param closing the number of days to adjust the end date displayed for the temporal dimension. If NULL, opening defaults to the maximum end date of the mating scene object.
+##' @param dailyPoints logical indicating whether daily counts of individuals should be displayed for plots of the temporal dimension
+##' @param drawQuartiles logical indicating whether vertical lines should be drawn at population peak (the date when the maximum number of individuals were reproductively available) or quartiles
+##' @param sub either a vector containing the ids of individuals to be highlighted in the plots or a character string specifying which subset of individuals to highlight. Possible values are "random" or "all". If NULL, no subset will be emphasized.
+##' @param xcoord label for x coordinate of spatial dimension plots. If NULL, defaults to 'easting'.
+##' @param ycoord label for y coordinate of spatial dimension plots. If NULL, defaults to 'northing'.
+##' @param pch specify point type to be used in plots. Defaults to pch = 19 (filled in circle). If NULL points will be labeled by id.
+##' @param quartileWt if drawQuartiles = TRUE, specify weight of quartile and peak lines
+##' @param quartileColor if drawQuartiles = TRUE, specify color of quartile lines, defaults to 'gray81'
+##' @param peakColor if drawQuartiles = TRUE, specify color of peak lines, defaults to 'gray27'
+##' @param ... standard graphical parameters
 ##' @return nothing
 ##' @return optional arguments for the plot function
 ##' @export
 ##' @author Amy Waananen
-##' @seealso see generic function \code{\link{points}} for values of \code{pch}
+##' @seealso see \code{\link{mixedMatingPlot}} to visualize multiple dimensions on one plot
 ##' @examples
 ##' pop <- simulateScene()
 ##' matingPlot(pop)
 ##' \dontrun{plotMap(NULL)}
 ##'
 ##'
-matingPlot <- function(popn, dimension = "auto",
+matingPlot <- function(scene, dimension = "auto",
                        opening = NULL, closing = NULL,
                        dailyPoints = TRUE, drawQuartiles = TRUE,
-                       includeID = FALSE,
-                       sub= NULL, xlab = 'xlab', ylab = 'ylab', pch = 19,
+                       sub= NULL, n, xlab = 'xlab', ylab = 'ylab', pch = 19,
                        quartileWt = 2,
                        quartileColor = 'gray81',
                        peakColor = 'gray27', ...){
@@ -42,12 +38,13 @@ matingPlot <- function(popn, dimension = "auto",
   nm <- par("mar")
   nmfrow <- par('mfrow')
   noma <- par('oma')
+  par(xpd = F)
 
-  if (is.list(popn) & !is.data.frame(popn)) {
+  if (is.list(scene) & !is.data.frame(scene)) {
     if ("auto" %in% dimension) {
-      temp <- attr(popn[[1]], "t")
-      spat <- attr(popn[[1]], "s")
-      comp <- attr(popn[[1]], "mt")
+      temp <- attr(scene[[1]], "t")
+      spat <- attr(scene[[1]], "s")
+      comp <- attr(scene[[1]], "mt")
     } else {
       temp <- F
       spat <- F
@@ -62,187 +59,177 @@ matingPlot <- function(popn, dimension = "auto",
         comp <- T
       }
     }
-    nr <- length(popn)
+    nr <- length(scene)
     nc <- sum(temp,spat,comp)
     par(mfrow = c(nr,nc))
     par(oma = c(4,3,2,1))
 
-    count <- nrow(popn[[1]])
-    emin <- min(popn[[1]]['x'])
-    emax <- max(popn[[1]]['x'])
-    nmin <- min(popn[[1]]['y'])
-    nmax <- max(popn[[1]]['y'])
-    smin <- min(as.numeric(popn[[1]][['s1']]))
-    smax <- min(as.numeric(popn[[1]][['s1']]))
-    opening <- min(popn[[1]]['start'])
-    closing <- max(popn[[1]]['end'])
+    for (i in 1:length(scene)){
 
-    for (i in 1:length(popn)){
-      if (nrow(popn[[i]]) > max(count)){
-        count <- nrow(popn[[i]])
+      count <- nrow(scene[[1]])
+      if (nrow(scene[[i]]) > max(count)){
+        count <- nrow(scene[[i]])
       }
-      if (min(popn[[i]]['x'])< emin){
-        emin <- min(popn[[i]]['x'])
+
+      if (spat){
+        emin <- min(scene[[1]]['x'])
+        emax <- max(scene[[1]]['x'])
+        nmin <- min(scene[[1]]['y'])
+        nmax <- max(scene[[1]]['y'])
+
+        if (min(scene[[i]]['x'])< emin){
+          emin <- min(scene[[i]]['x'])
+        }
+        if (max(scene[[i]]['x'])< emax){
+          emax <- max(scene[[i]]['x'])
+        }
+        if (min(scene[[i]]['y'])< nmin){
+          nmin <- min(scene[[i]]['y'])
+        }
+        if (max(scene[[i]]['y'])< nmax){
+          nmax <- max(scene[[i]]['y'])
+        }
       }
-      if (max(popn[[i]]['x'])< emax){
-        emax <- max(popn[[i]]['x'])
+
+      if(comp){
+        smin <- min(as.numeric(scene[[1]][['s1']]))
+        smax <- min(as.numeric(scene[[1]][['s1']]))
+
+        if (max(as.numeric(scene[[i]][['s1']])>smax)){
+          smax <- max(as.numeric(scene[[i]][['s1']]))
+        }
+        if (max(as.numeric(scene[[i]][['s2']])>smax)){
+          smax <- max(as.numeric(scene[[i]][['s2']]))
+        }
+        if (min(as.numeric(scene[[i]][['s1']])>smin)){
+          smin <- min(as.numeric(scene[[i]][['s1']]))
+        }
+        if (min(as.numeric(scene[[i]][['s2']])>smin)){
+          smin <- min(as.numeric(scene[[i]][['s2']]))
+        }
       }
-      if (min(popn[[i]]['y'])< nmin){
-        nmin <- min(popn[[i]]['y'])
-      }
-      if (max(popn[[i]]['y'])< nmax){
-        nmax <- max(popn[[i]]['y'])
-      }
-      if (max(as.numeric(popn[[i]][['s1']])>smax)){
-        smax <- max(as.numeric(popn[[i]][['s1']]))
-      }
-      if (max(as.numeric(popn[[i]][['s2']])>smax)){
-        smax <- max(as.numeric(popn[[i]][['s2']]))
-      }
-      if (min(as.numeric(popn[[i]][['s1']])>smin)){
-        smin <- min(as.numeric(popn[[i]][['s1']]))
-      }
-      if (min(as.numeric(popn[[i]][['s2']])>smin)){
-        smin <- min(as.numeric(popn[[i]][['s2']]))
-      }
-      if (min(popn[[i]]['start']) < opening){
-        opening <- min(popn[[i]]['start'])
-      }
-      if (max(popn[[i]]['end']) < closing){
-        closing <- min(popn[[i]]['end'])
+
+      if(temp){
+        if(is.null(opening)){
+          opening <- min(scene[[1]][,'start'])
+          if (min(scene[[i]]['start']) < opening){
+            opening <- min(scene[[i]][,'start'])
+          }
+        }
+        if(is.null(closing)){
+          closing <- max(scene[[1]][,'end'])
+          if (max(scene[[i]][,'end']) > closing){
+            closing <- max(scene[[i]][,'end'])
+          }
+        }
       }
     }
 
-    for (i in 1:length(popn)){
-      popi <- popn[[i]]
+    if ('random' %in% sub){
+      sub <- sample(scene[[1]][['id']],9)
+    }
+
+    for (i in 1:length(scene)){
+      scene.i <- scene[[i]]
       if (temp){     # temporal (flowering schedule)
-        popi <- popi[order(popi[, 'start'], popi[, 'end']),]
-        popi$index <- seq_along(popi[, 1])
+        scene.i <- scene.i[order(scene.i[, 'start'], scene.i[, 'end']),]
+        scene.i$index <- seq_along(scene.i[, 1])
+        par(mar = c(0.25,3.25,0.25,0.5))
+        plot.default(scene.i[, 'start'], scene.i$index, ylim = c(1,count), xlim = c(opening, closing), type = "n", xlab = 'date', ylab = "",
+                     xaxt = 'n', ...)
+        segments(scene.i[, 'start'], scene.i$index, scene.i[, 'end'],
+                 scene.i$index, col = "gray50", cex = 3, ...)
+        mtext(names(scene)[i],side = 2,adj = 0.5, cex = 0.75, line = 5, font = 2)
+        mtext('count',side = 2,adj = 0.5, cex = 0.75, line = 2.5)
         if (i == nr){
-          par(mar = c(0.25,3.25,0.25,0.5))
-          plot.default(popi[, 'start'], popi$index, ylim = c(1,count), xlim = c(opening, closing), type = "n", xlab = 'date', ylab = "",
-                        xaxt = 'n', ...)
-          datLabs <- seq(opening, closing, by = 7)
-          axis(1, at = datLabs, labels = format(as.Date(datLabs, origin = as.Date("1970-01-01")),format = "%b %d"), tick=0.25)
-          segments(popi[, 'start'], popi$index, popi[, 'end'],
-                   popi$index, col = "gray50", cex = 3, ...)
-          mtext(names(popn)[i],side = 2,adj = 0.5, cex = 0.75, line = 5, font = 2)
+          datLabs <- seq(opening,closing, by = 7)
+          axis(1, at = datLabs, labels = format(as.Date(attr(scene.i, 'origin') + datLabs, origin = as.Date("1970-01-01")),format = "%b %d"), tick=0.25)
           mtext('date',side = 1,adj = 0.5, cex = 0.75, line = 3)
-          mtext('count',side = 2,adj = 0.5, cex = 0.75, line = 2.5)
         } else if(i == 1){
-          par(mar = c(0.25,3.25,0.25,0.5))
-          plot.default(popi[, 'start'], popi$index, ylim = c(1,count), xlim = c(opening, closing), type = "n", ylab = "",
-                       xaxt = "n", ...)
-          segments(popi[, 'start'], popi$index, popi[, 'end'],
-                   popi$index, col = "gray50", cex = 3, ...)
-          mtext(names(popn)[i],side = 2,adj = 0.5, cex = 0.75, line = 5, font = 2)
-          mtext('count',side = 2,adj = 0.5, cex = 0.75, line = 2.5)
           mtext('temporal',side = 3, adj = 0.5, line = 0.5)
-        }else{
-          par(mar = c(0.25,3.25,0.25,0.5))
-          plot.default(popi[, 'start'], popi$index, ylim = c(1,count), xlim = c(opening, closing), type = "n", ylab = "",
-                       xaxt = "n", ...)
-          segments(popi[, 'start'], popi$index, popi[, 'end'],
-                   popi$index, col = "gray50", cex = 3, ...)
-          mtext(names(popn)[i],side = 2,adj = 0.5, cex = 0.75, line = 5, font = 2)
-          mtext('count',side = 2,adj = 0.5, cex = 0.75, line = 2.5)
         }
         if (!is.null(sub)){
-          segments(popi[popi$id %in% sub, 'start'], popi[popi$id %in% sub, 'index'], popi[popi$id %in% sub, 'end'],
-                   popi[popi$id %in% sub, 'index'], col = "blue", ...)
+          segments(scene.i[scene.i$id %in% sub, 'start'], scene.i[scene.i$id %in% sub, 'index'], scene.i[scene.i$id %in% sub, 'end'],
+                   scene.i[scene.i$id %in% sub, 'index'], col = "blue", ...)
         }
         if (dailyPoints == TRUE){
-          rbd <- receptivityByDay(popi)
+          rbd <- receptivityByDay(scene.i)
           fl.density <- colSums(rbd)
           points(as.numeric(names(fl.density)), fl.density, pch = pch, ...)
         }
         if (drawQuartiles ==TRUE){
-          rbd <- receptivityByDay(popi)
+          rbd <- receptivityByDay(scene.i)
           fl.density <- colSums(rbd)
-          abline(v = median(popi$start), col = quartileColor, cex = quartileWt, lty = 2)
-          abline(v = median(popi$end), col = quartileColor, cex = quartileWt, lty = 2)
+          abline(v = median(scene.i$start), col = quartileColor, cex = quartileWt, lty = 2)
+          abline(v = median(scene.i$end), col = quartileColor, cex = quartileWt, lty = 2)
           if (max(fl.density))
             abline(v = as.numeric(names(fl.density[fl.density == max(fl.density)])), col = peakColor, cex = quartileWt*1.5, ...)
         }
       }
       if (spat){     # spatial (map)
-        xlab <- 'easting'
-        ylab <- 'northing'
-        if (i == nr){
-          par(mar = c(0.25,3.25,0.25,0.5))
-          plot.default(popi[, 'x'], popi[, 'y'], type = "n", xlab = xlab,
-                      xlim = c(emin,emax), ylim = c(nmin,nmax), ylab = "", ...)
-          mtext('easting',side = 1,adj = 0.5, cex = 0.75, line = 3)
-          mtext('northing',side = 2,adj = 0.5, cex = 0.75, line = 2.5)
-        } else if(i == 1){
-          par(mar = c(0.25,3.25,0.25,0.5))
-          plot.default(popi[, 'x'], popi[, 'y'], type = "n", xaxt = 'n',ylab = "",
-                       xlim = c(emin,emax), ylim = c(nmin,nmax), ...)
-          mtext('northing',side = 2,adj = 0.5, cex = 0.75, line = 2.5)
-          mtext('spatial',side = 3, adj = 0.5, line = 0.5)
-        } else{
-          par(mar = c(0.25,3.25,0.25,0.5))
-          plot.default(popi[, 'x'], popi[, 'y'], type = "n", xaxt = 'n',ylab = "",
-                        xlim = c(emin,emax), ylim = c(nmin,nmax), ...)
-          mtext('northing',side = 2,adj = 0.5, cex = 0.75, line = 2.5)
+        if (is.null(xlab)){
+          xlab <- 'easting'
         }
-
+        if (is.null(ylab)){
+          ylab <- 'northing'
+        }
+        par(mar = c(0.25,3.25,0.25,0.5))
+        plot.default(scene.i[, 'x'], scene.i[, 'y'], type = "n", xlab = xlab,
+                     xlim = c(emin,emax), ylim = c(nmin,nmax), ylab = "",xaxt = 'n',...)
+        mtext('northing',side = 2,adj = 0.5, cex = 0.75, line = 2.5)
+        if (i == nr){
+          axis(1)
+          mtext('easting',side = 1,adj = 0.5, cex = 0.75, line = 3)
+        } else if(i == 1){
+          mtext('spatial',side = 3, adj = 0.5, line = 0.5)
+        }
         if (is.null(pch)) {
-          text(popi[, 'x'], popi[, 'y'], popi[, 'id'], ...)
+          text(scene.i[, 'x'], scene.i[, 'y'], scene.i[, 'id'], ...)
         } else {
-          points(popi[, 'x'], popi[, 'y'], pch = pch, ...)
+          points(scene.i[, 'x'], scene.i[, 'y'], pch = pch, ...)
         }
         if (!is.null(sub)){
-          popi.sub <- popi[popi[, 'id'] %in% sub, ]
-          text(popi.sub[, 'x'], popi.sub[, 'y'], popi.sub[, 'id'], pos = 3, ...)
-          points(popi.sub[, 'x'], popi.sub[, 'y'], pch = 19, ...)
-          popi.sub[, 'id']
-          # mtext(names(popn[i]),2, adj = 0, outer = TRUE)
+          scene.i.sub <- scene.i[scene.i[, 'id'] %in% sub, ]
+          text(scene.i.sub[, 'x'], scene.i.sub[, 'y'], scene.i.sub[, 'id'], pos = 3, ...)
+          points(scene.i.sub[, 'x'], scene.i.sub[, 'y'], pch = 19,col = 'blue', ...)
         }
         if(temp == F){
-          mtext(names(popn)[i],side = 2,adj = 0.5, cex = 0.75, line = 5, font = 2)
+          mtext(names(scene)[i],side = 2,adj = 0.5, cex = 0.75, line = 5, font = 2)
         }
       }
       if(comp){
-        popi$s1 <- as.numeric(popi$s1)
-        popi$s2 <- as.numeric(popi$s2)
-        for (j in 1:nrow(popi)){
-          if (popi[j,'s1'] < popi[j,'s2']){
-            popi[j,c('s1','s2')] <- popi[j,c('s2','s1')]
+        scene.i$s1 <- as.numeric(scene.i$s1)
+        scene.i$s2 <- as.numeric(scene.i$s2)
+        for (j in 1:nrow(scene.i)){
+          if (scene.i[j,'s1'] < scene.i[j,'s2']){
+            scene.i[j,c('s1','s2')] <- scene.i[j,c('s2','s1')]
           }
         }
-        ptWt<- aggregate(id ~ s1 + s2, data = popi, length)
+        ptWt<- aggregate(id ~ s1 + s2, data = scene.i, length)
         ptWt$scale <- (ptWt$id - min(ptWt$id)) / diff(range(ptWt$id))
+        par(mar = c(0.25,3.25,0.25,0.5))
+        plot(ptWt$s1, ptWt$s2, cex = 2*ptWt$scale, pch = pch, xlim = c(smin, smax), ylim = c(smin,smax), ylab = "", xaxt = 'n')
+        mtext('s2',side = 2,adj = 0.5, cex = 0.75, line = 2.5)
+        axis(2, at = smin:smax, labels = smin:smax, tick = 0.25)
+        leg.text <- levels(as.factor(ptWt$id))
+        legend('topleft',legend = leg.text, pt.cex = 1+(as.numeric(leg.text) - min(as.numeric(leg.text)))/diff(range(as.numeric(leg.text))), pch = pch)
         if (i == nr){
-          par(mar = c(0.25,3.25,0.25,0.5))
-          plot(ptWt$s1, ptWt$s2, cex = 2*ptWt$scale, pch = pch, xlim = c(smin, smax), ylim = c(smin,smax), ylab = "")
           mtext('s1',side = 1,adj = 0.5, cex = 0.75, line = 3)
-          mtext('s2',side = 2,adj = 0.5, cex = 0.75, line = 2.5)
-          axis(2, at = smin:smax, labels = smin:smax, tick = 0.25)
           axis(1, at = smin:smax, labels = smin:smax)
         } else if(i == 1){
-          par(mar = c(0.25,3.25,0.25,0.5))
-          plot(ptWt$s1, ptWt$s2, cex = 2*ptWt$scale, pch = pch, xlim = c(smin, smax), ylim = c(smin,smax), xaxt = 'n', ylab = "")
-          axis(2, at = smin:smax, labels = smin:smax, tick = 0.25)
           mtext('mating type',side = 3, adj = 0.5, line = 0.5)
-          mtext('s2',side = 2,adj = 0.5, cex = 0.75, line = 2.5)
-        }else {
-          par(mar = c(0.25,3.25,0.25,0.5))
-          plot(ptWt$s1, ptWt$s2, cex = 2*ptWt$scale, pch = pch, xlim = c(smin, smax), ylim = c(smin,smax), xaxt = "n", ylab = "")
-          axis(2, at = smin:smax, labels = smin:smax, tick = 0.25)
-          mtext('s2',side = 2,adj = 0.5, cex = 0.75, line = 2.5)
         }
         if (temp == F & spat == F){
-          mtext(names(popn)[i],side = 2,adj = 0.5, cex = 0.75, line = 5, font = 2)
+          mtext(names(scene)[i],side = 2,adj = 0.5, cex = 0.75, line = 5, font = 2)
         }
       }
     }
   } else {
 
     if ("auto" %in% dimension) {
-      temp <- attr(popn, "t")
-      spat <- attr(popn, "s")
-      comp <- attr(popn, "mt")
+      temp <- attr(scene, "t")
+      spat <- attr(scene, "s")
+      comp <- attr(scene, "mt")
     } else {
       temp <- F
       spat <- F
@@ -257,37 +244,42 @@ matingPlot <- function(popn, dimension = "auto",
         comp <- T
       }
     }
+
+    if('random' %in% sub){
+      sub <- sample(scene[,'id'],n)
+    }
+
     par(mfrow = c(1,sum(temp,spat,comp)))
     if (temp){     # temporal (flowering schedule)
       if (is.null(opening))
-        opening <- min(popn[, 'start'])
+        opening <- min(scene[, 'start'])
       if (is.null(closing))
-        closing <- max(popn[, 'end'])
-      count <- dim(popn)[1]
-      popn <- popn[order(popn[, 'start'], popn[, 'end']),]
-      popn$index <- seq_along(popn[, 1])
-      plot.default(popn[, 'start'], popn$index, ylim = c(1,count), xlim = c(opening, closing), type = "n", xlab = 'date', ylab = 'count', xaxt = "n", ...)
-      datLabs <- seq(opening, closing, by = 7)
-      axis(1, at = datLabs, labels = format(as.Date(datLabs, origin = as.Date("1970-01-01")),
+        closing <- max(scene[, 'end'])
+      count <- dim(scene)[1]
+      scene <- scene[order(scene[, 'start'], scene[, 'end']),]
+      scene$index <- seq_along(scene[, 1])
+      plot.default(scene[, 'start'], scene$index, ylim = c(1,count), xlim = c(opening, closing), type = "n", xlab = 'date', ylab = 'count', xaxt = "n", ...)
+      datLabs <- seq(opening,closing, by = 7)
+      axis(1, at = datLabs, labels = format(as.Date(attr(scene, 'origin') + datLabs, origin = as.Date("1970-01-01")),
                                             format = "%b %d"),tick = 0.25)
-      segments(popn[, 'start'], popn$index, popn[, 'end'],
-               popn$index, col = "gray50", cex = 3, ...)
+      segments(scene[, 'start'], scene$index,scene[, 'end'],
+               scene$index, col = "gray50", cex = 3, ...)
 
 
       if (!is.null(sub)){
-        segments(popn[popn$id %in% sub, 'start'], popn[popn$id %in% sub, 'index'], popn[popn$id %in% sub, 'end'],
-                 popn[popn$id %in% sub, 'index'], col = "blue", ...)
+        segments(scene[scene$id %in% sub, 'start'], scene[scene$id %in% sub, 'index'], scene[scene$id %in% sub, 'end'],
+                 scene[scene$id %in% sub, 'index'], col = "darkgray", ...)
       }
       if (dailyPoints == TRUE){
-        rbd <- receptivityByDay(popn)
+        rbd <- receptivityByDay(scene)
         fl.density <- colSums(rbd)
         points(as.numeric(names(fl.density)), fl.density, pch = pch, ...)
       }
       if (drawQuartiles ==TRUE){
-        rbd <- receptivityByDay(popn)
+        rbd <- receptivityByDay(scene)
         fl.density <- colSums(rbd)
-        abline(v = median(popn$start), col = quartileColor, cex = quartileWt, lty = 2)
-        abline(v = median(popn$end), col = quartileColor, cex = quartileWt, lty = 2)
+        abline(v = median(scene$start), col = quartileColor, cex = quartileWt, lty = 2)
+        abline(v = median(scene$end), col = quartileColor, cex = quartileWt, lty = 2)
         if (max(fl.density))
           abline(v = as.numeric(names(fl.density[fl.density == max(fl.density)])), col = peakColor, cex = quartileWt*1.5, ...)
       }
@@ -295,36 +287,50 @@ matingPlot <- function(popn, dimension = "auto",
     }
 
     if (spat){     # spatial (map)
-      xlab <- 'easting'
-      ylab <- 'northing'
-      plot.default(popn[, 'x'], popn[, 'y'], type = "n", xlab = xlab, ylab = ylab, ...)
+      xcoord <- 'easting'
+      ycoord <- 'northing'
+      plot.default(scene[, 'x'], scene[, 'y'], type = "n", xlab = xcoord, ylab = ycoord, ...)
       if (is.null(pch)) {
-        text(popn[, 'x'], popn[, 'y'], popn[, 'id'], ...)
+        text(scene[, 'x'], scene[, 'y'], scene[, 'id'], ...)
       } else {
-        points(popn[, 'x'], popn[, 'y'], pch = pch, ...)
+        points(scene[, 'x'], scene[, 'y'], pch = pch, ...)
       }
       if (!is.null(sub)){
-        popn.sub <- popn[popn[, 'id'] %in% sub, ]
-        text(popn.sub[, 'x'], popn.sub[, 'y'], popn.sub[, 'id'], pos = 3, ...)
-        points(popn.sub[, 'x'], popn.sub[, 'y'], pch = 19, ...)
-        popn.sub[, 'id']
+        scene.sub <- scene[scene[, 'id'] %in% sub, ]
+        text(scene.sub[, 'x'], scene.sub[, 'y'], scene.sub[, 'id'], pos = 3, ...)
+        points(scene.sub[, 'x'], scene.sub[, 'y'], pch = 19,col = 'blue',...)
+        scene.sub[, 'id']
       }
     }
 
     if(comp){
-      popn$s1 <- as.numeric(popn$s1)
-      popn$s2 <- as.numeric(popn$s2)
-      for (i in 1:nrow(popn)){
-        if (popn[i,'s1'] < popn[i,'s2']){
-          popn[i,c('s1','s2')] <- popn[i,c('s2','s1')]
+      scene$s1 <- as.numeric(scene$s1)
+      scene$s2 <- as.numeric(scene$s2)
+      for (i in 1:nrow(scene)){
+        if (scene[i,'s1'] < scene[i,'s2']){
+          scene[i,c('s1','s2')] <- scene[i,c('s2','s1')]
         }
       }
-      ptWt<- aggregate(id ~ s1 + s2, data = popn, length)
-      ptWt$scale <- (ptWt$id - min(ptWt$id)) / diff(range(ptWt$id))
-      plot(ptWt$s1, ptWt$s2, cex = 2*ptWt$scale, xlab = "s1", ylab = "s2", pch = pch, xlim = c(min(ptWt$s2),max(ptWt$s1)), ylim = c(min(ptWt$s2),max(ptWt$s1)))
+      ptWt<- aggregate(id ~ s1 + s2, data = scene, length)
+      ptWt$normalized <- (ptWt$id - min(ptWt$id)) / diff(range(ptWt$id))
+      plot(ptWt$s1, ptWt$s2, cex = 1+ptWt$normalized, xlab = "s1", ylab = "s2", pch = pch, xlim = c(min(ptWt$s2),max(ptWt$s1)), ylim = c(min(ptWt$s2),max(ptWt$s1)))
       axis(1, at = min(ptWt$s2):max(ptWt$s1), labels = min(ptWt$s2):max(ptWt$s1))
       axis(2, at = min(ptWt$s2):max(ptWt$s1), labels = min(ptWt$s2):max(ptWt$s1))
+      leg.text <- levels(as.factor(ptWt$id))
+      legend('topleft',legend = leg.text, pt.cex = 1+(as.numeric(leg.text) - min(as.numeric(leg.text)))/diff(range(as.numeric(leg.text))), pch = pch)
     }
   }
   par(mar = nm, mfrow = nmfrow, oma = noma)
 }
+
+
+
+# test <- simulateScene(30)
+# test1 <- simulateScene(30)
+# test2 <- simulateScene(60)
+#
+# testList<- list('2001' = test, '2002' = test1, '2003' = test2)
+#
+# matingPlot(testList, sub = 'random')
+
+

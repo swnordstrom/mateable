@@ -1,11 +1,10 @@
-#### function to make mating potential plots ####
 
 ##' Visualize mating potential
 ##'
 ##' @title graphical visualization of a mating potential object
-##' @param matPot
-##' @param subject
-##' @param plotType
+##' @param matPot a mating potential object
+##' @param subject a character string indicating whether the subject to be visualized is individuals or all pairwise interactions
+##' @param plotType a character string indivating the plots to be displayed. Options are histogram ('hist'), network diagram ('net')
 ##' @param showDensity
 ##' @param sub.ids
 ##' @param N

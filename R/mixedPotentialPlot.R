@@ -1,8 +1,7 @@
-
 ##' Visualize multiple dimensions of mating potential
 ##'
 ##' @title graphical visualization of multiple mating potential objects
-##' @param matPots
+##' @param potentials
 ##' @param plotType
 ##' @param showDensity
 ##' @param sub.ids
@@ -17,7 +16,7 @@
 ##' @return optional arguments for the plot function
 ##' @export
 ##' @author Amy Waananen
-##' @seealso see generic function \code{\link{points}} for values of \code{pch}
+##' @seealso
 ##' @examples
 ##' pop <- simulateScene()
 ##' sync <- synchrony(pop)
@@ -25,8 +24,7 @@
 ##'
 ##'
 
-
-potentialPlot <-   function(matPots, # matPots is vector of matingPotential objects (must be length 1 to 3, each with unique dimension)
+mixedPotentialPlot <-   function(matPots, # matPots is vector of matingPotential objects (must be length 1 to 3, each with unique dimension)
                             showDensity = T,
                             sub.ids = NULL, N = 9, sample = "random",
                             sub.labels = FALSE,
@@ -62,8 +60,6 @@ potentialPlot <-   function(matPots, # matPots is vector of matingPotential obje
           mt <- TRUE
         }
 
-        ### might want to do some work to make sure that matPots object has dimensions in the same order every time (t, s, mt)
-
         # use apply function to subset each potential object in matPots for sub.ids
         extract.sub <- function(x){
           iids <- x[['ind']][['id']]
@@ -75,57 +71,23 @@ potentialPlot <-   function(matPots, # matPots is vector of matingPotential obje
         poti <- vapply(matPots,extract.sub)
 
         if (t & s &! mt){
-
-          # map with points colored by DAM
-          xlab <- 'easting'
-          ylab <- 'northing'
-          if (i == nr){
-            par(mar = c(0.25,3.25,0.25,0.5))
-            plot.default(popi[, 'x'], popi[, 'y'], type = "n", xlab = xlab,
-                         xlim = c(emin,emax), ylim = c(nmin,nmax), ylab = "", ...)
-            mtext('easting',side = 1,adj = 0.5, cex = 0.75, line = 3)
-            mtext('northing',side = 2,adj = 0.5, cex = 0.75, line = 2.5)
-          } else if(i == 1){
-            par(mar = c(0.25,3.25,0.25,0.5))
-            plot.default(popi[, 'x'], popi[, 'y'], type = "n", xaxt = 'n',ylab = "",
-                         xlim = c(emin,emax), ylim = c(nmin,nmax), ...)
-            mtext('northing',side = 2,adj = 0.5, cex = 0.75, line = 2.5)
-            mtext('spatial',side = 3, adj = 0.5, line = 0.5)
-          } else{
-            par(mar = c(0.25,3.25,0.25,0.5))
-            plot.default(popi[, 'x'], popi[, 'y'], type = "n", xaxt = 'n',ylab = "",
-                         xlim = c(emin,emax), ylim = c(nmin,nmax), ...)
-            mtext('northing',side = 2,adj = 0.5, cex = 0.75, line = 2.5)
-          }
-
-          if (is.null(pch)) {
-            text(popi[, 'x'], popi[, 'y'], popi[, 'id'], ...)
-          } else {
-            points(popi[, 'x'], popi[, 'y'], pch = pch, ...)
-          }
-          if (!is.null(sub)){
-            popi.sub <- popi[popi[, 'id'] %in% sub, ]
-            text(popi.sub[, 'x'], popi.sub[, 'y'], popi.sub[, 'id'], pos = 3, ...)
-            points(popi.sub[, 'x'], popi.sub[, 'y'], pch = 19, ...)
-            popi.sub[, 'id']
-          }
-          mtext(names(matPots)[[i]],side = 2,adj = 0.5, cex = 0.75, line = 5, font = 2)
-
+          # network diagram with lines weighted by synchrony, colored by proximity? id label size weighted by sum of product of synchrony and proximity for all interactions?
+          # option for vice versa?
         }
 
         if (t & mt &! s){
-          # mating type alleles colored by DAM
+          # network diagram with lines weighted by synchrony, lines omitted if incompatible
+          # histogram with cells shaded by synchrony, omitted if imcompatible
         }
 
         if (s & mt &! t){
-          # map with points colored by mating type alleles (two color points??)
-          # map with lines drawn between compatible plants
+          # network diagram with lines weighted by proximity, lines omitted if incompatible
+          # histogram with cells shaded by proximity, omitted if imcompatible
         }
 
         if (t & s & mt){
-          # map with points colored by time and lines drawn between compatible individuals
+          # network diagram with lines weighted by synchrony, colored by proximity, lines omitted if incompatible, id label size weighted by sum of product of synchrony and proximity for all interactions?
         }
-
       }
 
     } else {
@@ -141,20 +103,19 @@ potentialPlot <-   function(matPots, # matPots is vector of matingPotential obje
 
       # if matPot is not a list
       if (t & s &! mt){
-        # map with points colored by DAM
+
       }
 
       if (t & mt &! s){
-        # mating type alleles colored by DAM
+
       }
 
       if (s & mt &! t){
-        # map with points colored by mating type alleles (two color points??)
-        # map with lines drawn between compatible plants
+
       }
 
       if (t & s & mt){
-        # map with points colored by time and lines drawn between compatible individuals
+
       }
     }
 
