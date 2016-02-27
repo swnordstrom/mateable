@@ -2,7 +2,7 @@
 ##' in a standard format with individuals randomly assigned a mating schedule,
 ##' a location, and S-alleles
 ##'
-##' @title simulate a 3d population
+##' @title Simulate a Mating Scene
 ##' @param size integer number of plants
 ##' @param meanSD date mean start date
 ##' @param sdSD date standard deviation of start date

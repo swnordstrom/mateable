@@ -2,7 +2,7 @@
 % Please edit documentation in R/spatialDataFunctions.R
 \name{pairDist}
 \alias{pairDist}
-\title{Distance matrix for a population}
+\title{Distance Matrix for a Population}
 \usage{
 pairDist(popn)
 }
@@ -10,7 +10,8 @@ pairDist(popn)
 \item{popn}{a 3D population object}
 }
 \value{
-a vector representing the lower triangle of the distance matrix
+a matrix of all pairwise comparisons with attribute for order of
+ids (idOrder)
 }
 \description{
 Compute all pairwise distances for a population. This function

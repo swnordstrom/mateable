@@ -4,7 +4,7 @@ Title: Tools to Assess Mating Potential in Space and Time
 Version: 0.2.0
 Date: 2015-12-29
 Authors@R: c(
-    person("Stuart", "Wagenius", email = "swagenius@gmail.com", role = c("cre", "aut")),
+    person("Stuart", "Wagenius", email = "stuart.wagenius@gmail.com", role = c("cre", "aut")),
     person("Danny", "Hanson", email = "danny.hanson52@gmail.com", role = "aut"),
     person("Amy", "Waananen", email = "amy.waananen@gmail.com", role = "aut"))
 Maintainer: Stuart Wagenius <stuart.wagenius@gmail.com>

@@ -2,21 +2,23 @@
 % Please edit documentation in R/temporalDataFunctions.R
 \name{receptivityByDay}
 \alias{receptivityByDay}
-\title{Flowering by day in a populations}
+\title{Mating Receptivity by Day}
 \usage{
 receptivityByDay(popn)
 }
 \arguments{
-\item{popn}{a 3D population object}
+\item{popn}{a matingScene data frame or list}
 }
 \value{
 a matrix where the columns represent all mating days and the rows
 represent all individuals in the population. The value for day i and
 individual j will be TRUE if that individual was flowering on that day and
-is located in position [i,j]
+is located in position [i,j] \cr
+If popn is a multi-year mating scene, then overlap will return a list of matrices
+(as described above) where each matrix represents one year.
 }
 \description{
-Create a matrix showing which individuals are flowering on a given day
+Create a matrix showing which individuals are receptive on a given day.
 }
 \examples{
 pop <- simulateScene(size = 10)
