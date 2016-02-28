@@ -2,25 +2,25 @@
 % Please edit documentation in R/temporalDataFunctions.R
 \name{synchrony}
 \alias{synchrony}
-\title{Mating synchrony of a population}
+\title{Make potentials object--mating synchrony}
 \usage{
-synchrony(popn, method, synchronyType = "all", averageType = "mean",
+synchrony(scene, method, subject = "all", averageType = "mean",
   syncNN = 1, compareToSelf = FALSE)
 }
 \arguments{
-\item{popn}{a 3dPop object that has the flowering schedule for the
-population of interest.}
+\item{scene}{a matingScene object that include the flowering schedule for the
+scene of interest.}
 
 \item{method}{character, partial matching allowed, describing what type
 of synchrony will be calculated. "augspurger" is based on the method
 described in Augspurger (1983). "kempenaers" is based on the method
-described in Kempenaers (1993). "sync/either" will calculate a synchrony
+described in Kempenaers (1993). "overlap" will calculate a synchrony
 value based on the number of days both individuals were flowering divided
 by the number of days either individual was available for mating. "sync_nn"
 gives the average of the kth nearest neighbor, or rather the kth most
 synchronous individual.}
 
-\item{synchronyType}{one of "population", "pairwise", "individual", or "all"
+\item{subject}{one of "population", "pairwise", "individual", or "all"
 - see Value for more details.}
 
 \item{averageType}{character. Identifies whether to take the mean or median
@@ -33,8 +33,9 @@ calculating population synchrony}
 when calculation synchrony. Defaults to FALSE.}
 }
 \value{
-The result depends on the input for \code{subject}. If
-\code{subject} is "population" \code{synchrony} will return a numeric
+A potentials object containing one more more of the following, depending the
+input for \code{subject}: \cr
+If \code{subject} is "population" \code{synchrony} will return a numeric
 value that has a range depending on the \code{method}. If
 \code{subject} is "pairwise" \code{synchrony} will return a matrix
 with all pairwise synchrony comparisons. It is important to note two things:
@@ -49,11 +50,11 @@ containing the values described above for population, pairwise, and
 individual synchrony.
 }
 \description{
-Calculate one of a variety of measures of mating synchrony for a population.
+Calculate one of a variety of measures of mating synchrony.
 }
 \details{
 Measures of synchrony are based on methods described in Augspurger (1983),
-Kempenaers (1983), and from Wagenius (personal observations), as well
+Kempenaers (1983), and from Ison and Wagenius (2014), as well
 as variations on different factors of those measures.
 }
 \examples{

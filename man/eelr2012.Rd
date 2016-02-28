@@ -3,7 +3,7 @@
 \docType{data}
 \name{eelr2012}
 \alias{eelr2012}
-\title{Information about flowering phenology at sire eelr in 2012.}
+\title{Information about mating scene at site eelr in 2012.}
 \format{A 44 x 6 data frame}
 \usage{
 eelr2012
@@ -11,10 +11,10 @@ eelr2012
 \description{
 This dataframe contains information about all 44 plants that flowered in 2012
 at the site eelr (East Elk Lake Road). Kelly Kapsar visited plants regularly
-to determine the starting and ending dates of flowering on every head of 
-every plant. The metadata for the phenology dataset is saved in the file 
-"phen_mastersheet_2012_metadata.doc". Plants were mapped with high precision 
-gps.
+to determine the starting and ending dates of flowering on every head of
+every plant. The metadata for the phenology dataset is saved in the file
+"phen_mastersheet_2012_metadata.doc" (Cite this better). Plants were mapped with gps with
+better than 6 cm precision.
 }
 \section{Variables}{
 
@@ -29,11 +29,11 @@ Variables:
 }
 }
 \examples{
-dim(eelr2012) 
+dim(eelr2012)
 str(eelr2012) # we should include useful example code
 }
 \references{
-we need some more info
+Cite Wagenius (2006).
 }
 \keyword{datasets}
 

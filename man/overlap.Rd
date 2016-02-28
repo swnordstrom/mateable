@@ -4,10 +4,11 @@
 \alias{overlap}
 \title{Pairwise Mating Timing Comparison}
 \usage{
-overlap(popn, overlapOrTotal = c("overlap", "total"), compareToSelf = FALSE)
+overlap(scene, overlapOrTotal = c("overlap", "total"),
+  compareToSelf = FALSE)
 }
 \arguments{
-\item{popn}{a mating scene data frame or list}
+\item{scene}{a matingScene object}
 
 \item{overlapOrTotal}{whether to calculate the number of days that each
 pair was overlapping in mating receptivity or the total number of days
@@ -21,9 +22,9 @@ a matrix containing all pairwise comparisons. If compareToSelf
 is FALSE then there will be n rows and n-1 columns. \cr
 To index result[i,j] where j > i, use result[i,j-1], where result
 is the return value of overlap. There is one attribute "idOrder"
-which holds the order of the id column in popn at the time of the function call.
+which holds the order of the id column in scene at the time of the function call.
 This can be useful to find certain elements in the matrix (see examples). \cr
-If popn is a multi-year mating scene, then overlap will return a list of matrices
+If scene is a multi-year mating scene, then overlap will return a list of matrices
 (as described above) where each matrix represents one year.
 }
 \description{

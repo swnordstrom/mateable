@@ -2,12 +2,12 @@
 % Please edit documentation in R/compatibility.R
 \name{compatibility}
 \alias{compatibility}
-\title{Mating Type Compatibility of a Population}
+\title{Make potentials object--mating type compatibility}
 \usage{
-compatibility(popn, method, subject = "all", averageType = "mean")
+compatibility(scene, method, subject = "all", averageType = "mean")
 }
 \arguments{
-\item{popn}{a mating scene object}
+\item{scene}{a mating scene object}
 
 \item{method}{either "si_echinacea" or "dioecious" see details for
 further description}
@@ -19,8 +19,8 @@ Specifying more than one is allowed.}
 using the mean or median}
 }
 \value{
-A list containing one more more of the following, depending the
-input for subject: \cr
+A potentials object containing one more more of the following, depending the
+input for \code{subject}: \cr
 If \code{subject} is "population" the return list will contain a numeric
 value that has a range depending on the \code{method}. If
 \code{subject} is "pair" the return list will contain a matrix
@@ -30,7 +30,7 @@ a column containing compatibility averages. If \code{subject} is "all"
 the return list will contain all three of the items above.
 }
 \description{
-Calculate one of several of measures of mating synchrony for a population.
+Calculate one or several of measures of mating compatibility.
 }
 \details{
 When \code{method} is "si_echinacea" compatibility will be

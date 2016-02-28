@@ -4,18 +4,18 @@
 \alias{matingSummary}
 \title{Summarize a Mating Scene}
 \usage{
-matingSummary(popn, type = "auto", k = 1, compatMethod = "si_echinacea")
+matingSummary(scene, type = "auto", k = 1, compatMethod = "si_echinacea")
 }
 \arguments{
-\item{popn}{a mating scene data frame or list}
+\item{scene}{a matingScene object}
 
 \item{type}{character. whether to do a temporal (t), spatial (s), or mating
 type (mt) summary. The default is "auto" which will automatically summarize
-all mating information in popn}
+all mating information in scene}
 
 \item{k}{integer. Which nearest neighbor to calculate (only for type == "s")}
 
-\item{compatMethod}{character. What method to use when calculating
+\item{compatMethod}{character indicating the method to use when calculating
 compatiblity. Defaults to "si_echinacea"}
 }
 \value{
@@ -31,11 +31,11 @@ maximum y (maxY), average distance to kth nearest neighbor as specified
 by k (k<n> where n is the input for k)\cr
 compatibility - number of mating types (nMatType), average number of
 compatible mates (meanComp)\cr
-If popn is a multi-year mating scene, then the output will be a list
+If scene is a multi-year mating scene, then the output will be a list
 of lists, one list for each year.
 }
 \description{
-Create a summary of data contained within a matingScene data frame.
+Create a summary of information contained within a matingScene object.
 }
 \examples{
 eelr <- makeScene(eelr2012, startCol = "firstDay", endCol = "lastDay",

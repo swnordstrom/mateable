@@ -4,17 +4,17 @@
 \alias{receptivityByDay}
 \title{Mating Receptivity by Day}
 \usage{
-receptivityByDay(popn)
+receptivityByDay(scene)
 }
 \arguments{
-\item{popn}{a matingScene data frame or list}
+\item{scene}{a matingScene data frame or list}
 }
 \value{
 a matrix where the columns represent all mating days and the rows
 represent all individuals in the population. The value for day i and
 individual j will be TRUE if that individual was flowering on that day and
 is located in position [i,j] \cr
-If popn is a multi-year mating scene, then overlap will return a list of matrices
+If scene is a multi-year mating scene, then overlap will return a list of matrices
 (as described above) where each matrix represents one year.
 }
 \description{
