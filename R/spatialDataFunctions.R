@@ -1,18 +1,18 @@
 ##' Compute all pairwise distances for a population. This function
-##' is simply a wrapper for \code{dist} that only returns a matrix
+##' is simply a wrapper for \code{dist} that returns only a matrix
 ##'
-##' @title Distance Matrix for a Population
-##' @param popn a 3D population object
-##' @return a matrix of all pairwise comparisons with attribute for order of
-##' ids (idOrder)
+##' @title Distance Matrix for a mating scene
+##' @param scene a matingScene object
+##' @return a matrix of all pairwise comparisons with attributes for order of
+##' identifiers (idOrder)
 ##' @export
 ##' @seealso \code{\link{dist}}
 ##' @author Danny Hanson
 ##' @examples
 ##' pop <- simulateScene()
 ##' distance <- pairDist(pop)
-pairDist <- function(popn) {
-  distMat <- as.matrix(dist(popn[, c("x", "y")]))
+pairDist <- function(scene) {
+  distMat <- as.matrix(dist(scene[, c("x", "y")]))
   attr(distMat, "idOrder") <- attr(distMat, "dimnames")[[1]]
   attr(distMat, "dimnames") <- NULL
   distMat
@@ -22,7 +22,7 @@ pairDist <- function(popn) {
 ##' function is simply a wrapper for \code{FNN::knn.dist}.
 ##'
 ##' @title Get k Nearest Neighbors
-##' @param popn a 3D population object
+##' @param scene a matingScene object
 ##' @param k integer of how many nearest neighbors to get
 ##' @return a matrix where the rows are all individuals and the columns are
 ##' their k nearest neighbors
@@ -32,17 +32,17 @@ pairDist <- function(popn) {
 ##' @examples
 ##' pop <- simulateScene(10)
 ##' kNearNeighbors(pop, 3)
-kNearNeighbors <- function(popn, k) {
-  knnMatrix <- FNN::knn.dist(popn[c("x", "y")], k = k, algorithm = "brute")
-  rownames(knnMatrix) <- popn$id
+kNearNeighbors <- function(scene, k) {
+  knnMatrix <- FNN::knn.dist(scene[c("x", "y")], k = k, algorithm = "brute")
+  rownames(knnMatrix) <- scene$id
   colnames(knnMatrix) <- paste("k", 1:k, sep = "")
   knnMatrix
 }
 
-##' Calculate one of several of measures of mating synchrony for a population.
+##' Calculate one or several of measures of spatial proximity
 ##'
-##' @title Spatial Proximity of a Population
-##' @param popn a 3D population object
+##' @title Make potentials object--spatial proximity
+##' @param scene a matingScene object
 ##' @param method one of "maxProp", and "maxPropSqrd" see details for
 ##' further description
 ##' @param proximityFun a function used to calculate proximity. Not yet
@@ -51,8 +51,8 @@ kNearNeighbors <- function(popn, k) {
 ##' using the mean or median
 ##' @param subject whether you want pair, individual, population, or all.
 ##' Specifying more than one is allowed.
-##' @return A list containing one more more of the following, depending the
-##' input for subject: \cr
+##' @return A potentials object containing one more more of the following, depending the
+##' input for \code{subject}: \cr
 ##' If \code{subject} is "population" the return list will contain a numeric
 ##' value that has a range depending on the \code{method}. If
 ##' \code{subject} is "pair" the return list will contain a matrix
@@ -68,13 +68,13 @@ kNearNeighbors <- function(popn, k) {
 ##' @examples
 ##' pop <- simulateScene()
 ##' proximity(pop, "maxProp")
-proximity <- function(popn, method, proximityFun = NULL, averageType = "mean",
+proximity <- function(scene, method, proximityFun = NULL, averageType = "mean",
                       subject = "all") {
   method <- match.arg(method, c("maxProp", "maxPropSqrd"))
   subject <- match.arg(subject, c("all", "pair", "population", "individual"),
                        several.ok = TRUE)
-  n <- nrow(popn)
-  distMatrix <- pairDist(popn)
+  n <- nrow(scene)
+  distMatrix <- pairDist(scene)
   maxDist <- max(distMatrix)
   if (averageType == "mean") {
     average <- mean
@@ -94,7 +94,7 @@ proximity <- function(popn, method, proximityFun = NULL, averageType = "mean",
     distNoDiag <- matrix(distMatrix[-seq(1, n^2, n+1)], nrow = n, byrow = T)
     pairProx2 <- 1 - distNoDiag/maxDist
 
-    indProx <- data.frame(id = popn$id, proximity = -1)
+    indProx <- data.frame(id = scene$id, proximity = -1)
     indProx$proximity <- apply(pairProx2, 1, average)
 
     popProx <- average(indProx[,2])
@@ -106,7 +106,7 @@ proximity <- function(popn, method, proximityFun = NULL, averageType = "mean",
     distNoDiag <- matrix(distMatrix[-seq(1, n^2, n+1)], nrow = n, byrow = T)
     pairProx2 <- (1 - distNoDiag/maxDist)^2
 
-    indProx <- data.frame(id = popn$id, proximity = -1)
+    indProx <- data.frame(id = scene$id, proximity = -1)
     indProx$proximity <- apply(pairProx2, 1, average)
 
     popProx <- average(indProx[,2])
