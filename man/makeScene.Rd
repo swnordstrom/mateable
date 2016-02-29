@@ -70,9 +70,6 @@ collected and df is a multi-year data set, put the collection year into the
 column labelled as startCol and set dateFormat = "%Y" and that will split
 the data appropriately.
 }
-\examples{
-\dontrun{makeFS(NULL)}
-}
 \author{
 Danny Hanson
 }

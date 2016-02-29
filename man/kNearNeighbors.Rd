@@ -23,9 +23,6 @@ function is simply a wrapper for \code{FNN::knn.dist}.
 pop <- simulateScene(10)
 kNearNeighbors(pop, 3)
 }
-\author{
-Danny Hanson
-}
 \seealso{
 \code{\link{knn.dist}}
 }
