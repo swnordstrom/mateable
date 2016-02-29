@@ -401,11 +401,6 @@ mixedMatingPlot <- function(scene, dimension = "auto",
       if (is.null(pch)) {
         text(scene[, 'x'], scene[, 'y'], scene[, 'id'], col = scene$cols, ...)
       } else {
-        legend('topleft', legend = c(format(opening, format = "%b %d"),' ',' ',' ',
-                                     format(attr(scene,'origin')+round(mean(c(minstart,maxstart))), format = "%b %d"),' ',' ',' ',
-                                     format(attr(scene,'origin')+maxstart, format = "%b %d")),
-               fill = colorRampPalette(c('blue','red'))(9),ncol = 1, bty = 'n', xpd = T,
-               y.intersp = 0.68, title = 'start date', inset = c(0.02,0.03))
         if (!is.null(sub)){
           scene.sub <- scene[scene[, 'id'] %in% sub, ]
           text(scene.sub[, 'x'], scene.sub[, 'y'], scene.sub[, 'id'], pos = 3, cex =1.1, font = 2, ...)
@@ -417,6 +412,9 @@ mixedMatingPlot <- function(scene, dimension = "auto",
           text (scene[,'x'], scene[,'y'], paste(scene[,'s1'],', ',scene[,'s2'], sep = ""), pos = 2, cex = 0.7)
         }
       }
+      par(fig = c(0, 1, 0, 1), oma = c(0, 0, 0, 0), mar = c(0, 0, 0, 0), new = TRUE)
+      plot(0, 0, type = "n", bty = "n", xaxt = "n", yaxt = "n")
+      legend("topleft", legend = c(format(attr(scene,'origin')+min(scene$start), format = "%b %d"),' ',' ',' ',format(attr(scene,'origin')+median(scene$start), format = "%b %d"),' ',' ',' ',format(attr(scene,'origin')+max(scene$start), format = "%b %d")), fill = colorRampPalette(c('blue','red'))(9),ncol = 1, bty = 'n', y.intersp = 0.68, title = 'start date', inset = c(0.02,0.03))
 
     } else if (temp & spat){
       xcoord <- 'easting'
@@ -425,7 +423,6 @@ mixedMatingPlot <- function(scene, dimension = "auto",
       if (is.null(pch)) {
         text(scene[, 'x'], scene[, 'y'], scene[, 'id'], ...)
       } else {
-        legend("topleft", legend = c(format(attr(scene,'origin')+min(scene$start), format = "%b %d"),' ',' ',' ',format(attr(scene,'origin')+median(scene$start), format = "%b %d"),' ',' ',' ',format(attr(scene,'origin')+max(scene$start), format = "%b %d")), fill = colorRampPalette(c('blue','red'))(9),ncol = 1, bty = 'n', y.intersp = 0.68, title = 'start date', inset = c(-.13,0))
         if (!is.null(sub)){
           scene.sub <- scene[scene[, 'id'] %in% sub, ]
           text(scene.sub[, 'x'], scene.sub[, 'y'], scene.sub[, 'id'], pos = 3, ...)
@@ -435,6 +432,10 @@ mixedMatingPlot <- function(scene, dimension = "auto",
           points(scene[, 'x'], scene[, 'y'], pch = pch, col = scene$cols, ...)
         }
       }
+      par(fig = c(0, 1, 0, 1), oma = c(0, 0, 0, 0), mar = c(0, 0, 0, 0), new = TRUE)
+      plot(0, 0, type = "n", bty = "n", xaxt = "n", yaxt = "n")
+      legend("topleft", legend = c(format(attr(scene,'origin')+min(scene$start), format = "%b %d"),' ',' ',' ',format(attr(scene,'origin')+median(scene$start), format = "%b %d"),' ',' ',' ',format(attr(scene,'origin')+max(scene$start), format = "%b %d")), fill = colorRampPalette(c('blue','red'))(9),ncol = 1, bty = 'n', y.intersp = 0.68, title = 'start date', inset = c(0.02,0.03))
+
 
     } else if(spat & comp){
       par(xpd = T)
@@ -468,13 +469,16 @@ mixedMatingPlot <- function(scene, dimension = "auto",
       plot(jitter(scene$s1), jitter(scene$s2), col = scene$cols,xlim = c(min(scene$s2),max(scene$s1)), ylim = c(min(scene$s2),max(scene$s1)), xlab = 's1', ylab = 's2', pch = pch,...)
       abline(v = c(1:10) - 0.5, lty = 'dotted', col = 'lightgray')
       abline(h = c(1:10) - 0.5 , lty = 'dotted', col = 'lightgray')
-      legend("topleft", legend = c(format(attr(scene,'origin')+min(scene$start), format = "%b %d"),' ',' ',' ',format(attr(scene,'origin')+median(scene$start), format = "%b %d"),' ',' ',' ',format(attr(scene,'origin')+max(scene$start), format = "%b %d")), fill = colorRampPalette(c('blue','red'))(9),ncol = 1, y.intersp = 0.68, title = 'start date', bty = 'o', box.lty = 'blank', inset = 0.05)
       axis(1, at = min(scene$s2):max(scene$s1), labels = min(scene$s2):max(scene$s1))
       axis(2, at = min(scene$s2):max(scene$s1), labels = min(scene$s2):max(scene$s1))
       if (!is.null(sub)){
         scene.sub <- scene[scene[, 'id'] %in% sub, ]
         text(scene.sub[, 's1'], scene.sub[, 's2'], scene.sub[, 'id'], pos = 3, cex =1, font = 2, ...)
       }
+      par(fig = c(0, 1, 0, 1), oma = c(0, 0, 0, 0), mar = c(0, 0, 0, 0), new = TRUE)
+      plot(0, 0, type = "n", bty = "n", xaxt = "n", yaxt = "n")
+      legend("topleft", legend = c(format(attr(scene,'origin')+min(scene$start), format = "%b %d"),' ',' ',' ',format(attr(scene,'origin')+median(scene$start), format = "%b %d"),' ',' ',' ',format(attr(scene,'origin')+max(scene$start), format = "%b %d")), fill = colorRampPalette(c('blue','red'))(9),ncol = 1, bty = 'n', y.intersp = 0.68, title = 'start date', inset = c(0.02,0.03))
+
     }
     par(mar = nm, mfrow = nmfrow, oma = noma, xpd = F)
   }
