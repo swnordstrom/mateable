@@ -379,17 +379,13 @@ mixedMatingPlot <- function(scene, dimension = "auto",
     if(temp){
       scene$cols <- cut(scene$start,9)
       palette(colorRampPalette(c('blue','red'))(9))
-      if(is.null(opening)){
+      opening <- attr(scene,'origin')+min(scene[,'start'])
+      if (attr(scene,'origin')+min(scene[,'start']) < opening){
         opening <- attr(scene,'origin')+min(scene[,'start'])
-        if (attr(scene,'origin')+min(scene[,'start']) < opening){
-          opening <- attr(scene,'origin')+min(scene[,'start'])
-        }
       }
-      if(is.null(closing)){
+      closing <- attr(scene,'origin')+max(scene[,'end'])
+      if (attr(scene,'origin')+max(scene[,'end']) > closing){
         closing <- attr(scene,'origin')+max(scene[,'end'])
-        if (attr(scene,'origin')+max(scene[,'end']) > closing){
-          closing <- attr(scene,'origin')+max(scene[,'end'])
-        }
       }
 
       maxstart <- max(scene[,'start'])

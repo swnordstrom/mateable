@@ -19,7 +19,7 @@
 ##' @seealso
 ##' @examples
 ##' pop <- simulateScene()
-##' sync <- synchrony(pop)
+##' sync <- synchrony(pop, "augs")
 ##' potentialPlot(sync)
 ##'
 ##'

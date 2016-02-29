@@ -19,7 +19,7 @@
 ##' @seealso see generic function \code{\link{points}} for values of \code{pch}
 ##' @examples
 ##' pop <- simulateScene()
-##' sync <- synchrony(pop)
+##' sync <- synchrony(pop, "augs")
 ##' potentialPlot(sync)
 ##'
 ##'
