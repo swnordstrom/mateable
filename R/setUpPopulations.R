@@ -88,8 +88,6 @@ simulateScene <- function(size = 30, meanSD = "2012-07-12", sdSD = 6, meanDur = 
 ##' column labelled as startCol and set dateFormat = "%Y" and that will split
 ##' the data appropriately.
 ##' @author Danny Hanson
-##' @examples
-##' \dontrun{makeFS(NULL)}
 makeScene <- function (df, multiYear = FALSE, startCol = "start", endCol = "end", xCol = "x",
                        yCol = "y", s1Col = "s1", s2Col = "s2", idCol = "id",
                        dateFormat = "%Y-%m-%d") {

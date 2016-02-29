@@ -10,25 +10,23 @@
 ##' @param N a positive number, the number of individuals to sample if sub.ids = 'random'
 ##' @param sample a character string specifying how to choose a subset of individuals to be represented in pairwise potential plots. Possible values are "random" (default) or "all".
 ##' @param lab.cex parameter indicating label size relative to plot
+##' (different than cex.lab)
 ##' @param main the main title (on top of plot)
-##' @param ...
-##' @return nothing
-##' @return optional arguments for the plot function
+##' @param ... optional arguments for the plot function
 ##' @export
 ##' @author Amy Waananen
 ##' @seealso see generic function \code{\link{points}} for values of \code{pch}
 ##' @examples
 ##' pop <- simulateScene()
-##' sync <- synchrony(pop)
-##' potentialPlot(sync)
+##' sync <- synchrony(pop, "augs")
+##' plotPotential(sync)
 ##'
 ##'
-potentialPlot <-   function(matPot,
+plotPotential <-   function(matPot,
                             subject = c('pair','ind'),
                             plotType = 'auto',
                             showDensity = T,
                             sub.ids = NULL, N = 9, sample = "random",
-                            ind.labels = TRUE,
                             lab.cex = 0.5, main = NULL, ...){
 
   nm <- par("mar")
@@ -154,8 +152,8 @@ potentialPlot <-   function(matPot,
           subMat[upper.tri(subMat, diag = TRUE)] <- 0
           im <- poti[['ind']][which(sub.iids %in% iids), potential]
           lab.cex <- 1 + (im - min(im))/(max(im) - min(im))
-          plotweb3(subMat, names = sub.iids, val = FALSE, legend = FALSE, length = 0,
-                   labz.size = lab.cex, ...)
+          plot_web3(subMat, names = sub.iids, val = FALSE, legend = FALSE, length = 0,
+                    labz.size = lab.cex, ...)
         }
         if (! 'hist' %in% pt){
           mtext(names(matPot)[i],side = 2,adj = 0.5, cex = 0.75, las = 1, font = 2)
@@ -171,7 +169,7 @@ potentialPlot <-   function(matPot,
           diag(subMat) <- 1
           subMat[upper.tri(subMat, diag = FALSE)] <- NA
           image(x = 1:nrow(subMat),y = 1:nrow(subMat), z = subMat, axes = F, xlab = "", ylab = "", col = colorRampPalette(c('white','red'))(12))
-          legend("topleft", legend = round(seq(min(subMat, na.rm = T),max(subMat, na.rm = T),length.out = 12),digits = 2), fill = colorRampPalette(c('white','red'))(12),ncol = 4, bty = 'n')
+          legend("topleft", legend = round(seq(min(subMat, na.rm = T),max(subMat, na.rm = T),length.out = 12),digits = 2), fill = colorRampPalette(c('white','red'))(12),ncol = 3, bty = 'n')
           axis(1, 1:ncol(subMat), labels = sub.iids, tick = 0, cex.axis = -0.2 + 1/log10(nrow(subMat)))
           axis(4, 1:ncol(subMat), labels = sub.iids, tick = 0, cex.axis = -0.2 + 1/log10(nrow(subMat)), las = 2)
           par(mgp = c(3,1,0))
@@ -209,7 +207,7 @@ potentialPlot <-   function(matPot,
 
 
 
-plotweb3 <-
+plot_web3 <-
   function (flowmat, names = NULL, lab.size = 1.5, add = FALSE,
             fig.size = 1.3, main = "", sub = "", sub2 = "", log = FALSE,
             mar = c(0.25, 0.25, 0.25, 0.25), nullflow = NULL, minflow = NULL, maxflow = NULL,
@@ -308,7 +306,7 @@ plotweb3 <-
       y2 <- yi[i]
       for (j in 1:i) {
         if (flowmatrix[i, j] > zero | flowmatrix[j, i] >
-              zero) {
+            zero) {
           Arr.col <- arr.col[i, j]
           x1 <- xi[j]
           y1 <- yi[j]

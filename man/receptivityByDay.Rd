@@ -7,14 +7,13 @@
 receptivityByDay(scene)
 }
 \arguments{
-\item{scene}{a matingScene data frame or list}
+\item{scene}{a matingScene object}
 }
 \value{
 a matrix where the columns represent all mating days and the rows
-represent all individuals in the population. The value for day i and
-individual j will be TRUE if that individual was flowering on that day and
-is located in position [i,j] \cr
-If scene is a multi-year mating scene, then overlap will return a list of matrices
+represent all individuals in the population. The value at position
+[i,j] will be TRUE if individual j was receptive on day i \cr
+If scene is a multi-year matingScene, then overlap will return a list of matrices
 (as described above) where each matrix represents one year.
 }
 \description{

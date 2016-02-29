@@ -1,13 +1,14 @@
 ##' Visualize a mating scene
 ##'
 ##' @title graphical visualization of a mating scene object
-##' @param scene a mating scene object
+##' @param scene a matingScene object
 ##' @param dimension what dimension(s) of the mating scene should be visualized. Possible dimensions are 't' for temporal, 's' for spatial, 'mt' for mating type, and 'auto' (the default). For dimension = 'auto', all dimensions represented in the mating scene object will be plotted.
 ##' @param opening the number of days to adjust the start date displayed for the temporal dimension. Start date defaults to minimum day of year of start date in mating scene object.
 ##' @param closing the number of days to adjust the end date displayed for the temporal dimension. End date defaults to maximum day of year end date in mating scene object.
 ##' @param dailyPoints logical indicating whether daily counts of individuals should be displayed for plots of the temporal dimension
 ##' @param drawQuartiles logical indicating whether vertical lines should be drawn at population peak (the date when the maximum number of individuals were reproductively available) or quartiles
 ##' @param sub a vector containing the ids of individuals to be highlighted in the plots or a character string specifying how to choose individuals to highlight. Possible values are "random" or "all". If NULL, no subset will be identified in the plots.
+##' @param N a positive number, the number of individuals to sample if \code{sub} = 'random'
 ##' @param xcoord label for x coordinate of spatial dimension plots. If NULL, defaults to 'easting'.
 ##' @param ycoord label for y coordinate of spatial dimension plots. If NULL, defaults to 'northing'.
 ##' @param pch specify point type to be used in plots. Defaults to pch = 19 (filled in circle). If NULL points will be labeled by id.
@@ -19,17 +20,17 @@
 ##' @return optional arguments for the plot function
 ##' @export
 ##' @author Amy Waananen
-##' @seealso see \code{\link{mixedMatingPlot}} to visualize multiple dimensions on one plot
+##' @seealso see \code{\link{plot3DScene}} to visualize multiple dimensions on one plot
 ##' @examples
 ##' pop <- simulateScene()
-##' matingPlot(pop)
+##' plotScene(pop)
 ##' \dontrun{plotMap(NULL)}
 ##'
 ##'
-matingPlot <- function(scene, dimension = "auto",
+plotScene <- function(scene, dimension = "auto",
                        opening = NULL, closing = NULL,
                        dailyPoints = TRUE, drawQuartiles = TRUE,
-                       sub= NULL, n, xlab = 'xlab', ylab = 'ylab', pch = 19,
+                       sub= NULL, N = 9, xcoord = 'xlab', ycoord = 'ylab', pch = 19,
                        quartileWt = 2,
                        quartileColor = 'gray81',
                        peakColor = 'gray27', ...){
@@ -254,7 +255,7 @@ matingPlot <- function(scene, dimension = "auto",
     }
 
     if('random' %in% sub){
-      sub <- sample(scene[,'id'],n)
+      sub <- sample(scene[,'id'],N)
     }
 
     par(mfrow = c(1,sum(temp,spat,comp)))
@@ -295,8 +296,13 @@ matingPlot <- function(scene, dimension = "auto",
     }
 
     if (spat){     # spatial (map)
-      xcoord <- 'easting'
-      ycoord <- 'northing'
+      if (is.null(xcoord)){
+        xcoord <- 'easting'
+      }
+
+      if(is.null(ycoord)){
+        ycoord <- 'northing'
+      }
       plot.default(scene[, 'x'], scene[, 'y'], type = "n", xlab = xcoord, ylab = ycoord, ...)
       if (is.null(pch)) {
         text(scene[, 'x'], scene[, 'y'], scene[, 'id'], ...)

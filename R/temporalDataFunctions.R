@@ -21,7 +21,7 @@
 ##' by k (k<n> where n is the input for k)\cr
 ##' compatibility - number of mating types (nMatType), average number of
 ##' compatible mates (meanComp)\cr
-##' If scene is a multi-year mating scene, then the output will be a list
+##' If scene is a multi-year matingScene, then the output will be a list
 ##' of lists, one list for each year.
 ##' @examples
 ##' eelr <- makeScene(eelr2012, startCol = "firstDay", endCol = "lastDay",
@@ -94,11 +94,11 @@ matingSummary <- function(scene, type = "auto", k = 1,
 ##' return value
 ##' @return a matrix containing all pairwise comparisons. If compareToSelf
 ##' is FALSE then there will be n rows and n-1 columns. \cr
-##' To index result[i,j] where j > i, use result[i,j-1], where result
+##' To index result[i,j] where j > i, use \code{result[i,j-1]}, where \code{result}
 ##' is the return value of overlap. There is one attribute "idOrder"
 ##' which holds the order of the id column in scene at the time of the function call.
 ##' This can be useful to find certain elements in the matrix (see examples). \cr
-##' If scene is a multi-year mating scene, then overlap will return a list of matrices
+##' If scene is a multi-year matingScene, then overlap will return a list of matrices
 ##' (as described above) where each matrix represents one year.
 ##' @author Danny Hanson
 ##' @examples
@@ -142,12 +142,11 @@ overlap <- function(scene, overlapOrTotal = c("overlap", "total"),
 ##'
 ##' Create a matrix showing which individuals are receptive on a given day.
 ##'
-##' @param scene a matingScene data frame or list
+##' @param scene a matingScene object
 ##' @return a matrix where the columns represent all mating days and the rows
-##' represent all individuals in the population. The value for day i and
-##' individual j will be TRUE if that individual was flowering on that day and
-##' is located in position [i,j] \cr
-##' If scene is a multi-year mating scene, then overlap will return a list of matrices
+##' represent all individuals in the population. The value at position
+##' [i,j] will be TRUE if individual j was receptive on day i \cr
+##' If scene is a multi-year matingScene, then overlap will return a list of matrices
 ##' (as described above) where each matrix represents one year.
 ##' @author Danny Hanson
 ##' @examples
@@ -178,16 +177,18 @@ receptivityByDay <- function(scene) {
 ##' Calculate one of a variety of measures of mating synchrony.
 ##'
 ##' @title Make potentials object--mating synchrony
-##' @param scene a matingScene object that include the flowering schedule for the
+##' @param scene a matingScene object that includes the flowering schedule for the
 ##' scene of interest.
 ##' @param method character, partial matching allowed, describing what type
 ##' of synchrony will be calculated. "augspurger" is based on the method
 ##' described in Augspurger (1983). "kempenaers" is based on the method
-##' described in Kempenaers (1993). "overlap" will calculate a synchrony
-##' value based on the number of days both individuals were flowering divided
-##' by the number of days either individual was available for mating. "sync_nn"
-##' gives the average of the kth nearest neighbor, or rather the kth most
-##' synchronous individual.
+##' described in Kempenaers (1993). "sync_prop" will calculate individual
+##'  synchrony based on the proportion of the sum of all individuals' days
+##'  available to mate that coincided with the individual's days available for mating.
+##' "overlap" will calculate a synchrony value based on the number of days both
+##' individuals were flowering divided by the number of days either individual
+##' was available for mating. "sync_nn" gives the average of the kth nearest
+##' neighbor, or rather the kth most synchronous individual.
 ##' @param subject one of "population", "pairwise", "individual", or "all"
 ##' - see Value for more details.
 ##' @param averageType character. Identifies whether to take the mean or median
@@ -229,11 +230,11 @@ receptivityByDay <- function(scene) {
 synchrony <- function(scene, method, subject = "all", averageType = "mean",
                       syncNN = 1, compareToSelf = FALSE) {
 
-  method <- match.arg(method, c("augspurger", "kempenaers", "overlap",
-                                "sync_nn"))
+  method <- match.arg(method, c("augspurger", "kempenaers", "sync_prop",
+                                "overlap", "sync_nn"))
   subject <- match.arg(subject, c("population", "pairwise",
-                                              "individual", "all"),
-                             several.ok = T)
+                                  "individual", "all"),
+                       several.ok = T)
   averageType <- match.arg(averageType, c("mean", "median"))
 
   # some things that all methods need
@@ -275,11 +276,24 @@ synchrony <- function(scene, method, subject = "all", averageType = "mean",
     indSync <- data.frame(id = scene$id, synchrony = -1)
     indSync$synchrony <- kemp_ind(indCols, scene$start, scene$end, scene$duration,
                                   compareToSelf)
-#     indSync$synchrony <- sapply(1:n, FUN = function(i) {
-#       inds <- as.character(scene[i, "start"]:scene[i, "end"])
-#       sum(indDaily[,inds]) - scene[i,"duration"]
-#     })/(scene[,"duration"]*(n-1))
+    #     indSync$synchrony <- sapply(1:n, FUN = function(i) {
+    #       inds <- as.character(scene[i, "start"]:scene[i, "end"])
+    #       sum(indDaily[,inds]) - scene[i,"duration"]
+    #     })/(scene[,"duration"]*(n-1))
 
+    popSync <- average(indSync[,2])
+
+  } else if (method == 'sync_prop') {
+    days <- min(scene$start):max(scene$end)
+    fl <- receptivityByDay(scene)
+    n <- sum(fl)
+
+    prop <- apply(fl, 2, function(x){sum(x)/n})
+    indPropDaily<- t(apply(fl,1,function(x){x*prop}))
+    totalIndProp <- rowSums(indPropDaily)
+
+    pairSync <- NULL
+    indSync <- data.frame(id = scene$id, synchrony = totalIndProp)
     popSync <- average(indSync[,2])
 
   } else if (method == "overlap") {
@@ -333,6 +347,7 @@ synchrony <- function(scene, method, subject = "all", averageType = "mean",
     popSync <- average(indSync[,2])
 
   }
+
 
   # return
   potential <- list()

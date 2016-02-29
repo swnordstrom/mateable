@@ -21,9 +21,6 @@ is simply a wrapper for \code{dist} that returns only a matrix
 pop <- simulateScene()
 distance <- pairDist(pop)
 }
-\author{
-Danny Hanson
-}
 \seealso{
 \code{\link{dist}}
 }

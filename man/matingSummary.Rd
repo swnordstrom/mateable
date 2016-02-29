@@ -31,7 +31,7 @@ maximum y (maxY), average distance to kth nearest neighbor as specified
 by k (k<n> where n is the input for k)\cr
 compatibility - number of mating types (nMatType), average number of
 compatible mates (meanComp)\cr
-If scene is a multi-year mating scene, then the output will be a list
+If scene is a multi-year matingScene, then the output will be a list
 of lists, one list for each year.
 }
 \description{

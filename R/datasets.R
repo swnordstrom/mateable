@@ -3,8 +3,8 @@
 #' This dataframe contains information about all 44 plants that flowered in 2012
 #' at the site eelr (East Elk Lake Road). Kelly Kapsar visited plants regularly
 #' to determine the starting and ending dates of flowering on every head of
-#' every plant. The metadata for the phenology dataset is saved in the file
-#' "phen_mastersheet_2012_metadata.doc" (Cite this better). Plants were mapped with gps with
+#' every plant. The metadata for the phenology dataset can be provide upon request
+#' to the maintainer. Plants were mapped with gps with
 #' better than 6 cm precision.
 #'
 #' @section Variables:
@@ -21,9 +21,10 @@
 #' @name eelr2012
 #' @usage eelr2012
 #' @format A 44 x 6 data frame
-#' @references Cite Wagenius (2006).
+#' @references Wagenius, S. 2006. Scale-dependence of reproductive failure in
+#' fragmented \emph{Echinacea} populations. Ecology 87: 931-941.
 #' @keywords datasets
 #' @examples
 #' dim(eelr2012)
-#' str(eelr2012) # we should include useful example code
+#' str(eelr2012)
 NULL
