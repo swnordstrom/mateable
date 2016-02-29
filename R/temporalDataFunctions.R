@@ -178,7 +178,7 @@ receptivityByDay <- function(scene) {
 ##' Calculate one of a variety of measures of mating synchrony.
 ##'
 ##' @title Make potentials object--mating synchrony
-##' @param scene a matingScene object that include the flowering schedule for the
+##' @param scene a matingScene object that includes the flowering schedule for the
 ##' scene of interest.
 ##' @param method character, partial matching allowed, describing what type
 ##' of synchrony will be calculated. "augspurger" is based on the method
@@ -229,11 +229,11 @@ receptivityByDay <- function(scene) {
 synchrony <- function(scene, method, subject = "all", averageType = "mean",
                       syncNN = 1, compareToSelf = FALSE) {
 
-  method <- match.arg(method, c("augspurger", "kempenaers", "overlap",
-                                "sync_nn"))
+  method <- match.arg(method, c("augspurger", "kempenaers", "sync_prop",
+                                "overlap", "sync_nn"))
   subject <- match.arg(subject, c("population", "pairwise",
-                                              "individual", "all"),
-                             several.ok = T)
+                                  "individual", "all"),
+                       several.ok = T)
   averageType <- match.arg(averageType, c("mean", "median"))
 
   # some things that all methods need
@@ -275,11 +275,24 @@ synchrony <- function(scene, method, subject = "all", averageType = "mean",
     indSync <- data.frame(id = scene$id, synchrony = -1)
     indSync$synchrony <- kemp_ind(indCols, scene$start, scene$end, scene$duration,
                                   compareToSelf)
-#     indSync$synchrony <- sapply(1:n, FUN = function(i) {
-#       inds <- as.character(scene[i, "start"]:scene[i, "end"])
-#       sum(indDaily[,inds]) - scene[i,"duration"]
-#     })/(scene[,"duration"]*(n-1))
+    #     indSync$synchrony <- sapply(1:n, FUN = function(i) {
+    #       inds <- as.character(scene[i, "start"]:scene[i, "end"])
+    #       sum(indDaily[,inds]) - scene[i,"duration"]
+    #     })/(scene[,"duration"]*(n-1))
 
+    popSync <- average(indSync[,2])
+
+  } else if (method == 'sync_prop') {
+    days <- min(scene$start):max(scene$end)
+    fl <- receptivityByDay(scene)
+    n <- sum(fl)
+
+    prop <- apply(fl, 2, function(x){sum(x)/n})
+    indPropDaily<- t(apply(fl,1,function(x){x*prop}))
+    totalIndProp <- rowSums(indPropDaily)
+
+    pairSync <- NULL
+    indSync <- data.frame(id = scene$id, synchrony = totalIndProp)
     popSync <- average(indSync[,2])
 
   } else if (method == "overlap") {
@@ -333,6 +346,7 @@ synchrony <- function(scene, method, subject = "all", averageType = "mean",
     popSync <- average(indSync[,2])
 
   }
+
 
   # return
   potential <- list()

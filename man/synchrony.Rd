@@ -8,7 +8,7 @@ synchrony(scene, method, subject = "all", averageType = "mean",
   syncNN = 1, compareToSelf = FALSE)
 }
 \arguments{
-\item{scene}{a matingScene object that include the flowering schedule for the
+\item{scene}{a matingScene object that includes the flowering schedule for the
 scene of interest.}
 
 \item{method}{character, partial matching allowed, describing what type
