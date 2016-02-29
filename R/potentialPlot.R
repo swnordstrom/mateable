@@ -27,7 +27,6 @@ potentialPlot <-   function(matPot,
                             plotType = 'auto',
                             showDensity = T,
                             sub.ids = NULL, N = 9, sample = "random",
-                            ind.labels = TRUE,
                             lab.cex = 0.5, main = NULL, ...){
 
   nm <- par("mar")
