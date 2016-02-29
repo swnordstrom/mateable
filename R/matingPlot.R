@@ -322,15 +322,3 @@ matingPlot <- function(scene, dimension = "auto",
   }
   par(mar = nm, mfrow = nmfrow, oma = noma)
 }
-
-
-
-# test <- simulateScene(30)
-# test1 <- simulateScene(30)
-# test2 <- simulateScene(60)
-#
-# testList<- list('2001' = test, '2002' = test1, '2003' = test2)
-#
-# matingPlot(testList, sub = 'random')
-
-
