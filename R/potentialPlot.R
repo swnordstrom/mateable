@@ -10,9 +10,9 @@
 ##' @param N a positive number, the number of individuals to sample if sub.ids = 'random'
 ##' @param sample a character string specifying how to choose a subset of individuals to be represented in pairwise potential plots. Possible values are "random" (default) or "all".
 ##' @param lab.cex parameter indicating label size relative to plot
+##' (different than cex.lab)
 ##' @param main the main title (on top of plot)
 ##' @param ... optional arguments for the plot function
-##' @return nothing
 ##' @export
 ##' @author Amy Waananen
 ##' @seealso see generic function \code{\link{points}} for values of \code{pch}
@@ -27,7 +27,6 @@ potentialPlot <-   function(matPot,
                             plotType = 'auto',
                             showDensity = T,
                             sub.ids = NULL, N = 9, sample = "random",
-                            ind.labels = TRUE,
                             lab.cex = 0.5, main = NULL, ...){
 
   nm <- par("mar")

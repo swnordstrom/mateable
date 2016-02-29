@@ -18,7 +18,7 @@ pop <- simulateScene()
 pop
 
 matingPlot(pop)
-matingplot(pop, "t")
+matingPlot(pop, "t")
 
 mixedMatingPlot(pop)
 

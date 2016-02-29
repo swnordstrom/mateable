@@ -6,7 +6,7 @@
 \usage{
 potentialPlot(matPot, subject = c("pair", "ind"), plotType = "auto",
   showDensity = T, sub.ids = NULL, N = 9, sample = "random",
-  ind.labels = TRUE, lab.cex = 0.5, main = NULL, ...)
+  lab.cex = 0.5, main = NULL, ...)
 }
 \arguments{
 \item{matPot}{a mating potential object}
@@ -23,14 +23,12 @@ potentialPlot(matPot, subject = c("pair", "ind"), plotType = "auto",
 
 \item{sample}{a character string specifying how to choose a subset of individuals to be represented in pairwise potential plots. Possible values are "random" (default) or "all".}
 
-\item{lab.cex}{parameter indicating label size relative to plot}
+\item{lab.cex}{parameter indicating label size relative to plot
+(different than cex.lab)}
 
 \item{main}{the main title (on top of plot)}
 
 \item{...}{optional arguments for the plot function}
-}
-\value{
-nothing
 }
 \description{
 Visualize mating potential

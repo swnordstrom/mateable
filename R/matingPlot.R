@@ -8,8 +8,9 @@
 ##' @param dailyPoints logical indicating whether daily counts of individuals should be displayed for plots of the temporal dimension
 ##' @param drawQuartiles logical indicating whether vertical lines should be drawn at population peak (the date when the maximum number of individuals were reproductively available) or quartiles
 ##' @param sub a vector containing the ids of individuals to be highlighted in the plots or a character string specifying how to choose individuals to highlight. Possible values are "random" or "all". If NULL, no subset will be identified in the plots.
-##' @param xcoord label for x coordinate of spatial dimension plots. If NULL, defaults to 'easting'.
-##' @param ycoord label for y coordinate of spatial dimension plots. If NULL, defaults to 'northing'.
+##' @param N a positive number, the number of individuals to sample if \code{sub} = 'random'
+##' @param xlab label for x coordinate of spatial dimension plots. If NULL, defaults to 'easting'.
+##' @param ylab label for y coordinate of spatial dimension plots. If NULL, defaults to 'northing'.
 ##' @param pch specify point type to be used in plots. Defaults to pch = 19 (filled in circle). If NULL points will be labeled by id.
 ##' @param quartileWt if drawQuartiles = TRUE, specify weight of quartile and peak lines
 ##' @param quartileColor if drawQuartiles = TRUE, specify color of quartile lines, defaults to 'gray81'
@@ -29,7 +30,7 @@
 matingPlot <- function(scene, dimension = "auto",
                        opening = NULL, closing = NULL,
                        dailyPoints = TRUE, drawQuartiles = TRUE,
-                       sub= NULL, n, xlab = 'xlab', ylab = 'ylab', pch = 19,
+                       sub= NULL, N = 9, xlab = 'xlab', ylab = 'ylab', pch = 19,
                        quartileWt = 2,
                        quartileColor = 'gray81',
                        peakColor = 'gray27', ...){
@@ -254,7 +255,7 @@ matingPlot <- function(scene, dimension = "auto",
     }
 
     if('random' %in% sub){
-      sub <- sample(scene[,'id'],n)
+      sub <- sample(scene[,'id'],N)
     }
 
     par(mfrow = c(1,sum(temp,spat,comp)))

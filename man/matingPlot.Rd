@@ -5,7 +5,7 @@
 \title{graphical visualization of a mating scene object}
 \usage{
 matingPlot(scene, dimension = "auto", opening = NULL, closing = NULL,
-  dailyPoints = TRUE, drawQuartiles = TRUE, sub = NULL, n,
+  dailyPoints = TRUE, drawQuartiles = TRUE, sub = NULL, N = 9,
   xlab = "xlab", ylab = "ylab", pch = 19, quartileWt = 2,
   quartileColor = "gray81", peakColor = "gray27", ...)
 }
@@ -24,6 +24,12 @@ matingPlot(scene, dimension = "auto", opening = NULL, closing = NULL,
 
 \item{sub}{a vector containing the ids of individuals to be highlighted in the plots or a character string specifying how to choose individuals to highlight. Possible values are "random" or "all". If NULL, no subset will be identified in the plots.}
 
+\item{N}{a positive number, the number of individuals to sample if \code{sub} = 'random'}
+
+\item{xlab}{label for x coordinate of spatial dimension plots. If NULL, defaults to 'easting'.}
+
+\item{ylab}{label for y coordinate of spatial dimension plots. If NULL, defaults to 'northing'.}
+
 \item{pch}{specify point type to be used in plots. Defaults to pch = 19 (filled in circle). If NULL points will be labeled by id.}
 
 \item{quartileWt}{if drawQuartiles = TRUE, specify weight of quartile and peak lines}
@@ -33,10 +39,6 @@ matingPlot(scene, dimension = "auto", opening = NULL, closing = NULL,
 \item{peakColor}{if drawQuartiles = TRUE, specify color of peak lines, defaults to 'gray27'}
 
 \item{...}{standard graphical parameters}
-
-\item{xcoord}{label for x coordinate of spatial dimension plots. If NULL, defaults to 'easting'.}
-
-\item{ycoord}{label for y coordinate of spatial dimension plots. If NULL, defaults to 'northing'.}
 }
 \value{
 nothing

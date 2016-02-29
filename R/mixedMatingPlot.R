@@ -19,7 +19,7 @@
 ##'
 ##'
 mixedMatingPlot <- function(scene, dimension = "auto",
-                            sub= NULL, n, ycoord = 'northing', xcoord = 'easting',
+                            sub= NULL, ycoord = 'northing', xcoord = 'easting',
                             pch = 19, ...){
   dimension <- match.arg(dimension, c("auto", "t", "s", "mt"),several.ok = TRUE)
   nm <- par("mar")

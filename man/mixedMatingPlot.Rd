@@ -4,7 +4,7 @@
 \alias{mixedMatingPlot}
 \title{multi-dimensional visualization of mating scene object}
 \usage{
-mixedMatingPlot(scene, dimension = "auto", sub = NULL, n,
+mixedMatingPlot(scene, dimension = "auto", sub = NULL,
   ycoord = "northing", xcoord = "easting", pch = 19, ...)
 }
 \arguments{
