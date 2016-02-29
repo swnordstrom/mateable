@@ -2,27 +2,51 @@
 % Please edit documentation in R/spatialDataFunctions.R
 \name{proximity}
 \alias{proximity}
-\title{Spatial proximity of a population}
+\title{Spatial Proximity of a Population}
 \usage{
-proximity(popn, proximityFun = NULL, proximityType = c("individual",
-  "population", "both"))
+proximity(popn, method, proximityFun = NULL, averageType = "mean",
+  subject = "all")
 }
 \arguments{
 \item{popn}{a 3D population object}
 
-\item{proximityFun}{a function used to calculate proximity}
+\item{method}{one of "maxProp", and "maxPropSqrd" see details for
+further description}
 
-\item{proximityType}{whether you want individual, population, or both}
+\item{proximityFun}{a function used to calculate proximity. Not yet
+implemented}
+
+\item{averageType}{whether to calculate individual and population proximity
+using the mean or median}
+
+\item{subject}{whether you want pair, individual, population, or all.
+Specifying more than one is allowed.}
+}
+\value{
+A list containing one more more of the following, depending the
+input for subject: \cr
+If \code{subject} is "population" the return list will contain a numeric
+value that has a range depending on the \code{method}. If
+\code{subject} is "pair" the return list will contain a matrix
+with all pairwise proximity comparisons. If \code{subject} is "individual"
+the return list will contain a dataframe with a column containing IDs and
+a column containing proximity values. If \code{subject} is "all"
+the return list will contain all three of the items above.
 }
 \description{
-Currently the function doesn't do anything. If you like returning null,
-I would use it a lot.
+Calculate one of several of measures of mating synchrony for a population.
+}
+\details{
+If \code{method} is "maxProp" then proximity between two
+individuals will be calculated as 1 - distance/max(distance).
+If \code{method} is "maxPropSqrd" then proximity between two
+individuals will be calculated as (1 - distance/max(distance))^2.
 }
 \examples{
 pop <- simulateScene()
-proximity(pop)
+proximity(pop, "maxProp")
 }
 \author{
-No Body
+Danny Hanson
 }
 

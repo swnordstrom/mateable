@@ -33,18 +33,18 @@ calculating population synchrony}
 when calculation synchrony. Defaults to FALSE.}
 }
 \value{
-The result depends on the input for \code{synchronyType}. If
-\code{synchronyType} is "population" \code{synchrony} will return a numeric
+The result depends on the input for \code{subject}. If
+\code{subject} is "population" \code{synchrony} will return a numeric
 value that has a range depending on the \code{method}. If
-\code{synchronyType} is "pairwise" \code{synchrony} will return a matrix
+\code{subject} is "pairwise" \code{synchrony} will return a matrix
 with all pairwise synchrony comparisons. It is important to note two things:
 [1] if \code{method} is set to "sync_nn" then the pairwise comparisons will
 be in descending order and cannot be indexed by ID order. [2] if
 \code{compareToSelf} is set to FALSE, the matrix will have dimensions 100
 rows by 99 columns. Similar to \code{\link{overlap}}, indexing will be
-affected. If \code{synchronyType} is "individual" \code{synchrony} will
+affected. If \code{subject} is "individual" \code{synchrony} will
 returns a data frame with a row for id and a row for individual synchrony.
-If \code{synchronyType} is "all" \code{synchrony} will return a list
+If \code{subject} is "all" \code{synchrony} will return a list
 containing the values described above for population, pairwise, and
 individual synchrony.
 }
