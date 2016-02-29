@@ -99,17 +99,13 @@ mixedMatingPlot <- function(scene, dimension = "auto",
       }
 
       if(temp){
-        if(is.null(opening)){
           opening <- attr(scene[[1]],'origin')+min(scene[[1]][,'start'])
           if (attr(scene[[1]],'origin')+min(scene[[i]]['start']) < opening){
             opening <- attr(scene[[1]],'origin')+min(scene[[i]][,'start'])
-          }
         }
-        if(is.null(closing)){
           closing <- attr(scene[[1]],'origin')+max(scene[[1]][,'end'])
           if (attr(scene[[1]],'origin')+max(scene[[i]][,'end']) > closing){
             closing <- attr(scene[[1]],'origin')+max(scene[[i]][,'end'])
-          }
         }
 
         maxstart <- max(scene[[1]]['start'])
