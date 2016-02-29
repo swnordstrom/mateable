@@ -68,11 +68,6 @@ mixedMatingPlot <- function(scene, dimension = "auto",
     par(oma = c(4,1,4,1))
 
     for (i in 1:length(scene)){
-      count <- nrow(scene[[1]])
-      if (nrow(scene[[i]]) > max(count)){
-        count <- nrow(scene[[i]])
-      }
-
       if (spat){
         emin <- min(scene[[1]]['x'])
         emax <- max(scene[[1]]['x'])
@@ -80,16 +75,16 @@ mixedMatingPlot <- function(scene, dimension = "auto",
         nmax <- max(scene[[1]]['y'])
 
         if (min(scene[[i]]['x'])< emin){
-          emin <- min(scene[[i]]['x'])
+          emin <- min(scene[[i]][,'x'])
         }
-        if (max(scene[[i]]['x'])< emax){
-          emax <- max(scene[[i]]['x'])
+        if (max(scene[[i]]['x'])> emax){
+          emax <- max(scene[[i]][,'x'])
         }
         if (min(scene[[i]]['y'])< nmin){
-          nmin <- min(scene[[i]]['y'])
+          nmin <- min(scene[[i]][,'y'])
         }
-        if (max(scene[[i]]['y'])< nmax){
-          nmax <- max(scene[[i]]['y'])
+        if (max(scene[[i]]['y'])> nmax){
+          nmax <- max(scene[[i]][,'y'])
         }
       }
 
@@ -103,25 +98,25 @@ mixedMatingPlot <- function(scene, dimension = "auto",
         if (max(as.numeric(scene[[i]][['s2']])>smax)){
           smax <- max(as.numeric(scene[[i]][['s2']]))
         }
-        if (min(as.numeric(scene[[i]][['s1']])>smin)){
+        if (min(as.numeric(scene[[i]][['s1']])<smin)){
           smin <- min(as.numeric(scene[[i]][['s1']]))
         }
-        if (min(as.numeric(scene[[i]][['s2']])>smin)){
+        if (min(as.numeric(scene[[i]][['s2']])<smin)){
           smin <- min(as.numeric(scene[[i]][['s2']]))
         }
       }
 
       if(temp){
         if(is.null(opening)){
-          opening <- attr(scene[[1]],'origin')+min(scene[[1]]['start'])
+          opening <- attr(scene[[1]],'origin')+min(scene[[1]][,'start'])
           if (attr(scene[[1]],'origin')+min(scene[[i]]['start']) < opening){
-            opening <- attr(scene[[1]],'origin')+min(scene[[i]]['start'])
+            opening <- attr(scene[[1]],'origin')+min(scene[[i]][,'start'])
           }
         }
         if(is.null(closing)){
-          closing <- attr(scene[[1]],'origin')+max(scene[[1]]['end'])
-          if (attr(scene[[1]],'origin')+max(scene[[i]]['end']) > closing){
-            closing <- attr(scene[[1]],'origin')+max(scene[[i]]['end'])
+          closing <- attr(scene[[1]],'origin')+max(scene[[1]][,'end'])
+          if (attr(scene[[1]],'origin')+max(scene[[i]][,'end']) > closing){
+            closing <- attr(scene[[1]],'origin')+max(scene[[i]][,'end'])
           }
         }
 
@@ -502,13 +497,3 @@ mixedMatingPlot <- function(scene, dimension = "auto",
   }
 
 }
-
-mixedMatingPlot(testList, sub = 'random', pch = 19)
-#
-# test <- simulateScene(size = 30)
-# test$cols <- cut(test$start,9)
-#
-#
-
-
-
