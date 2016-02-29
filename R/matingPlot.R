@@ -1,7 +1,7 @@
 ##' Visualize a mating scene
 ##'
 ##' @title graphical visualization of a mating scene object
-##' @param scene a mating scene object
+##' @param scene a matingScene object
 ##' @param dimension what dimension(s) of the mating scene should be visualized. Possible dimensions are 't' for temporal, 's' for spatial, 'mt' for mating type, and 'auto' (the default). For dimension = 'auto', all dimensions represented in the mating scene object will be plotted.
 ##' @param opening the number of days to adjust the start date displayed for the temporal dimension. Start date defaults to minimum day of year of start date in mating scene object.
 ##' @param closing the number of days to adjust the end date displayed for the temporal dimension. End date defaults to maximum day of year end date in mating scene object.
@@ -20,14 +20,14 @@
 ##' @return optional arguments for the plot function
 ##' @export
 ##' @author Amy Waananen
-##' @seealso see \code{\link{mixedMatingPlot}} to visualize multiple dimensions on one plot
+##' @seealso see \code{\link{plot3DScene}} to visualize multiple dimensions on one plot
 ##' @examples
 ##' pop <- simulateScene()
-##' matingPlot(pop)
+##' plotScene(pop)
 ##' \dontrun{plotMap(NULL)}
 ##'
 ##'
-matingPlot <- function(scene, dimension = "auto",
+plotScene <- function(scene, dimension = "auto",
                        opening = NULL, closing = NULL,
                        dailyPoints = TRUE, drawQuartiles = TRUE,
                        sub= NULL, N = 9, xcoord = 'xlab', ycoord = 'ylab', pch = 19,

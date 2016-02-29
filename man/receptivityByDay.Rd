@@ -13,7 +13,7 @@ receptivityByDay(scene)
 a matrix where the columns represent all mating days and the rows
 represent all individuals in the population. The value at position
 [i,j] will be TRUE if individual j was receptive on day i \cr
-If scene is a multi-year mating scene, then overlap will return a list of matrices
+If scene is a multi-year matingScene, then overlap will return a list of matrices
 (as described above) where each matrix represents one year.
 }
 \description{

@@ -7,7 +7,7 @@
 compatibility(scene, method, subject = "all", averageType = "mean")
 }
 \arguments{
-\item{scene}{a mating scene object}
+\item{scene}{a matingScene object}
 
 \item{method}{either "si_echinacea" or "dioecious" see details for
 further description}

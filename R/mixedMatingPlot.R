@@ -1,7 +1,7 @@
 ##' Visualize multiple dimensions of a mating scene
 ##'
 ##' @title multi-dimensional visualization of mating scene object
-##' @param scene a mating scene object
+##' @param scene a matingScene object
 ##' @param dimension what dimension(s) of the mating scene should be visualized. Possible dimensions are 't' for temporal, 's' for spatial, 'mt' for mating type, and 'auto' (the default). For dimension = 'auto', all dimensions represented in the mating scene object will be plotted.
 ##' @param sub a subset of the population to plot
 ##' @param xcoord x-axis coordinate system label
@@ -14,11 +14,11 @@
 ##' @seealso see generic function \code{\link{points}} for values of \code{pch}
 ##' @examples
 ##' pop <- simulateScene()
-##' mixedMatingPlot(pop)
+##' plot3DScene(pop)
 ##'
 ##'
 ##'
-mixedMatingPlot <- function(scene, dimension = "auto",
+plot3DScene <- function(scene, dimension = "auto",
                             sub= NULL, ycoord = 'northing', xcoord = 'easting',
                             pch = 19, ...){
   dimension <- match.arg(dimension, c("auto", "t", "s", "mt"),several.ok = TRUE)

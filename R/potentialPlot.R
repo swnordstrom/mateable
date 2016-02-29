@@ -19,10 +19,10 @@
 ##' @examples
 ##' pop <- simulateScene()
 ##' sync <- synchrony(pop, "augs")
-##' potentialPlot(sync)
+##' plotPotential(sync)
 ##'
 ##'
-potentialPlot <-   function(matPot,
+plotPotential <-   function(matPot,
                             subject = c('pair','ind'),
                             plotType = 'auto',
                             showDensity = T,

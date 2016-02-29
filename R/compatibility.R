@@ -1,7 +1,7 @@
 ##' Calculate one or several of measures of mating compatibility.
 ##'
 ##' @title Make potentials object--mating type compatibility
-##' @param scene a mating scene object
+##' @param scene a matingScene object
 ##' @param method either "si_echinacea" or "dioecious" see details for
 ##' further description
 ##' @param subject whether you want pair, individual, population, or all.

@@ -17,15 +17,15 @@ library(mateable)
 pop <- simulateScene()
 pop
 
-matingPlot(pop)
-matingPlot(pop, "t")
+plotScene(pop)
+plotScene(pop, "t")
 
-mixedMatingPlot(pop)
+plot3DScene(pop)
 
 sync <- synchrony(pop, "augs")
 prox <- proximity(pop, "maxPropSqrd")
-potentialPlot(sync)
-potentialPlot(prox, "ind")
+plotPotential(sync)
+plotPotential(prox, "ind")
 
 
 str(eelr2012)

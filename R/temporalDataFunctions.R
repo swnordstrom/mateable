@@ -21,7 +21,7 @@
 ##' by k (k<n> where n is the input for k)\cr
 ##' compatibility - number of mating types (nMatType), average number of
 ##' compatible mates (meanComp)\cr
-##' If scene is a multi-year mating scene, then the output will be a list
+##' If scene is a multi-year matingScene, then the output will be a list
 ##' of lists, one list for each year.
 ##' @examples
 ##' eelr <- makeScene(eelr2012, startCol = "firstDay", endCol = "lastDay",
@@ -98,7 +98,7 @@ matingSummary <- function(scene, type = "auto", k = 1,
 ##' is the return value of overlap. There is one attribute "idOrder"
 ##' which holds the order of the id column in scene at the time of the function call.
 ##' This can be useful to find certain elements in the matrix (see examples). \cr
-##' If scene is a multi-year mating scene, then overlap will return a list of matrices
+##' If scene is a multi-year matingScene, then overlap will return a list of matrices
 ##' (as described above) where each matrix represents one year.
 ##' @author Danny Hanson
 ##' @examples
@@ -146,7 +146,7 @@ overlap <- function(scene, overlapOrTotal = c("overlap", "total"),
 ##' @return a matrix where the columns represent all mating days and the rows
 ##' represent all individuals in the population. The value at position
 ##' [i,j] will be TRUE if individual j was receptive on day i \cr
-##' If scene is a multi-year mating scene, then overlap will return a list of matrices
+##' If scene is a multi-year matingScene, then overlap will return a list of matrices
 ##' (as described above) where each matrix represents one year.
 ##' @author Danny Hanson
 ##' @examples
