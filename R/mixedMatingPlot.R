@@ -503,7 +503,7 @@ mixedMatingPlot <- function(scene, dimension = "auto",
 
 }
 
-mixedMatingPlot(testList, sub = 'random', pch = 19)
+# mixedMatingPlot(testList, sub = 'random', pch = 19)
 #
 # test <- simulateScene(size = 30)
 # test$cols <- cut(test$start,9)
