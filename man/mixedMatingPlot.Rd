@@ -8,18 +8,22 @@ mixedMatingPlot(scene, dimension = "auto", sub = NULL, n,
   ycoord = "northing", xcoord = "easting", pch = 19, ...)
 }
 \arguments{
+\item{scene}{a mating scene object}
+
 \item{dimension}{what dimension(s) of the mating scene should be visualized. Possible dimensions are 't' for temporal, 's' for spatial, 'mt' for mating type, and 'auto' (the default). For dimension = 'auto', all dimensions represented in the mating scene object will be plotted.}
+
+\item{sub}{a subset of the population to plot}
 
 \item{ycoord}{y-axis coordinate system label}
 
 \item{xcoord}{x-axis coordinate system label}
 
 \item{pch}{point type, defaults to pch = 19, solid filled in circle. If pch = NULL, individuals will be labeled by their id.}
+
+\item{...}{optional arguments for the plot function}
 }
 \value{
 nothing
-
-optional arguments for the plot function
 }
 \description{
 Visualize multiple dimensions of a mating scene

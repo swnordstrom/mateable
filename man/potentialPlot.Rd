@@ -26,11 +26,11 @@ potentialPlot(matPot, subject = c("pair", "ind"), plotType = "auto",
 \item{lab.cex}{parameter indicating label size relative to plot}
 
 \item{main}{the main title (on top of plot)}
+
+\item{...}{optional arguments for the plot function}
 }
 \value{
 nothing
-
-optional arguments for the plot function
 }
 \description{
 Visualize mating potential
