@@ -5,14 +5,12 @@
 ##' @param matPot a mating potential object
 ##' @param subject a character string indicating whether the subject to be visualized is individuals or all pairwise interactions
 ##' @param plotType a character string indivating the plots to be displayed. Options are histogram ('hist'), network diagram ('net')
-##' @param showDensity
-##' @param sub.ids
-##' @param N
-##' @param sample
-##' @param sub.labels
-##' @param ind.labels
-##' @param lab.cex
-##' @param main
+##' @param showDensity logical. If true (default), plots probability density over histogram.
+##' @param sub.ids a vector containing the ids of individuals to be represented in pairwise potential plots
+##' @param N a positive number, the number of individuals to sample if sub.ids = 'random'
+##' @param sample a character string specifying how to choose a subset of individuals to be represented in pairwise potential plots. Possible values are "random" (default) or "all".
+##' @param lab.cex parameter indicating label size relative to plot
+##' @param main the main title (on top of plot)
 ##' @param ...
 ##' @return nothing
 ##' @return optional arguments for the plot function
@@ -26,11 +24,10 @@
 ##'
 ##'
 potentialPlot <-   function(matPot,
-                            subject = c('ind','pair'),
-                            plotType = c('hist','heat','net'),
+                            subject = c('pair','ind'),
+                            plotType = 'auto',
                             showDensity = T,
                             sub.ids = NULL, N = 9, sample = "random",
-                            sub.labels = FALSE,
                             ind.labels = TRUE,
                             lab.cex = 0.5, main = NULL, ...){
 
@@ -40,176 +37,172 @@ potentialPlot <-   function(matPot,
 
   if(!sample %in% c("random", "all")) {warning("sample must be 'random' or 'all'")}
 
-  pt <- match.arg(plotType, c('hist','net','heat'), several.ok = TRUE)
-  subject <- match.arg(subject)
+  pt <- match.arg(plotType, c('auto','heat','net','hist'), several.ok = TRUE)
 
-  if (is.list(matPot[[1]])) {
-    if(attr(matPot[[1]],'t')){
-      potential <- 'synchrony'
-    } else if(attr(matPot[[1]],'s')){
-      potential <- 'proximity'
-    } else if(attr(matPot[[1]],'c')){
-      potential <- 'compatibility'
-    }
+  if (!is.list(matPot[[1]])){
+    matPot <- list(matPot)
+  }
 
-    if(is.null(main) & subject %in% 'ind') main <- paste('average pairwise', potential)
-    if(is.null(main) & subject %in% 'pair') main <- paste('pairwise', potential)
-
-    nr <- length(matPot)
-    nc <- length(pt)
-
-    if (subject %in% 'ind'){
-      par(mfrow = c(nr,1))
-      par(oma = c(2.25,2.25,2.25,2.25))
+  if (!is.null(subject)){
+    if (!'pair' %in% names(matPot[[1]])){
+      subject <- 'ind'
     } else {
-      par(mfrow = c(nr,nc))
-      par(mar = c(4,0.5,0.5,2.5))
-      par(oma = c(4,4,2.25,1.5))
-    }
-
-    ids <- matPot[[1]][['ind']][['id']]
-
-    if (is.null(sub.ids)){
-      if (sample %in% 'all'){
-        sub.ids <- ids
-      } else {
-        sub.ids <- sample(ids, N)
-      }
-    }
-
-    for (i in 1:length(matPot)){
-      poti <- matPot[[i]]
-      iids <- poti[['ind']][['id']]
-      diag(poti[['pair']]) <- 1
-      sub.iids <- poti[['ind']][which(iids %in% sub.ids), 'id']
-      subMat<- poti[['pair']][which(sub.iids %in% attr(poti[['pair']],'idOrder')),which(sub.iids %in% attr(poti[['pair']],'idOrder'))]
-
-      if (subject %in% 'pair'){
-        if ('hist' %in% pt){
-          hist(poti[[subject]], breaks = 15, prob = T, xlab = NULL, main = NULL, ylab = "")
-          mtext(names(matPot)[i],side = 2,adj = 0.5, cex = 0.75, line = 3, font = 2)
-          if (i == nr){
-            title(xlab = potential)
-          }
-          if (showDensity){
-            lines(density(poti[[subject]]))
-          }
-        }
-
-        if ('net' %in% pt){
-          if(length(sub.iids)< 3){
-            plot(1, type="n", axes=F, xlab="", ylab="")
-          } else {
-            subMat[upper.tri(subMat, diag = TRUE)] <- 0
-            if(ind.labels){
-              im <- poti[['ind']][which(sub.iids %in% iids), potential]
-              lab.cex <- 1 + (im - min(im))/(max(im) - min(im))
-            }
-            plotweb3(subMat, names = sub.iids, val = FALSE, legend = FALSE, length = 0,
-                     labz.size = lab.cex, ...)
-          }
-          if (! 'hist' %in% pt){
-            mtext(names(matPot)[i],side = 2,adj = 0.5, cex = 0.75, las = 1, font = 2)
-          }
-        }
-
-        if ('heat' %in% pt){
-          if(length(sub.iids) <= 2){
-            plot(1, type="n", axes=F, xlab="", ylab="")
-          } else {
-            diag(subMat) <- 1
-            subMat[upper.tri(subMat, diag = FALSE)] <- NA
-            image(x = 1:nrow(subMat),y = 1:nrow(subMat), z = subMat, axes = F, xlab = "", ylab = "", col = colorRampPalette(c('white','red'))(12))
-            legend("topleft", legend = round(seq(min(subMat, na.rm = T),max(subMat, na.rm = T),length.out = 12),digits = 2), fill = colorRampPalette(c('white','red'))(12),ncol = 4, inset = 0.025, bty = 'n')
-            axis(1, 1:ncol(subMat), labels = sub.iids, tick = 0, cex.axis = -0.2 + 1/log10(nrow(subMat)))
-            axis(4, 1:ncol(subMat), labels = sub.iids, tick = 0, cex.axis = -0.2 + 1/log10(nrow(subMat)), las = 2)
-            par(mgp = c(3,1,0))
-          }
-          if(!'hist'%in% pt &! 'net' %in% pt){
-            mtext(names(matPot)[i],side = 2,adj = 0.5, cex = 0.75, las = 1, font = 2)
-          }
-        }
-
-      } else if (subject %in% 'ind') {
-        par(mar = c(1,5,1,1))
-        if ('hist' %in% pt){
-          hist(poti[[subject]][,potential], prob = TRUE, breaks = 15, main = NULL, xlab = NULL, ylab = NULL)
-          title(ylab = 'density', outer = T, line = -1.5)
-          mtext(names(matPot)[i],side = 2,adj = 0.5, cex = 0.75, line = 5, font = 2)
-          if (i == nr){
-            par(mar = c(4,5,1,1))
-            title(xlab = potential, outer = T, line = -2.5)
-          }
-          if (showDensity){
-            lines(density(poti[[subject]][,potential]))
-          }
-        } else (warning("plotType for subject = 'ind' must be histogram"))
-      }
-    }
-  } else {
-    diag(matPot[['pair']]) <- 1
-    if(attr(matPot,'t')){
-      potential <- 'synchrony'
-    } else if(attr(matPot,'s')){
-      potential <- 'proximity'
-    } else if(attr(matPot,'c')){
-      potential <- 'compatibility'
-    }
-
-    if(is.null(main) & subject %in% 'ind') main <- paste('individual average', potential)
-    if(is.null(main) & subject %in% 'pair') main <- paste('pairwise', potential)
-
-    nc <- length(pt)
-    # print(nc)
-    par(mfrow = c(1,nc))
-    par(mar = c(4,3.5,1.5,1.5))
-    par(oma = c(2.25, 2.25, 2.25, 2.25))
-    ids <- matPot[['ind']][['id']]
-    if (is.null(sub.ids)){
-      if (sample %in% 'all'){
-        sub.ids <- ids
-      } else {
-        sub.ids <- sample(ids, N)
-      }
-    }
-
-    subMat<- matPot$pair[which(sub.ids %in% attr(matPot$pair,'idOrder')),which(sub.ids %in% attr(matPot$pair,'idOrder'))]
-
-    if ('pair' %in% subject){
-      if ('hist' %in% pt){
-        hist(matPot[[subject]], prob = TRUE, breaks = 15, main = NULL, xlab = NULL)
-        if (showDensity){
-          lines(density(matPot[[subject]]))
-        }
-      }
-      if ('heat' %in% pt){
-        subMat[upper.tri(subMat, diag = FALSE)] <- NA
-        image(x = 1:nrow(subMat),y = 1:nrow(subMat), z = subMat, axes = F, xlab = "", ylab = "", col = colorRampPalette(c('white','red'))(12))
-        legend("topleft", legend = round(seq(min(subMat, na.rm = T),max(subMat, na.rm = T),length.out = 12),digits = 2), fill = colorRampPalette(c('white','red'))(12),ncol = 4, inset = 0.025, bty = 'n')
-        axis(1, 1:ncol(subMat), labels = sub.ids, tick = 0, cex.axis = -0.2 + 1/log10(nrow(subMat)))
-        axis(4, 1:ncol(subMat), labels = sub.ids, tick = 0, cex.axis = -0.2 + 1/log10(nrow(subMat)), las = 2)
-        par(mgp = c(3,1,0))
-      }
-      if ('net' %in% pt){
-        subMat[upper.tri(subMat, diag = TRUE)] <- 0
-        if(ind.labels){
-          im <- matPot[['ind']][which(sub.ids %in% ids), potential]
-          lab.cex <- 1 + (im - min(im))/(max(im) - min(im))
-        }
-        plotweb3(subMat, names = sub.ids, val = FALSE, legend = FALSE, length = 0,
-                 labz.size = lab.cex, ...)
-      }
-    } else if ('ind' %in% subject) {
-      subVals <- matPot[['ind']][which(sub.ids %in% ids), potential]
-      if ('hist' %in% pt){
-        hist(matPot[[subject]][,potential], prob = TRUE, breaks = 15, xlab = potential, main = NULL)
-        if (showDensity){
-          lines(density(matPot[[subject]][,potential]))
-        }
-
-      } else (warning("plotType for subject = 'ind' must be histogram"))
+      subject <- 'pair'
     }
   }
+
+  if(attr(matPot[[1]],'t')){
+    potential <- 'synchrony'
+  } else if(attr(matPot[[1]],'s')){
+    potential <- 'proximity'
+  } else if(attr(matPot[[1]],'c')){
+    potential <- 'compatibility'
+  }
+
+  if(!'pair' %in% names(matPot[[1]])){
+    if('pair' %in% subject){
+      warning('potentials object must have pairwise potential for subject to be pairwise interactions')
+      subject <- 'ind'
+    }
+  }
+
+  if ('auto' %in% pt){
+    if (subject %in% 'pair'){
+      pt <- c('heat','hist','net')
+    } else {pt <- 'hist'}
+  }
+
+  if(is.null(main) & subject %in% 'ind') main <- paste('individual', potential)
+  if(is.null(main) & subject %in% 'pair') main <- paste('pairwise', potential)
+
+  nr <- length(matPot)
+  nc <- length(pt)
+
+  if (subject %in% 'ind'){
+    par(mfrow = c(nr,1))
+    par(oma = c(0,0,0,0))
+  } else {
+    par(mfrow = c(nr,nc))
+    par(mar = c(4,0.5,0.5,2.5))
+    par(oma = c(4,4,4,1.5))
+  }
+
+  ids <- matPot[[1]][['ind']][['id']]
+
+  if (is.null(sub.ids)){
+    if (sample %in% 'all'){
+      sub.ids <- ids
+    } else {
+      sub.ids <- sample(ids, N)
+    }
+  }
+
+  if ('ind' %in% subject){
+    hmax <- max(hist(matPot[[1]][[subject]][,potential], breaks = 15, plot = F)$breaks)
+    hmin <- min(hist(matPot[[1]][[subject]][,potential], breaks = 15, plot = F)$breaks)
+  } else {
+    hmax <- max(hist(matPot[[1]][[subject]], breaks = 15, plot = F)$breaks)
+    hmin <- min(hist(matPot[[1]][[subject]], breaks = 15, plot = F)$breaks)
+  }
+
+
+  for (j in 1:length(matPot)){
+    potj <- matPot[[j]]
+    if('hist' %in% pt){
+      if('ind' %in% subject){
+        if (max(hist(potj[[subject]][,potential], breaks = 15, plot = F)$breaks) > hmax){
+          hmax <- max(hist(potj[[subject]][,potential], breaks = 15, plot = F)$breaks)
+        }
+        if (min(hist(potj[[subject]][,potential], breaks = 15, plot = F)$breaks) < hmin){
+          hmin <- min(hist(potj[[subject]][,potential], breaks = 15, plot = F)$breaks)
+        }
+      } else {
+        if (max(hist(potj[[subject]], breaks = 15, plot = F)$breaks) > hmax){
+          hmax <- max(hist(potj[[subject]], breaks = 15, plot = F)$breaks)
+        }
+        if (min(hist(potj[[subject]], breaks = 15, plot = F)$breaks) < hmin){
+          hmin <- min(hist(potj[[subject]], breaks = 15, plot = F)$breaks)
+        }
+      }
+    }
+  }
+
+  for (i in 1:length(matPot)){
+    poti <- matPot[[i]]
+    iids <- poti[['ind']][['id']]
+    sub.iids <- poti[['ind']][which(iids %in% sub.ids), 'id']
+
+    if (subject %in% 'pair'){
+      diag(poti[['pair']]) <- 1
+      subMat<- poti[['pair']][which(sub.iids %in% attr(poti[['pair']],'idOrder')),which(sub.iids %in% attr(poti[['pair']],'idOrder'))]
+
+      if ('hist' %in% pt){
+        hist(poti[['pair']], breaks = 15, prob = T, xlab = NULL, main = NULL, ylab = "")
+        mtext(names(matPot)[i],side = 2,adj = 0.5, cex = 0.75, line = 3, font = 2)
+        if (i == nr){
+          title(xlab = potential)
+        }
+        if (showDensity){
+          lines(density(poti[['pair']]))
+        }
+      }
+
+      if ('net' %in% pt){
+        if(length(sub.iids)< 3){
+          plot(1, type="n", axes=F, xlab="", ylab="")
+        } else {
+          subMat[upper.tri(subMat, diag = TRUE)] <- 0
+          im <- poti[['ind']][which(sub.iids %in% iids), potential]
+          lab.cex <- 1 + (im - min(im))/(max(im) - min(im))
+          plotweb3(subMat, names = sub.iids, val = FALSE, legend = FALSE, length = 0,
+                   labz.size = lab.cex, ...)
+        }
+        if (! 'hist' %in% pt){
+          mtext(names(matPot)[i],side = 2,adj = 0.5, cex = 0.75, las = 1, font = 2)
+        }
+      }
+
+
+
+      if ('heat' %in% pt){
+        if(length(sub.iids) <= 2){
+          plot(1, type="n", axes=F, xlab="", ylab="")
+        } else {
+          diag(subMat) <- 1
+          subMat[upper.tri(subMat, diag = FALSE)] <- NA
+          image(x = 1:nrow(subMat),y = 1:nrow(subMat), z = subMat, axes = F, xlab = "", ylab = "", col = colorRampPalette(c('white','red'))(12))
+          legend("topleft", legend = round(seq(min(subMat, na.rm = T),max(subMat, na.rm = T),length.out = 12),digits = 2), fill = colorRampPalette(c('white','red'))(12),ncol = 4, bty = 'n')
+          axis(1, 1:ncol(subMat), labels = sub.iids, tick = 0, cex.axis = -0.2 + 1/log10(nrow(subMat)))
+          axis(4, 1:ncol(subMat), labels = sub.iids, tick = 0, cex.axis = -0.2 + 1/log10(nrow(subMat)), las = 2)
+          par(mgp = c(3,1,0))
+        }
+        if(!'hist'%in% pt &! 'net' %in% pt){
+          mtext(names(matPot)[i],side = 2,adj = 0.5, cex = 0.75, las = 1, font = 2)
+        }
+      }
+
+
+
+    } else if (subject %in% 'ind') {
+      par(mar = c(4,4,4,1))
+      if ('hist' %in% pt){
+        hist(poti[[subject]][,potential], prob = TRUE, breaks = 15, main = NULL, axes = F, xlab = NULL,xlim = c(hmin,hmax), ylab = NULL)
+        title(ylab = 'density', outer = T, line = -1.5)
+        axis(1)
+        axis(2)
+        mtext(names(matPot)[i],side = 2,adj = 0.5, cex = 0.75, line = 5, font = 2)
+        mtext(main, side = 3, line = 4, cex = 1.5)
+        if (i == nr){
+          par(mar = c(4,3,1,1))
+          title(xlab = potential)
+        }
+        if (showDensity){
+          lines(density(poti[[subject]][,potential]))
+        }
+      }
+    }
+  }
+
   title(main = main, outer = T)
   par(mar = nm, mfrow = nmfrow, oma = noma)
 }
@@ -315,7 +308,7 @@ plotweb3 <-
       y2 <- yi[i]
       for (j in 1:i) {
         if (flowmatrix[i, j] > zero | flowmatrix[j, i] >
-            zero) {
+              zero) {
           Arr.col <- arr.col[i, j]
           x1 <- xi[j]
           y1 <- yi[j]
@@ -384,5 +377,4 @@ plotweb3 <-
     }
     par(mar = nm)
   }
-
 
