@@ -29,7 +29,7 @@
 matingPlot <- function(scene, dimension = "auto",
                        opening = NULL, closing = NULL,
                        dailyPoints = TRUE, drawQuartiles = TRUE,
-                       sub= NULL, n, xlab = 'xlab', ylab = 'ylab', pch = 19,
+                       sub= NULL, n, xcoord, ycoord, pch = 19,
                        quartileWt = 2,
                        quartileColor = 'gray81',
                        peakColor = 'gray27', ...){
@@ -295,8 +295,13 @@ matingPlot <- function(scene, dimension = "auto",
     }
 
     if (spat){     # spatial (map)
-      xcoord <- 'easting'
-      ycoord <- 'northing'
+      if (is.null(xcoord)){
+        xcoord <- 'easting'
+      }
+
+      if(is.null(ycoord)){
+        ycoord <- 'northing'
+      }
       plot.default(scene[, 'x'], scene[, 'y'], type = "n", xlab = xcoord, ylab = ycoord, ...)
       if (is.null(pch)) {
         text(scene[, 'x'], scene[, 'y'], scene[, 'id'], ...)
