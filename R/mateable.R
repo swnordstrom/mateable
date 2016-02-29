@@ -16,7 +16,17 @@
 #'
 #' pop <- simulateScene()
 #' pop
-
+#'
+#' matingPlot(pop)
+#' matingplot(pop, "t")
+#'
+#' mixedMatingPlot(pop)
+#'
+#' sync <- synchrony(pop, "augs")
+#' prox <- proximity(pop, "maxPropSqrd")
+#' potentialPlot(sync)
+#' potentialPlot(prox, "ind")
+#'
 #'
 #' str(eelr2012)
 #' ee <- makeScene(eelr2012, FALSE, "firstDay", "lastDay", "Ecoord", "Ncoord", idCol = "tagNo")

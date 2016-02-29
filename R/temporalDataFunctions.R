@@ -94,7 +94,7 @@ matingSummary <- function(scene, type = "auto", k = 1,
 ##' return value
 ##' @return a matrix containing all pairwise comparisons. If compareToSelf
 ##' is FALSE then there will be n rows and n-1 columns. \cr
-##' To index result[i,j] where j > i, use result[i,j-1], where result
+##' To index result[i,j] where j > i, use \code{result[i,j-1]}, where \code{result}
 ##' is the return value of overlap. There is one attribute "idOrder"
 ##' which holds the order of the id column in scene at the time of the function call.
 ##' This can be useful to find certain elements in the matrix (see examples). \cr
@@ -142,11 +142,10 @@ overlap <- function(scene, overlapOrTotal = c("overlap", "total"),
 ##'
 ##' Create a matrix showing which individuals are receptive on a given day.
 ##'
-##' @param scene a matingScene data frame or list
+##' @param scene a matingScene object
 ##' @return a matrix where the columns represent all mating days and the rows
-##' represent all individuals in the population. The value for day i and
-##' individual j will be TRUE if that individual was flowering on that day and
-##' is located in position [i,j] \cr
+##' represent all individuals in the population. The value at position
+##' [i,j] will be TRUE if individual j was receptive on day i \cr
 ##' If scene is a multi-year mating scene, then overlap will return a list of matrices
 ##' (as described above) where each matrix represents one year.
 ##' @author Danny Hanson

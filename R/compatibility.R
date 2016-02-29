@@ -22,8 +22,9 @@
 ##' (and many other plants). For two individuals, they are incompatible if
 ##' they share any S alleles (columns s1 and s2) and they compatible otherwise.
 ##' When \code{method} is "dioecious" it is assumed that the column s1 will
-##' contain either a 1 or 2 depending sex. Thus, when comparing two individuals,
-##' they are compatible is s1 of the first != s1 of the second, and s2 is ignored.
+##' contain either a 1 or 2 depending on the individual's sex. Thus, when
+##' comparing two individuals, they are compatible if s1 of the first != s1
+##' of the second, and s2 is ignored.
 ##' @author Danny Hanson
 ##' @examples
 ##' pop <- simulateScene()
@@ -53,25 +54,25 @@ compatibility <- function(scene, method, subject = "all",
 
   }
 
-    # return
-    potential <- list()
-    if ("population" %in% subject) {
-      potential$pop <- popCompat
-    }
-    if ("individual" %in% subject) {
-      potential$ind <- indCompat
-    }
-    if ("pairwise" %in% subject) {
-      potential$pair <- pairCompat
-    }
-    if ("all" %in% subject) {
-      potential$pop <- popCompat
-      potential$ind <- indCompat
-      potential$pair <- pairCompat
-    }
-    attr(potential, "t") <- FALSE
-    attr(potential, "s") <- FALSE
-    attr(potential, "c") <- TRUE
-    potential
+  # return
+  potential <- list()
+  if ("population" %in% subject) {
+    potential$pop <- popCompat
+  }
+  if ("individual" %in% subject) {
+    potential$ind <- indCompat
+  }
+  if ("pairwise" %in% subject) {
+    potential$pair <- pairCompat
+  }
+  if ("all" %in% subject) {
+    potential$pop <- popCompat
+    potential$ind <- indCompat
+    potential$pair <- pairCompat
+  }
+  attr(potential, "t") <- FALSE
+  attr(potential, "s") <- FALSE
+  attr(potential, "c") <- TRUE
+  potential
 
 }
