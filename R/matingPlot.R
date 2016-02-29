@@ -3,11 +3,11 @@
 ##' @title graphical visualization of a mating scene object
 ##' @param scene a mating scene object
 ##' @param dimension what dimension(s) of the mating scene should be visualized. Possible dimensions are 't' for temporal, 's' for spatial, 'mt' for mating type, and 'auto' (the default). For dimension = 'auto', all dimensions represented in the mating scene object will be plotted.
-##' @param opening the number of days to adjust the start date displayed for the temporal dimension. If NULL, opening defaults to the minimum start date of the mating scene object.
-##' @param closing the number of days to adjust the end date displayed for the temporal dimension. If NULL, opening defaults to the maximum end date of the mating scene object.
+##' @param opening the number of days to adjust the start date displayed for the temporal dimension. Start date defaults to minimum day of year of start date in mating scene object.
+##' @param closing the number of days to adjust the end date displayed for the temporal dimension. End date defaults to maximum day of year end date in mating scene object.
 ##' @param dailyPoints logical indicating whether daily counts of individuals should be displayed for plots of the temporal dimension
 ##' @param drawQuartiles logical indicating whether vertical lines should be drawn at population peak (the date when the maximum number of individuals were reproductively available) or quartiles
-##' @param sub either a vector containing the ids of individuals to be highlighted in the plots or a character string specifying which subset of individuals to highlight. Possible values are "random" or "all". If NULL, no subset will be emphasized.
+##' @param sub a vector containing the ids of individuals to be highlighted in the plots or a character string specifying how to choose individuals to highlight. Possible values are "random" or "all". If NULL, no subset will be identified in the plots.
 ##' @param xcoord label for x coordinate of spatial dimension plots. If NULL, defaults to 'easting'.
 ##' @param ycoord label for y coordinate of spatial dimension plots. If NULL, defaults to 'northing'.
 ##' @param pch specify point type to be used in plots. Defaults to pch = 19 (filled in circle). If NULL points will be labeled by id.
@@ -64,62 +64,73 @@ matingPlot <- function(scene, dimension = "auto",
     par(mfrow = c(nr,nc))
     par(oma = c(4,3,2,1))
 
-    for (i in 1:length(scene)){
+    if(spat){
+      emin <- min(scene[[1]]['x'])
+      emax <- max(scene[[1]]['x'])
+      nmin <- min(scene[[1]]['y'])
+      nmax <- max(scene[[1]]['y'])
+    }
 
-      count <- nrow(scene[[1]])
+    if(temp){
+      if(is.null(opening)){
+        opening <- min(scene[[1]]['start'])
+      }
+      if(is.null(closing)){
+        closing <- max(scene[[1]]['end'])
+      }
+    }
+
+    if(comp){
+      smin <- min(as.numeric(scene[[1]][['s1']]))
+      smax <- min(as.numeric(scene[[1]][['s1']]))
+    }
+
+    count <- nrow(scene[[1]])
+
+    for (i in 1:length(scene)){
       if (nrow(scene[[i]]) > max(count)){
         count <- nrow(scene[[i]])
       }
 
       if (spat){
-        emin <- min(scene[[1]]['x'])
-        emax <- max(scene[[1]]['x'])
-        nmin <- min(scene[[1]]['y'])
-        nmax <- max(scene[[1]]['y'])
-
         if (min(scene[[i]]['x'])< emin){
           emin <- min(scene[[i]]['x'])
         }
-        if (max(scene[[i]]['x'])< emax){
+        if (max(scene[[i]]['x'])> emax){
           emax <- max(scene[[i]]['x'])
         }
         if (min(scene[[i]]['y'])< nmin){
           nmin <- min(scene[[i]]['y'])
         }
-        if (max(scene[[i]]['y'])< nmax){
+        if (max(scene[[i]]['y'])> nmax){
           nmax <- max(scene[[i]]['y'])
         }
       }
 
       if(comp){
-        smin <- min(as.numeric(scene[[1]][['s1']]))
-        smax <- min(as.numeric(scene[[1]][['s1']]))
-
         if (max(as.numeric(scene[[i]][['s1']])>smax)){
           smax <- max(as.numeric(scene[[i]][['s1']]))
         }
         if (max(as.numeric(scene[[i]][['s2']])>smax)){
           smax <- max(as.numeric(scene[[i]][['s2']]))
         }
-        if (min(as.numeric(scene[[i]][['s1']])>smin)){
+        if (min(as.numeric(scene[[i]][['s1']])<smin)){
           smin <- min(as.numeric(scene[[i]][['s1']]))
         }
-        if (min(as.numeric(scene[[i]][['s2']])>smin)){
+        if (min(as.numeric(scene[[i]][['s2']])<smin)){
           smin <- min(as.numeric(scene[[i]][['s2']]))
         }
       }
 
       if(temp){
         if(is.null(opening)){
-          opening <- min(scene[[1]][,'start'])
           if (min(scene[[i]]['start']) < opening){
-            opening <- min(scene[[i]][,'start'])
+            opening <- min(scene[[i]]['start'])
           }
         }
         if(is.null(closing)){
-          closing <- max(scene[[1]][,'end'])
-          if (max(scene[[i]][,'end']) > closing){
-            closing <- max(scene[[i]][,'end'])
+          if (max(scene[[i]]['end']) > closing){
+            closing <- max(scene[[i]]['end'])
           }
         }
       }
@@ -135,10 +146,8 @@ matingPlot <- function(scene, dimension = "auto",
         scene.i <- scene.i[order(scene.i[, 'start'], scene.i[, 'end']),]
         scene.i$index <- seq_along(scene.i[, 1])
         par(mar = c(0.25,3.25,0.25,0.5))
-        plot.default(scene.i[, 'start'], scene.i$index, ylim = c(1,count), xlim = c(opening, closing), type = "n", xlab = 'date', ylab = "",
-                     xaxt = 'n', ...)
-        segments(scene.i[, 'start'], scene.i$index, scene.i[, 'end'],
-                 scene.i$index, col = "gray50", cex = 3, ...)
+        plot.default(scene.i[, 'start'], scene.i$index, ylim = c(1,count), xlim = c(opening, closing), type = "n", xlab = 'date', ylab = "",xaxt = 'n', ...)
+        segments(scene.i[, 'start'], scene.i$index, scene.i[, 'end'],scene.i$index, col = "gray50", cex = 3, ...)
         mtext(names(scene)[i],side = 2,adj = 0.5, cex = 0.75, line = 5, font = 2)
         mtext('count',side = 2,adj = 0.5, cex = 0.75, line = 2.5)
         if (i == nr){
@@ -149,8 +158,7 @@ matingPlot <- function(scene, dimension = "auto",
           mtext('temporal',side = 3, adj = 0.5, line = 0.5)
         }
         if (!is.null(sub)){
-          segments(scene.i[scene.i$id %in% sub, 'start'], scene.i[scene.i$id %in% sub, 'index'], scene.i[scene.i$id %in% sub, 'end'],
-                   scene.i[scene.i$id %in% sub, 'index'], col = "blue", ...)
+          segments(scene.i[scene.i$id %in% sub, 'start'], scene.i[scene.i$id %in% sub, 'index'], scene.i[scene.i$id %in% sub, 'end'],scene.i[scene.i$id %in% sub, 'index'], col = "blue", ...)
         }
         if (dailyPoints == TRUE){
           rbd <- receptivityByDay(scene.i)
@@ -190,7 +198,7 @@ matingPlot <- function(scene, dimension = "auto",
         }
         if (!is.null(sub)){
           scene.i.sub <- scene.i[scene.i[, 'id'] %in% sub, ]
-          text(scene.i.sub[, 'x'], scene.i.sub[, 'y'], scene.i.sub[, 'id'], pos = 3, ...)
+          text(scene.i.sub[, 'x'], scene.i.sub[, 'y'], scene.i.sub[, 'id'], pos = 3,xpd = T, ...)
           points(scene.i.sub[, 'x'], scene.i.sub[, 'y'], pch = 19,col = 'blue', ...)
         }
         if(temp == F){
@@ -322,15 +330,3 @@ matingPlot <- function(scene, dimension = "auto",
   }
   par(mar = nm, mfrow = nmfrow, oma = noma)
 }
-
-
-
-# test <- simulateScene(30)
-# test1 <- simulateScene(30)
-# test2 <- simulateScene(60)
-#
-# testList<- list('2001' = test, '2002' = test1, '2003' = test2)
-#
-# matingPlot(testList, sub = 'random')
-
-
