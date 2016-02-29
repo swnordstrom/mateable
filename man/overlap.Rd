@@ -20,7 +20,7 @@ return value}
 \value{
 a matrix containing all pairwise comparisons. If compareToSelf
 is FALSE then there will be n rows and n-1 columns. \cr
-To index result[i,j] where j > i, use result[i,j-1], where result
+To index result[i,j] where j > i, use \code{result[i,j-1]}, where \code{result}
 is the return value of overlap. There is one attribute "idOrder"
 which holds the order of the id column in scene at the time of the function call.
 This can be useful to find certain elements in the matrix (see examples). \cr

@@ -38,8 +38,9 @@ calculated as self incompatible (si) in the same manner as Echinacea
 (and many other plants). For two individuals, they are incompatible if
 they share any S alleles (columns s1 and s2) and they compatible otherwise.
 When \code{method} is "dioecious" it is assumed that the column s1 will
-contain either a 1 or 2 depending sex. Thus, when comparing two individuals,
-they are compatible is s1 of the first != s1 of the second, and s2 is ignored.
+contain either a 1 or 2 depending on the individual's sex. Thus, when
+comparing two individuals, they are compatible if s1 of the first != s1
+of the second, and s2 is ignored.
 }
 \examples{
 pop <- simulateScene()

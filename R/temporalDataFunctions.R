@@ -182,11 +182,13 @@ receptivityByDay <- function(scene) {
 ##' @param method character, partial matching allowed, describing what type
 ##' of synchrony will be calculated. "augspurger" is based on the method
 ##' described in Augspurger (1983). "kempenaers" is based on the method
-##' described in Kempenaers (1993). "overlap" will calculate a synchrony
-##' value based on the number of days both individuals were flowering divided
-##' by the number of days either individual was available for mating. "sync_nn"
-##' gives the average of the kth nearest neighbor, or rather the kth most
-##' synchronous individual.
+##' described in Kempenaers (1993). "sync_prop" will calculate individual
+##'  synchrony based on the proportion of the sum of all individuals' days
+##'  available to mate that coincided with the individual's days available for mating.
+##' "overlap" will calculate a synchrony value based on the number of days both
+##' individuals were flowering divided by the number of days either individual
+##' was available for mating. "sync_nn" gives the average of the kth nearest
+##' neighbor, or rather the kth most synchronous individual.
 ##' @param subject one of "population", "pairwise", "individual", or "all"
 ##' - see Value for more details.
 ##' @param averageType character. Identifies whether to take the mean or median
