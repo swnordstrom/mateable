@@ -154,7 +154,7 @@ potentialPlot <-   function(matPot,
           im <- poti[['ind']][which(sub.iids %in% iids), potential]
           lab.cex <- 1 + (im - min(im))/(max(im) - min(im))
           plot_web3(subMat, names = sub.iids, val = FALSE, legend = FALSE, length = 0,
-                   labz.size = lab.cex, ...)
+                    labz.size = lab.cex, ...)
         }
         if (! 'hist' %in% pt){
           mtext(names(matPot)[i],side = 2,adj = 0.5, cex = 0.75, las = 1, font = 2)
@@ -170,7 +170,7 @@ potentialPlot <-   function(matPot,
           diag(subMat) <- 1
           subMat[upper.tri(subMat, diag = FALSE)] <- NA
           image(x = 1:nrow(subMat),y = 1:nrow(subMat), z = subMat, axes = F, xlab = "", ylab = "", col = colorRampPalette(c('white','red'))(12))
-          legend("topleft", legend = round(seq(min(subMat, na.rm = T),max(subMat, na.rm = T),length.out = 12),digits = 2), fill = colorRampPalette(c('white','red'))(12),ncol = 4, bty = 'n')
+          legend("topleft", legend = round(seq(min(subMat, na.rm = T),max(subMat, na.rm = T),length.out = 12),digits = 2), fill = colorRampPalette(c('white','red'))(12),ncol = 3, bty = 'n')
           axis(1, 1:ncol(subMat), labels = sub.iids, tick = 0, cex.axis = -0.2 + 1/log10(nrow(subMat)))
           axis(4, 1:ncol(subMat), labels = sub.iids, tick = 0, cex.axis = -0.2 + 1/log10(nrow(subMat)), las = 2)
           par(mgp = c(3,1,0))
@@ -307,7 +307,7 @@ plot_web3 <-
       y2 <- yi[i]
       for (j in 1:i) {
         if (flowmatrix[i, j] > zero | flowmatrix[j, i] >
-              zero) {
+            zero) {
           Arr.col <- arr.col[i, j]
           x1 <- xi[j]
           y1 <- yi[j]
