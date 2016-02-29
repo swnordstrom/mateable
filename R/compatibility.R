@@ -1,16 +1,15 @@
-##' Mating Type Compatibility of a Population
+##' Calculate one or several of measures of mating compatibility.
 ##'
-##' Calculate one of several of measures of mating synchrony for a population.
-##'
-##' @param popn a mating scene object
+##' @title Make potentials object--mating type compatibility
+##' @param scene a mating scene object
 ##' @param method either "si_echinacea" or "dioecious" see details for
 ##' further description
 ##' @param subject whether you want pair, individual, population, or all.
 ##' Specifying more than one is allowed.
 ##' @param averageType whether to calculate individual and population proximity
 ##' using the mean or median
-##' @return A list containing one more more of the following, depending the
-##' input for subject: \cr
+##' @return A potentials object containing one more more of the following, depending the
+##' input for \code{subject}: \cr
 ##' If \code{subject} is "population" the return list will contain a numeric
 ##' value that has a range depending on the \code{method}. If
 ##' \code{subject} is "pair" the return list will contain a matrix
@@ -29,7 +28,7 @@
 ##' @examples
 ##' pop <- simulateScene()
 ##' compatibility(pop, "si_echinacea")
-compatibility <- function(popn, method, subject = "all",
+compatibility <- function(scene, method, subject = "all",
                           averageType = "mean"){
 
   method <- match.arg(method, c("si_echinacea", "dioecious"))
@@ -44,9 +43,9 @@ compatibility <- function(popn, method, subject = "all",
   }
 
   if (method == "si_echinacea") {
-    pairCompat <- pair_si_ech(popn$s1, popn$s2)
+    pairCompat <- pair_si_ech(scene$s1, scene$s2)
 
-    indCompat <- data.frame(id = popn$id, compatibility = -1)
+    indCompat <- data.frame(id = scene$id, compatibility = -1)
     indCompat$compatibility <- apply(pairCompat, 1, average, na.rm = T)
 
     popCompat <- average(indCompat$compatibility)

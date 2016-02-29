@@ -1,13 +1,13 @@
 ##' Summarize a Mating Scene
 ##'
-##' Create a summary of data contained within a matingScene data frame.
+##' Create a summary of information contained within a matingScene object.
 ##'
-##' @param popn a mating scene data frame or list
+##' @param scene a matingScene object
 ##' @param type character. whether to do a temporal (t), spatial (s), or mating
 ##' type (mt) summary. The default is "auto" which will automatically summarize
-##' all mating information in popn
+##' all mating information in scene
 ##' @param k integer. Which nearest neighbor to calculate (only for type == "s")
-##' @param compatMethod character. What method to use when calculating
+##' @param compatMethod character indicating the method to use when calculating
 ##' compatiblity. Defaults to "si_echinacea"
 ##' @return a list or a list of lists containing summary information
 ##' including:\cr
@@ -21,24 +21,24 @@
 ##' by k (k<n> where n is the input for k)\cr
 ##' compatibility - number of mating types (nMatType), average number of
 ##' compatible mates (meanComp)\cr
-##' If popn is a multi-year mating scene, then the output will be a list
+##' If scene is a multi-year mating scene, then the output will be a list
 ##' of lists, one list for each year.
 ##' @examples
 ##' eelr <- makeScene(eelr2012, startCol = "firstDay", endCol = "lastDay",
 ##'   xCol = "Ecoord", yCol = "Ncoord", idCol = "tagNo")
 ##' eelrSum <- matingSummary(eelr)
 ##' eelrSum[c("minX", "minY", "maxX", "maxY")]
-matingSummary <- function(popn, type = "auto", k = 1,
+matingSummary <- function(scene, type = "auto", k = 1,
                           compatMethod = "si_echinacea") {
-  if (is.list(popn) & !is.data.frame(popn)) {
-    matSum <- lapply(popn, matingSummary)
+  if (is.list(scene) & !is.data.frame(scene)) {
+    matSum <- lapply(scene, matingSummary)
   } else {
     type <- match.arg(type, c("auto", "t", "s", "mt"))
     matSum <- list()
     if (type == "auto") {
-      temp <- attr(popn, "t")
-      spat <- attr(popn, "s")
-      comp <- attr(popn, "mt")
+      temp <- attr(scene, "t")
+      spat <- attr(scene, "s")
+      comp <- attr(scene, "mt")
     } else {
       temp <- F
       spat <- F
@@ -52,31 +52,31 @@ matingSummary <- function(popn, type = "auto", k = 1,
       }
     }
     if (temp) {
-      org <- attr(popn, "origin")
+      org <- attr(scene, "origin")
       matSum$year <- as.numeric(format(org, "%Y"))
       matSum$popSt <- as.Date(1, org)
-      matSum$meanSD <- as.Date(mean(popn$start), org)
-      matSum$sdSD <- sd(popn$start)
-      matSum$meanDur <- mean(popn$duration)
-      matSum$sdDur <- sd(popn$duration)
+      matSum$meanSD <- as.Date(mean(scene$start), org)
+      matSum$sdSD <- sd(scene$start)
+      matSum$meanDur <- mean(scene$duration)
+      matSum$sdDur <- sd(scene$duration)
       matSum$peak <-
-        as.Date(as.integer(which.max(colSums(receptivityByDay(popn)))), org)
-      matSum$meanED <- as.Date(mean(popn$end), org)
-      matSum$sdED <- sd(popn$end)
-      matSum$popEnd <- as.Date(max(popn$end), org)
+        as.Date(as.integer(which.max(colSums(receptivityByDay(scene)))), org)
+      matSum$meanED <- as.Date(mean(scene$end), org)
+      matSum$sdED <- sd(scene$end)
+      matSum$popEnd <- as.Date(max(scene$end), org)
     }
     if (spat) {
-      matSum$minX <- min(popn$x)
-      matSum$minY <- min(popn$y)
-      matSum$maxX <- max(popn$x)
-      matSum$maxY <- max(popn$y)
+      matSum$minX <- min(scene$x)
+      matSum$minY <- min(scene$y)
+      matSum$maxX <- max(scene$x)
+      matSum$maxY <- max(scene$y)
       matSum[[paste("k", k, sep = "")]] <-
-        mean(kNearNeighbors(popn, k)[k])
+        mean(kNearNeighbors(scene, k)[k])
     }
     if (comp) {
-      matSum$nMatType <- length(union(levels(popn$s1), levels(popn$s2)))
+      matSum$nMatType <- length(union(levels(scene$s1), levels(scene$s2)))
 
-      matSum$meanComp <- compatibility(popn, compatMethod)$pop * 100
+      matSum$meanComp <- compatibility(scene, compatMethod)$pop * 100
     }
   }
   matSum
@@ -86,7 +86,7 @@ matingSummary <- function(popn, type = "auto", k = 1,
 ##'
 ##' Get comparisons of mating timing between all pairs
 ##'
-##' @param popn a mating scene data frame or list
+##' @param scene a matingScene object
 ##' @param overlapOrTotal whether to calculate the number of days that each
 ##' pair was overlapping in mating receptivity or the total number of days
 ##' that either individual was receptive
@@ -96,9 +96,9 @@ matingSummary <- function(popn, type = "auto", k = 1,
 ##' is FALSE then there will be n rows and n-1 columns. \cr
 ##' To index result[i,j] where j > i, use result[i,j-1], where result
 ##' is the return value of overlap. There is one attribute "idOrder"
-##' which holds the order of the id column in popn at the time of the function call.
+##' which holds the order of the id column in scene at the time of the function call.
 ##' This can be useful to find certain elements in the matrix (see examples). \cr
-##' If popn is a multi-year mating scene, then overlap will return a list of matrices
+##' If scene is a multi-year mating scene, then overlap will return a list of matrices
 ##' (as described above) where each matrix represents one year.
 ##' @author Danny Hanson
 ##' @examples
@@ -111,28 +111,28 @@ matingSummary <- function(popn, type = "auto", k = 1,
 ##' } else {
 ##'   daysSync[indices[1], indices[2]-1]
 ##' }
-overlap <- function(popn, overlapOrTotal = c("overlap", "total"),
+overlap <- function(scene, overlapOrTotal = c("overlap", "total"),
                     compareToSelf = FALSE) {
-  if (is.list(popn) & !is.data.frame(popn)) {
-    overlapMatrix <- lapply(popn, overlap)
+  if (is.list(scene) & !is.data.frame(scene)) {
+    overlapMatrix <- lapply(scene, overlap)
   } else {
-    n <- nrow(popn)
+    n <- nrow(scene)
     overlapOrTotal <- match.arg(overlapOrTotal)
 
     if (overlapOrTotal == "overlap") {
       if (compareToSelf) {
-        overlapMatrix <- daysSync_self(popn$start, popn$end, n)
+        overlapMatrix <- daysSync_self(scene$start, scene$end, n)
       } else {
-        overlapMatrix <- daysSync_noself(popn$start, popn$end, n)
+        overlapMatrix <- daysSync_noself(scene$start, scene$end, n)
       }
     } else if (overlapOrTotal == "total") {
       if (compareToSelf) {
-        overlapMatrix <- daysEither_self(popn$start, popn$end, n)
+        overlapMatrix <- daysEither_self(scene$start, scene$end, n)
       } else {
-        overlapMatrix <- daysEither_noself(popn$start, popn$end, n)
+        overlapMatrix <- daysEither_noself(scene$start, scene$end, n)
       }
     }
-    attr(overlapMatrix, "idOrder") <- popn$id
+    attr(overlapMatrix, "idOrder") <- scene$id
   }
   overlapMatrix
 }
@@ -142,31 +142,31 @@ overlap <- function(popn, overlapOrTotal = c("overlap", "total"),
 ##'
 ##' Create a matrix showing which individuals are receptive on a given day.
 ##'
-##' @param popn a matingScene data frame or list
+##' @param scene a matingScene data frame or list
 ##' @return a matrix where the columns represent all mating days and the rows
 ##' represent all individuals in the population. The value for day i and
 ##' individual j will be TRUE if that individual was flowering on that day and
 ##' is located in position [i,j] \cr
-##' If popn is a multi-year mating scene, then overlap will return a list of matrices
+##' If scene is a multi-year mating scene, then overlap will return a list of matrices
 ##' (as described above) where each matrix represents one year.
 ##' @author Danny Hanson
 ##' @examples
 ##' pop <- simulateScene(size = 10)
 ##' receptivityByDay(pop)
-receptivityByDay <- function(popn) {
-  if (is.list(popn) & !is.data.frame(popn)) {
-    dailyMatrix <- lapply(popn, receptivityByDay)
+receptivityByDay <- function(scene) {
+  if (is.list(scene) & !is.data.frame(scene)) {
+    dailyMatrix <- lapply(scene, receptivityByDay)
   } else {
     # get ids and days that flowering occurred
-    ids <- popn$id
-    days <- seq(min(popn$start), max(popn$end), 1)
+    ids <- scene$id
+    days <- seq(min(scene$start), max(scene$end), 1)
     nID <- length(ids)
     nDay <- length(days)
 
     dailyMatrix <- matrix(F, nrow = nID, ncol = nDay)
     # for a given individual, say what days it was flowering on
     for (i in 1:nID) {
-      dailyMatrix[i, popn[i, "start"]:popn[i, "end"]] <- T
+      dailyMatrix[i, scene[i, "start"]:scene[i, "end"]] <- T
     }
 
     rownames(dailyMatrix) <- ids
@@ -175,24 +175,20 @@ receptivityByDay <- function(popn) {
   dailyMatrix
 }
 
-##' Calculate one of a variety of measures of mating synchrony for a population.
+##' Calculate one of a variety of measures of mating synchrony.
 ##'
-##' Measures of synchrony are based on methods described in Augspurger (1983),
-##' Kempenaers (1983), and from Wagenius (personal observations), as well
-##' as variations on different factors of those measures.
-##'
-##' @title Mating synchrony of a population
-##' @param popn a 3dPop object that has the flowering schedule for the
-##' population of interest.
+##' @title Make potentials object--mating synchrony
+##' @param scene a matingScene object that includes the flowering schedule for the
+##' scene of interest.
 ##' @param method character, partial matching allowed, describing what type
 ##' of synchrony will be calculated. "augspurger" is based on the method
 ##' described in Augspurger (1983). "kempenaers" is based on the method
-##' described in Kempenaers (1993). "sync/either" will calculate a synchrony
+##' described in Kempenaers (1993). "overlap" will calculate a synchrony
 ##' value based on the number of days both individuals were flowering divided
 ##' by the number of days either individual was available for mating. "sync_nn"
 ##' gives the average of the kth nearest neighbor, or rather the kth most
 ##' synchronous individual.
-##' @param synchronyType one of "population", "pairwise", "individual", or "all"
+##' @param subject one of "population", "pairwise", "individual", or "all"
 ##' - see Value for more details.
 ##' @param averageType character. Identifies whether to take the mean or median
 ##' when calculating averages
@@ -200,8 +196,9 @@ receptivityByDay <- function(popn) {
 ##' calculating population synchrony
 ##' @param compareToSelf logical. Whether or not to include self comparisons
 ##' when calculation synchrony. Defaults to FALSE.
-##' @return The result depends on the input for \code{subject}. If
-##' \code{subject} is "population" \code{synchrony} will return a numeric
+##' @return A potentials object containing one more more of the following, depending the
+##' input for \code{subject}: \cr
+##' If \code{subject} is "population" \code{synchrony} will return a numeric
 ##' value that has a range depending on the \code{method}. If
 ##' \code{subject} is "pairwise" \code{synchrony} will return a matrix
 ##' with all pairwise synchrony comparisons. It is important to note two things:
@@ -214,6 +211,9 @@ receptivityByDay <- function(popn) {
 ##' If \code{subject} is "all" \code{synchrony} will return a list
 ##' containing the values described above for population, pairwise, and
 ##' individual synchrony.
+##' @details Measures of synchrony are based on methods described in Augspurger (1983),
+##' Kempenaers (1983), and from Ison and Wagenius (2014), as well
+##' as variations on different factors of those measures.
 ##' @export
 ##' @author Danny Hanson
 ##' @references Kempenaers, B. (1993) The use of a breeding synchrony index.
@@ -226,18 +226,18 @@ receptivityByDay <- function(popn) {
 ##'
 ##' pop2 <- simulateScene(size = 1234, sdDur = 5, sk = 1)
 ##' syncVals <- synchrony(pop2, "sync_nn", "all", "median", 123)
-synchrony <- function(popn, method, synchronyType = "all", averageType = "mean",
+synchrony <- function(scene, method, subject = "all", averageType = "mean",
                       syncNN = 1, compareToSelf = FALSE) {
 
-  method <- match.arg(method, c("augspurger", "kempenaers", "overlap",
-                                "sync_nn"))
-  synchronyType <- match.arg(synchronyType, c("population", "pairwise",
-                                              "individual", "all"),
-                             several.ok = T)
+  method <- match.arg(method, c("augspurger", "kempenaers", "sync_prop",
+                                "overlap", "sync_nn"))
+  subject <- match.arg(subject, c("population", "pairwise",
+                                  "individual", "all"),
+                       several.ok = T)
   averageType <- match.arg(averageType, c("mean", "median"))
 
   # some things that all methods need
-  n <- nrow(popn) # population size
+  n <- nrow(scene) # population size
   if (averageType == "mean") {
     average <- mean
   } else if (averageType == "median") {
@@ -249,15 +249,15 @@ synchrony <- function(popn, method, synchronyType = "all", averageType = "mean",
   }
 
   if (method == "augspurger") {
-    if (synchronyType %in% c("pop", "all")) {
-      syncMatrix <- overlap(popn, "overlap", compareToSelf = T)
-      pairSync <- syncMatrix/popn$duration
+    if (subject %in% c("pop", "all")) {
+      syncMatrix <- overlap(scene, "overlap", compareToSelf = T)
+      pairSync <- syncMatrix/scene$duration
     }
 
-    syncMatrix2 <- overlap(popn, "overlap", compareToSelf)
-    pairSync2 <- syncMatrix2/popn$duration
+    syncMatrix2 <- overlap(scene, "overlap", compareToSelf)
+    pairSync2 <- syncMatrix2/scene$duration
 
-    indSync <- data.frame(id = popn$id, synchrony = -1)
+    indSync <- data.frame(id = scene$id, synchrony = -1)
     if (averageType == "mean") {
       indSync$synchrony <- rowMeans(pairSync2)
     } else if (averageType == "median") {
@@ -267,33 +267,46 @@ synchrony <- function(popn, method, synchronyType = "all", averageType = "mean",
     popSync <- average(indSync[,2])
 
   } else if (method == "kempenaers") {
-    indDaily <- receptivityByDay(popn)
+    indDaily <- receptivityByDay(scene)
 
     pairSync <- NULL
 
     indCols <- colSums(indDaily)
-    indSync <- data.frame(id = popn$id, synchrony = -1)
-    indSync$synchrony <- kemp_ind(indCols, popn$start, popn$end, popn$duration,
+    indSync <- data.frame(id = scene$id, synchrony = -1)
+    indSync$synchrony <- kemp_ind(indCols, scene$start, scene$end, scene$duration,
                                   compareToSelf)
-#     indSync$synchrony <- sapply(1:n, FUN = function(i) {
-#       inds <- as.character(popn[i, "start"]:popn[i, "end"])
-#       sum(indDaily[,inds]) - popn[i,"duration"]
-#     })/(popn[,"duration"]*(n-1))
+    #     indSync$synchrony <- sapply(1:n, FUN = function(i) {
+    #       inds <- as.character(scene[i, "start"]:scene[i, "end"])
+    #       sum(indDaily[,inds]) - scene[i,"duration"]
+    #     })/(scene[,"duration"]*(n-1))
 
     popSync <- average(indSync[,2])
 
+  } else if (method == 'sync_prop') {
+    days <- min(scene$start):max(scene$end)
+    fl <- receptivityByDay(scene)
+    n <- sum(fl)
+
+    prop <- apply(fl, 2, function(x){sum(x)/n})
+    indPropDaily<- t(apply(fl,1,function(x){x*prop}))
+    totalIndProp <- rowSums(indPropDaily)
+
+    pairSync <- NULL
+    indSync <- data.frame(id = scene$id, synchrony = totalIndProp)
+    popSync <- average(indSync[,2])
+
   } else if (method == "overlap") {
-    if (synchronyType %in% c("pop", "all")) {
-      syncMatrix <- overlap(popn, "overlap", compareToSelf = T)
-      eitherMatrix <- overlap(popn, "total", compareToSelf = T)
+    if (subject %in% c("pop", "all")) {
+      syncMatrix <- overlap(scene, "overlap", compareToSelf = T)
+      eitherMatrix <- overlap(scene, "total", compareToSelf = T)
       pairSync <- syncMatrix/eitherMatrix
     }
 
-    syncMatrix2 <- overlap(popn, "overlap", compareToSelf)
-    eitherMatrix2 <- overlap(popn, "total", compareToSelf)
+    syncMatrix2 <- overlap(scene, "overlap", compareToSelf)
+    eitherMatrix2 <- overlap(scene, "total", compareToSelf)
     pairSync2 <- syncMatrix2/eitherMatrix2
 
-    indSync <- data.frame(id = popn$id, synchrony = -1)
+    indSync <- data.frame(id = scene$id, synchrony = -1)
     if (averageType == "mean") {
       indSync$synchrony <- rowMeans(pairSync2)
     } else if (averageType == "median") {
@@ -307,9 +320,9 @@ synchrony <- function(popn, method, synchronyType = "all", averageType = "mean",
       stop("syncNN must be less than n")
     }
 
-    if (synchronyType %in% c("pop", "all")) {
-      syncMatrix <- overlap(popn, "overlap", compareToSelf = T)
-      eitherMatrix <- overlap(popn, "total", compareToSelf = T)
+    if (subject %in% c("pop", "all")) {
+      syncMatrix <- overlap(scene, "overlap", compareToSelf = T)
+      eitherMatrix <- overlap(scene, "total", compareToSelf = T)
       pairSyncInit <- syncMatrix/eitherMatrix
       pairSync <- matrix(nrow = n, ncol = n)
       for (i in 1:n) {
@@ -317,8 +330,8 @@ synchrony <- function(popn, method, synchronyType = "all", averageType = "mean",
       }
     }
 
-    syncMatrix2 <- overlap(popn, "overlap", compareToSelf)
-    eitherMatrix2 <- overlap(popn, "total", compareToSelf)
+    syncMatrix2 <- overlap(scene, "overlap", compareToSelf)
+    eitherMatrix2 <- overlap(scene, "total", compareToSelf)
     pairSyncInit2 <- syncMatrix2/eitherMatrix2
 
     m <- ifelse(compareToSelf, n, n-1)
@@ -327,25 +340,26 @@ synchrony <- function(popn, method, synchronyType = "all", averageType = "mean",
       pairSync2[i,] <- sort(pairSyncInit2[i,], decreasing = T)
     }
 
-    indSync <- data.frame(id = popn$id, synchrony = -1)
+    indSync <- data.frame(id = scene$id, synchrony = -1)
     indSync$synchrony <- pairSync2[,syncNN]
 
     popSync <- average(indSync[,2])
 
   }
 
+
   # return
   potential <- list()
-  if ("population" %in% synchronyType) {
+  if ("population" %in% subject) {
     potential$pop <- popSync
   }
-  if ("individual" %in% synchronyType) {
+  if ("individual" %in% subject) {
     potential$ind <- indSync
   }
-  if ("pairwise" %in% synchronyType) {
+  if ("pairwise" %in% subject) {
     potential$pair <- pairSync
   }
-  if ("all" %in% synchronyType) {
+  if ("all" %in% subject) {
     potential$pop <- popSync
     potential$ind <- indSync
     potential$pair <- pairSync

@@ -4,10 +4,10 @@
 \alias{kNearNeighbors}
 \title{Get k Nearest Neighbors}
 \usage{
-kNearNeighbors(popn, k)
+kNearNeighbors(scene, k)
 }
 \arguments{
-\item{popn}{a 3D population object}
+\item{scene}{a matingScene object}
 
 \item{k}{integer of how many nearest neighbors to get}
 }

@@ -2,20 +2,20 @@
 % Please edit documentation in R/spatialDataFunctions.R
 \name{pairDist}
 \alias{pairDist}
-\title{Distance Matrix for a Population}
+\title{Distance Matrix for a mating scene}
 \usage{
-pairDist(popn)
+pairDist(scene)
 }
 \arguments{
-\item{popn}{a 3D population object}
+\item{scene}{a matingScene object}
 }
 \value{
-a matrix of all pairwise comparisons with attribute for order of
-ids (idOrder)
+a matrix of all pairwise comparisons with attributes for order of
+identifiers (idOrder)
 }
 \description{
 Compute all pairwise distances for a population. This function
-is simply a wrapper for \code{dist} that only returns a matrix
+is simply a wrapper for \code{dist} that returns only a matrix
 }
 \examples{
 pop <- simulateScene()

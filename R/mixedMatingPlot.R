@@ -1,15 +1,14 @@
 ##' Visualize multiple dimensions of a mating scene
 ##'
 ##' @title multi-dimensional visualization of mating scene object
-##' @param scene
+##' @param scene a mating scene object
 ##' @param dimension what dimension(s) of the mating scene should be visualized. Possible dimensions are 't' for temporal, 's' for spatial, 'mt' for mating type, and 'auto' (the default). For dimension = 'auto', all dimensions represented in the mating scene object will be plotted.
-##' @param sub
+##' @param sub a subset of the population to plot
 ##' @param xcoord x-axis coordinate system label
 ##' @param ycoord y-axis coordinate system label
 ##' @param pch point type, defaults to pch = 19, solid filled in circle. If pch = NULL, individuals will be labeled by their id.
-##' @param ...
+##' @param ... optional arguments for the plot function
 ##' @return nothing
-##' @return optional arguments for the plot function
 ##' @export
 ##' @author Amy Waananen
 ##' @seealso see generic function \code{\link{points}} for values of \code{pch}
@@ -375,17 +374,13 @@ mixedMatingPlot <- function(scene, dimension = "auto",
     if(temp){
       scene$cols <- cut(scene$start,9)
       palette(colorRampPalette(c('blue','red'))(9))
-      if(is.null(opening)){
+      opening <- attr(scene,'origin')+min(scene[,'start'])
+      if (attr(scene,'origin')+min(scene[,'start']) < opening){
         opening <- attr(scene,'origin')+min(scene[,'start'])
-        if (attr(scene,'origin')+min(scene[,'start']) < opening){
-          opening <- attr(scene,'origin')+min(scene[,'start'])
-        }
       }
-      if(is.null(closing)){
+      closing <- attr(scene,'origin')+max(scene[,'end'])
+      if (attr(scene,'origin')+max(scene[,'end']) > closing){
         closing <- attr(scene,'origin')+max(scene[,'end'])
-        if (attr(scene,'origin')+max(scene[,'end']) > closing){
-          closing <- attr(scene,'origin')+max(scene[,'end'])
-        }
       }
 
       maxstart <- max(scene[,'start'])

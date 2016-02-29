@@ -43,8 +43,9 @@ simulateScene <- function(size = 30, meanSD = "2012-07-12", sdSD = 6, meanDur = 
 ##' genetic mating data into a matingScene object using a standard format.
 ##'
 ##' @title Create a matingScene object from a data frame
-##' @param df a data frame containing mating information
-##' @param multiYear logical giving whether or not to split the result into
+##' @param df a data frame containing information about a mating scene,
+##' namely coordinate of individuals in space, time, and mating type.
+##' @param multiYear logical indicating whether or not to split the result into
 ##' a list by year
 ##' @param startCol character name of column with start dates
 ##' @param endCol character name of column with end dates
@@ -53,31 +54,37 @@ simulateScene <- function(size = 30, meanSD = "2012-07-12", sdSD = 6, meanDur = 
 ##' @param s1Col character name of one column with S-allele
 ##' @param s2Col character name of another column with S-alleles
 ##' @param idCol character name for column with unique identifier
-##' @param dateFormat character giving either (1) the format of the start and end
+##' @param dateFormat character indicating either (1) the format of the start and end
 ##' date columns if those columns are characters or (2) the origin for the start
 ##' and end date columns if those columns are numeric. It is used in as.Date
 ##'
-##' @return a matingScene data frame or a list of matingScene data frames.
-##' A data frame with column names in a
-##' specific format. There are also attributes giving what type of mating
-##' information is in the data frame, what the original column names were,
-##' and the origin of the date columns. If it multiYear = TRUE,
+##' @return a matingScene object, either a single dataframe in standard format
+##' or a list of dataframes. Attributes of the matingScene object indicate the type of
+##' information in the data frame, including the original column names,
+##' and the origin of the date columns. If multiYear = TRUE,
 ##' the return value will be a list of matingScene data frames where each
 ##' element in the list represents one year. See details for more information
-##' on attributes and how to do multi year data.
-##' @details The columns are named id, start, end, x, y, s1, and s2 for
+##' on attributes and how to work with multi-year data.
+##' @details The input dataframe can contain information about locations of
+##' individuals in 1, 2, or 3 dimensions of a mating scenes.
+##' The function currently allows two spatial coordinates. The user specifies
+##' the names of the columns and they will be saved xCol and yCol in the
+##' matingScene object. MatingScene objects currently save temporal
+##' coordinates for individuals as start and end date of mating activity
+##' within a year. Mating type coordinates are saved as mating type alleles.
+##' Columns are named id, start, end, x, y, s1, and s2 for
 ##' idCol, startCol, endCol, xCol, yCol, s1Col, and s2Col respectively.
 ##' The attributes "t", "s", and "mt" will be set to TRUE if the data frame
 ##' has temporal, spatial, or mating type data, respectively and
 ##' will be FALSE otherwise. The attribute originalNames contains all the
-##' names of the original data frame.\cr
+##' names of the columns in the original data frame.\cr
 ##' The start and end columns will be changed to integers relative to the start
 ##' day of the population. So the first day of the first individual to become
 ##' receptive will be 1 and so on. The attribute origin contains the
 ##' origin that can be used when converting the columns start and end
 ##' from integers to dates.\cr
-##' If there is no temporal data available except the year in which it was
-##' collect and df is a multi-year data set, put the collection year into the
+##' If no temporal data are available except the year in which it was
+##' collected and df is a multi-year data set, put the collection year into the
 ##' column labelled as startCol and set dateFormat = "%Y" and that will split
 ##' the data appropriately.
 ##' @author Danny Hanson

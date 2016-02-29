@@ -11,15 +11,14 @@
 ##' @param sample a character string specifying how to choose a subset of individuals to be represented in pairwise potential plots. Possible values are "random" (default) or "all".
 ##' @param lab.cex parameter indicating label size relative to plot
 ##' @param main the main title (on top of plot)
-##' @param ...
+##' @param ... optional arguments for the plot function
 ##' @return nothing
-##' @return optional arguments for the plot function
 ##' @export
 ##' @author Amy Waananen
 ##' @seealso see generic function \code{\link{points}} for values of \code{pch}
 ##' @examples
 ##' pop <- simulateScene()
-##' sync <- synchrony(pop)
+##' sync <- synchrony(pop, "augs")
 ##' potentialPlot(sync)
 ##'
 ##'
@@ -154,7 +153,7 @@ potentialPlot <-   function(matPot,
           subMat[upper.tri(subMat, diag = TRUE)] <- 0
           im <- poti[['ind']][which(sub.iids %in% iids), potential]
           lab.cex <- 1 + (im - min(im))/(max(im) - min(im))
-          plotweb3(subMat, names = sub.iids, val = FALSE, legend = FALSE, length = 0,
+          plot_web3(subMat, names = sub.iids, val = FALSE, legend = FALSE, length = 0,
                    labz.size = lab.cex, ...)
         }
         if (! 'hist' %in% pt){
@@ -209,7 +208,7 @@ potentialPlot <-   function(matPot,
 
 
 
-plotweb3 <-
+plot_web3 <-
   function (flowmat, names = NULL, lab.size = 1.5, add = FALSE,
             fig.size = 1.3, main = "", sub = "", sub2 = "", log = FALSE,
             mar = c(0.25, 0.25, 0.25, 0.25), nullflow = NULL, minflow = NULL, maxflow = NULL,

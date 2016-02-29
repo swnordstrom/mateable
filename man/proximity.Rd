@@ -2,13 +2,13 @@
 % Please edit documentation in R/spatialDataFunctions.R
 \name{proximity}
 \alias{proximity}
-\title{Spatial Proximity of a Population}
+\title{Make potentials object--spatial proximity}
 \usage{
-proximity(popn, method, proximityFun = NULL, averageType = "mean",
+proximity(scene, method, proximityFun = NULL, averageType = "mean",
   subject = "all")
 }
 \arguments{
-\item{popn}{a 3D population object}
+\item{scene}{a matingScene object}
 
 \item{method}{one of "maxProp", and "maxPropSqrd" see details for
 further description}
@@ -23,8 +23,8 @@ using the mean or median}
 Specifying more than one is allowed.}
 }
 \value{
-A list containing one more more of the following, depending the
-input for subject: \cr
+A potentials object containing one more more of the following, depending the
+input for \code{subject}: \cr
 If \code{subject} is "population" the return list will contain a numeric
 value that has a range depending on the \code{method}. If
 \code{subject} is "pair" the return list will contain a matrix
@@ -34,7 +34,7 @@ a column containing proximity values. If \code{subject} is "all"
 the return list will contain all three of the items above.
 }
 \description{
-Calculate one of several of measures of mating synchrony for a population.
+Calculate one or several of measures of spatial proximity
 }
 \details{
 If \code{method} is "maxProp" then proximity between two
