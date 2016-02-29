@@ -3,17 +3,10 @@
 ##' @title multi-dimensional visualization of mating scene object
 ##' @param scene
 ##' @param dimension what dimension(s) of the mating scene should be visualized. Possible dimensions are 't' for temporal, 's' for spatial, 'mt' for mating type, and 'auto' (the default). For dimension = 'auto', all dimensions represented in the mating scene object will be plotted.
-##' @param opening
-##' @param closing
-##' @param dailyPoints
-##' @param drawQuartiles
 ##' @param sub
-##' @param xlab
-##' @param ylab
-##' @param pch
-##' @param quartileWt
-##' @param quartileColor
-##' @param peakColor
+##' @param xcoord x-axis coordinate system label
+##' @param ycoord y-axis coordinate system label
+##' @param pch point type, defaults to pch = 19, solid filled in circle. If pch = NULL, individuals will be labeled by their id.
 ##' @param ...
 ##' @return nothing
 ##' @return optional arguments for the plot function
@@ -22,14 +15,13 @@
 ##' @seealso see generic function \code{\link{points}} for values of \code{pch}
 ##' @examples
 ##' pop <- simulateScene()
-##' matingPlot(pop)
-##' \dontrun{plotMap(NULL)}
+##' mixedMatingPlot(pop)
+##'
 ##'
 ##'
 mixedMatingPlot <- function(scene, dimension = "auto",
-                            opening = NULL, closing = NULL,
-                            sub= NULL, n, xlab = 'xlab', ylab = 'ylab',
-                            pch = NULL, ...){
+                            sub= NULL, n, ycoord = 'northing', xcoord = 'easting',
+                            pch = 19, ...){
   dimension <- match.arg(dimension, c("auto", "t", "s", "mt"),several.ok = TRUE)
   nm <- par("mar")
   nmfrow <- par('mfrow')
@@ -140,10 +132,10 @@ mixedMatingPlot <- function(scene, dimension = "auto",
         palette(colorRampPalette(c('blue','red'))(9))
       }
       if (temp & spat & comp){
-        xlab <- 'easting'
-        ylab <- 'northing'
+        xcoord <- 'easting'
+        ycoord <- 'northing'
         par(mar = c(1,9,1,1), xpd = T)
-        plot.default(scene.i[, 'x'], scene.i[, 'y'], type = "n", ylab = ylab, xaxt = 'n', xlim = c(emin,emax),ylim = c(nmin,nmax), ...)
+        plot.default(scene.i[, 'x'], scene.i[, 'y'], type = "n", ylab = ycoord, xaxt = 'n', xlim = c(emin,emax),ylim = c(nmin,nmax), ...)
         mtext(names(scene)[i],side = 2, cex = 0.75, font = 2, las = 1, adj = 0, line = 8)
         if (i == 1){
           title(main = 'spatial, temporal, and mating type plot', outer = T)
@@ -198,10 +190,10 @@ mixedMatingPlot <- function(scene, dimension = "auto",
           }
         }
       } else if (temp & spat){
-        xlab <- 'easting'
-        ylab <- 'northing'
+        xcoord <- 'easting'
+        ycoord <- 'northing'
         par(mar = c(1,9,1,1), xpd = T)
-        plot.default(scene.i[, 'x'], scene.i[, 'y'], type = "n", ylab = ylab, xaxt = 'n', xlim = c(emin,emax),ylim = c(nmin,nmax), ...)
+        plot.default(scene.i[, 'x'], scene.i[, 'y'], type = "n", ylab = ycoord, xaxt = 'n', xlim = c(emin,emax),ylim = c(nmin,nmax), ...)
         mtext(names(scene)[i],side = 2,adj = 0.5, cex = 0.75, line = 8, font = 2, las = 1)
         if (i == 1){
           title(main = 'spatial and temporal plot', outer = T)
@@ -253,10 +245,10 @@ mixedMatingPlot <- function(scene, dimension = "auto",
         }
 
       } else if(spat & comp){
-        xlab <- 'easting'
-        ylab <- 'northing'
+        xcoord <- 'easting'
+        ycoord <- 'northing'
         par(mar = c(1,9,1,1))
-        plot.default(scene.i[, 'x'], scene.i[, 'y'], type = "n", ylab = ylab, xaxt = 'n', xlim = c(emin,emax),ylim = c(nmin,nmax), ...)
+        plot.default(scene.i[, 'x'], scene.i[, 'y'], type = "n", ylab = ycoord, xaxt = 'n', xlim = c(emin,emax),ylim = c(nmin,nmax), ...)
         mtext(names(scene)[i],side = 2,adj = 0.5, cex = 0.75, line = 8, font = 2, las = 1)
         if (i == 1){
           title(main = 'spatial and mating type plot', outer = T)
@@ -412,9 +404,9 @@ mixedMatingPlot <- function(scene, dimension = "auto",
       vec <- seq(minstart, maxstart, length.out = 9)
     }
     if (temp & spat & comp){
-      xlab <- 'easting'
-      ylab <- 'northing'
-      plot.default(scene[, 'x'], scene[, 'y'], type = "n", xlab = xlab, ylab = ylab, ...)
+      xcoord <- 'easting'
+      ycoord <- 'northing'
+      plot.default(scene[, 'x'], scene[, 'y'], type = "n", xlab = xcoord, ylab = ycoord, ...)
       if (is.null(pch)) {
         text(scene[, 'x'], scene[, 'y'], scene[, 'id'], col = scene$cols, ...)
       } else {
@@ -436,9 +428,9 @@ mixedMatingPlot <- function(scene, dimension = "auto",
       }
 
     } else if (temp & spat){
-      xlab <- 'easting'
-      ylab <- 'northing'
-      plot.default(scene[, 'x'], scene[, 'y'], type = "n", xlab = xlab, ylab = ylab, ...)
+      xcoord <- 'easting'
+      ycoord <- 'northing'
+      plot.default(scene[, 'x'], scene[, 'y'], type = "n", xlab = xcoord, ylab = ycoord, ...)
       if (is.null(pch)) {
         text(scene[, 'x'], scene[, 'y'], scene[, 'id'], ...)
       } else {
@@ -455,9 +447,9 @@ mixedMatingPlot <- function(scene, dimension = "auto",
 
     } else if(spat & comp){
       par(xpd = T)
-      xlab <- 'easting'
-      ylab <- 'northing'
-      plot.default(scene[, 'x'], scene[, 'y'], type = "n", xlab = xlab, ylab = ylab, ...)
+      xcoord <- 'easting'
+      ycoord <- 'northing'
+      plot.default(scene[, 'x'], scene[, 'y'], type = "n", xlab = xcoord, ylab = ycoord, ...)
       if (is.null(pch)) {
         text(scene[, 'x'], scene[, 'y'], scene[, 'id'], ...)
       } else {
