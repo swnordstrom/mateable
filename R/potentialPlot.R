@@ -141,7 +141,7 @@ plotPotential <-   function(matPot,
           title(xlab = potential)
         }
         if (showDensity){
-          lines(density(poti[['pair']]))
+          lines(density(poti[['pair']], na.rm = T))
         }
       }
 
@@ -160,8 +160,6 @@ plotPotential <-   function(matPot,
         }
       }
 
-
-
       if ('heat' %in% pt){
         if(length(sub.iids) <= 2){
           plot(1, type="n", axes=F, xlab="", ylab="")
@@ -179,8 +177,6 @@ plotPotential <-   function(matPot,
         }
       }
 
-
-
     } else if (subject %in% 'ind') {
       par(mar = c(4,4,4,1))
       if ('hist' %in% pt){
@@ -195,7 +191,7 @@ plotPotential <-   function(matPot,
           title(xlab = potential)
         }
         if (showDensity){
-          lines(density(poti[[subject]][,potential]))
+          lines(density(poti[[subject]][,potential], na.rm = T))
         }
       }
     }
