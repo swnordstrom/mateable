@@ -1,5 +1,6 @@
 mateable 0.3.0 is now available on CRAN.
 
+
 With this release you can organize mating scene data
 (makeScene and simulateScene), visualize mating scenes
 (plotScene, plot3DScene, and plotPotential), do some
