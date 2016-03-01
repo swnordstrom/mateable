@@ -30,9 +30,9 @@
 plotScene <- function(scene, dimension = "auto",
                        opening = NULL, closing = NULL,
                        dailyPoints = TRUE, drawQuartiles = TRUE,
-                       sub= NULL, N = 9, xcoord = 'xlab', ycoord = 'ylab', pch = 19,
+                       sub= NULL, N = 9, xcoord, ycoord, pch = 19,
                        quartileWt = 2,
-                       quartileColor = 'gray81',
+                       quartileColor = 'gray55',
                        peakColor = 'gray27', ...){
 
   dimension <- match.arg(dimension, c("auto", "t", "s", "mt"),several.ok = TRUE)
@@ -292,7 +292,6 @@ plotScene <- function(scene, dimension = "auto",
         if (max(fl.density))
           abline(v = as.numeric(names(fl.density[fl.density == max(fl.density)])), col = peakColor, cex = quartileWt*1.5, ...)
       }
-
     }
 
     if (spat){     # spatial (map)
