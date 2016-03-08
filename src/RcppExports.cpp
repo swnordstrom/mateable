@@ -40,6 +40,18 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// row_kth
+NumericVector row_kth(NumericMatrix toSort, int k);
+RcppExport SEXP mateable_row_kth(SEXP toSortSEXP, SEXP kSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type toSort(toSortSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    __result = Rcpp::wrap(row_kth(toSort, k));
+    return __result;
+END_RCPP
+}
 // kemp_ind
 NumericVector kemp_ind(IntegerVector byDay, IntegerVector starts, IntegerVector ends, IntegerVector durs, bool compSelf);
 RcppExport SEXP mateable_kemp_ind(SEXP byDaySEXP, SEXP startsSEXP, SEXP endsSEXP, SEXP dursSEXP, SEXP compSelfSEXP) {
