@@ -193,8 +193,10 @@ receptivityByDay <- function(scene) {
 ##' - see Value for more details.
 ##' @param averageType character. Identifies whether to take the mean or median
 ##' when calculating averages
-##' @param syncNN integer. The kth nearest neighbor to be averaged when
-##' calculating population synchrony
+##' @param syncNN integer between 1 and n-1 (inclusive) or numeric between 0 and 1
+##' (exclusive). The kth nearest neighbor to be averaged when
+##' calculating population synchrony. If k is in (0,1) then the k*nth nearest neighbor
+##' will be found
 ##' @param compareToSelf logical. Whether or not to include self comparisons
 ##' when calculation synchrony. Defaults to FALSE.
 ##' @return A potentials object containing one more more of the following, depending the
@@ -250,7 +252,7 @@ synchrony <- function(scene, method, subject = "all", averageType = "mean",
   }
 
   if (method == "augspurger") {
-    if (subject %in% c("pop", "all")) {
+    if (subject %in% c("pair", "all")) {
       syncMatrix <- overlap(scene, "overlap", compareToSelf = T)
       pairSync <- syncMatrix/scene$duration
     }
@@ -297,7 +299,7 @@ synchrony <- function(scene, method, subject = "all", averageType = "mean",
     popSync <- average(indSync[,2])
 
   } else if (method == "overlap") {
-    if (subject %in% c("pop", "all")) {
+    if (subject %in% c("pair", "all")) {
       syncMatrix <- overlap(scene, "overlap", compareToSelf = T)
       eitherMatrix <- overlap(scene, "total", compareToSelf = T)
       pairSync <- syncMatrix/eitherMatrix
@@ -317,11 +319,19 @@ synchrony <- function(scene, method, subject = "all", averageType = "mean",
     popSync <- average(indSync[,2])
 
   } else if (method == "sync_nn") {
-    if (syncNN >= n) {
-      stop("syncNN must be less than n")
+    if (syncNN > 0 & syncNN < 1) {
+      syncNN <- ceiling(syncNN * n)
+    } else if (syncNN >= n) {
+      stop("syncNN must be an integer between 1 and n-1 or a numeric in (0,1)")
+    } else if (syncNN <= 0) {
+      stop("syncNN must be an integer between 1 and n-1 or a numeric in (0,1)")
+    } else {
+      if (round(syncNN) != syncNN) {
+        stop("syncNN must be an integer between 1 and n-1 or a numeric in (0,1)")
+      }
     }
 
-    if (subject %in% c("pop", "all")) {
+    if (subject %in% c("pair", "all")) {
       syncMatrix <- overlap(scene, "overlap", compareToSelf = T)
       eitherMatrix <- overlap(scene, "total", compareToSelf = T)
       pairSyncInit <- syncMatrix/eitherMatrix
@@ -333,16 +343,11 @@ synchrony <- function(scene, method, subject = "all", averageType = "mean",
 
     syncMatrix2 <- overlap(scene, "overlap", compareToSelf)
     eitherMatrix2 <- overlap(scene, "total", compareToSelf)
-    pairSyncInit2 <- syncMatrix2/eitherMatrix2
+    pairSync2 <- syncMatrix2/eitherMatrix2
 
     m <- ifelse(compareToSelf, n, n-1)
-    pairSync2 <- matrix(nrow = n, ncol = m)
-    for (i in 1:n) {
-      pairSync2[i,] <- sort(pairSyncInit2[i,], decreasing = T)
-    }
-
     indSync <- data.frame(id = scene$id, synchrony = -1)
-    indSync$synchrony <- pairSync2[,syncNN]
+    indSync$synchrony <- row_kth(pairSync2, (m-syncNN)-1)
 
     popSync <- average(indSync[,2])
 

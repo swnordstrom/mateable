@@ -13,6 +13,10 @@ row_medians <- function(toSort) {
     .Call('mateable_row_medians', PACKAGE = 'mateable', toSort)
 }
 
+row_kth <- function(toSort, k) {
+    .Call('mateable_row_kth', PACKAGE = 'mateable', toSort, k)
+}
+
 kemp_ind <- function(byDay, starts, ends, durs, compSelf = FALSE) {
     .Call('mateable_kemp_ind', PACKAGE = 'mateable', byDay, starts, ends, durs, compSelf)
 }
