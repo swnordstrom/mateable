@@ -41,7 +41,7 @@ plotPotential <-   function(matPot,
     matPot <- list(matPot)
   }
 
-  if (!is.null(subject)){
+  if (is.null(subject)){
     if (!'pair' %in% names(matPot[[1]])){
       subject <- 'ind'
     } else {
