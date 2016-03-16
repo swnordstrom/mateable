@@ -239,141 +239,146 @@ synchrony <- function(scene, method, subject = "all", averageType = "mean",
                        several.ok = T)
   averageType <- match.arg(averageType, c("mean", "median"))
 
-  # some things that all methods need
-  n <- nrow(scene) # population size
-  if (averageType == "mean") {
-    average <- mean
-  } else if (averageType == "median") {
-    average <- median
-  }
-  # deal with pop size and transposing matrices
-  if (n < 2) {
-    stop("Can't calculate synchrony for population size less than 2")
-  }
+  if (is.list(scene) & !is.data.frame(scene)) {
+    potential <- lapply(scene, synchrony, method, subject, averageType, syncNN, compareToSelf)
+  } else {
 
-  if (method == "augspurger") {
-    if (subject %in% c("pair", "all")) {
-      syncMatrix <- overlap(scene, "overlap", compareToSelf = T)
-      pairSync <- syncMatrix/scene$duration
-    }
-
-    syncMatrix2 <- overlap(scene, "overlap", compareToSelf)
-    pairSync2 <- syncMatrix2/scene$duration
-
-    indSync <- data.frame(id = scene$id, synchrony = -1)
+    # some things that all methods need
+    n <- nrow(scene) # population size
     if (averageType == "mean") {
-      indSync$synchrony <- rowMeans(pairSync2)
+      average <- mean
     } else if (averageType == "median") {
-      indSync$synchrony <- row_medians(pairSync2)
+      average <- median
+    }
+    # deal with pop size and transposing matrices
+    if (n < 2) {
+      stop("Can't calculate synchrony for population size less than 2")
     }
 
-    popSync <- average(indSync[,2])
+    if (method == "augspurger") {
+      if (subject %in% c("pair", "all")) {
+        syncMatrix <- overlap(scene, "overlap", compareToSelf = T)
+        pairSync <- syncMatrix/scene$duration
+      }
 
-  } else if (method == "kempenaers") {
-    indDaily <- receptivityByDay(scene)
+      syncMatrix2 <- overlap(scene, "overlap", compareToSelf)
+      pairSync2 <- syncMatrix2/scene$duration
 
-    pairSync <- NULL
+      indSync <- data.frame(id = scene$id, synchrony = -1)
+      if (averageType == "mean") {
+        indSync$synchrony <- rowMeans(pairSync2)
+      } else if (averageType == "median") {
+        indSync$synchrony <- row_medians(pairSync2)
+      }
 
-    indCols <- colSums(indDaily)
-    indSync <- data.frame(id = scene$id, synchrony = -1)
-    indSync$synchrony <- kemp_ind(indCols, scene$start, scene$end, scene$duration,
-                                  compareToSelf)
-    #     indSync$synchrony <- sapply(1:n, FUN = function(i) {
-    #       inds <- as.character(scene[i, "start"]:scene[i, "end"])
-    #       sum(indDaily[,inds]) - scene[i,"duration"]
-    #     })/(scene[,"duration"]*(n-1))
+      popSync <- average(indSync[,2])
 
-    popSync <- average(indSync[,2])
+    } else if (method == "kempenaers") {
+      indDaily <- receptivityByDay(scene)
 
-  } else if (method == 'sync_prop') {
-    days <- min(scene$start):max(scene$end)
-    fl <- receptivityByDay(scene)
-    n <- sum(fl)
+      pairSync <- NULL
 
-    prop <- apply(fl, 2, function(x){sum(x)/n})
-    indPropDaily<- t(apply(fl,1,function(x){x*prop}))
-    totalIndProp <- rowSums(indPropDaily)
+      indCols <- colSums(indDaily)
+      indSync <- data.frame(id = scene$id, synchrony = -1)
+      indSync$synchrony <- kemp_ind(indCols, scene$start, scene$end, scene$duration,
+                                    compareToSelf)
+      #     indSync$synchrony <- sapply(1:n, FUN = function(i) {
+      #       inds <- as.character(scene[i, "start"]:scene[i, "end"])
+      #       sum(indDaily[,inds]) - scene[i,"duration"]
+      #     })/(scene[,"duration"]*(n-1))
 
-    pairSync <- NULL
-    indSync <- data.frame(id = scene$id, synchrony = totalIndProp)
-    popSync <- average(indSync[,2])
+      popSync <- average(indSync[,2])
 
-  } else if (method == "overlap") {
-    if (subject %in% c("pair", "all")) {
-      syncMatrix <- overlap(scene, "overlap", compareToSelf = T)
-      eitherMatrix <- overlap(scene, "total", compareToSelf = T)
-      pairSync <- syncMatrix/eitherMatrix
-    }
+    } else if (method == 'sync_prop') {
+      days <- min(scene$start):max(scene$end)
+      fl <- receptivityByDay(scene)
+      n <- sum(fl)
 
-    syncMatrix2 <- overlap(scene, "overlap", compareToSelf)
-    eitherMatrix2 <- overlap(scene, "total", compareToSelf)
-    pairSync2 <- syncMatrix2/eitherMatrix2
+      prop <- apply(fl, 2, function(x){sum(x)/n})
+      indPropDaily<- t(apply(fl,1,function(x){x*prop}))
+      totalIndProp <- rowSums(indPropDaily)
 
-    indSync <- data.frame(id = scene$id, synchrony = -1)
-    if (averageType == "mean") {
-      indSync$synchrony <- rowMeans(pairSync2)
-    } else if (averageType == "median") {
-      indSync$synchrony <- row_medians(pairSync2)
-    }
+      pairSync <- NULL
+      indSync <- data.frame(id = scene$id, synchrony = totalIndProp)
+      popSync <- average(indSync[,2])
 
-    popSync <- average(indSync[,2])
+    } else if (method == "overlap") {
+      if (subject %in% c("pair", "all")) {
+        syncMatrix <- overlap(scene, "overlap", compareToSelf = T)
+        eitherMatrix <- overlap(scene, "total", compareToSelf = T)
+        pairSync <- syncMatrix/eitherMatrix
+      }
 
-  } else if (method == "sync_nn") {
-    if (syncNN > 0 & syncNN < 1) {
-      syncNN <- ceiling(syncNN * n)
-    } else if (syncNN >= n) {
-      stop("syncNN must be an integer between 1 and n-1 or a numeric in (0,1)")
-    } else if (syncNN <= 0) {
-      stop("syncNN must be an integer between 1 and n-1 or a numeric in (0,1)")
-    } else {
-      if (round(syncNN) != syncNN) {
+      syncMatrix2 <- overlap(scene, "overlap", compareToSelf)
+      eitherMatrix2 <- overlap(scene, "total", compareToSelf)
+      pairSync2 <- syncMatrix2/eitherMatrix2
+
+      indSync <- data.frame(id = scene$id, synchrony = -1)
+      if (averageType == "mean") {
+        indSync$synchrony <- rowMeans(pairSync2)
+      } else if (averageType == "median") {
+        indSync$synchrony <- row_medians(pairSync2)
+      }
+
+      popSync <- average(indSync[,2])
+
+    } else if (method == "sync_nn") {
+      if (syncNN > 0 & syncNN < 1) {
+        syncNN <- ceiling(syncNN * n)
+      } else if (syncNN >= n) {
         stop("syncNN must be an integer between 1 and n-1 or a numeric in (0,1)")
+      } else if (syncNN <= 0) {
+        stop("syncNN must be an integer between 1 and n-1 or a numeric in (0,1)")
+      } else {
+        if (round(syncNN) != syncNN) {
+          stop("syncNN must be an integer between 1 and n-1 or a numeric in (0,1)")
+        }
       }
+
+      if (subject %in% c("pair", "all")) {
+        syncMatrix <- overlap(scene, "overlap", compareToSelf = T)
+        eitherMatrix <- overlap(scene, "total", compareToSelf = T)
+        pairSyncInit <- syncMatrix/eitherMatrix
+        pairSync <- matrix(nrow = n, ncol = n)
+        for (i in 1:n) {
+          pairSync[i,] <- sort(pairSyncInit[i,], decreasing = T)
+        }
+      }
+
+      syncMatrix2 <- overlap(scene, "overlap", compareToSelf)
+      eitherMatrix2 <- overlap(scene, "total", compareToSelf)
+      pairSync2 <- syncMatrix2/eitherMatrix2
+
+      m <- ifelse(compareToSelf, n, n-1)
+      indSync <- data.frame(id = scene$id, synchrony = -1)
+      indSync$synchrony <- row_kth(pairSync2, (m-syncNN)-1)
+
+      popSync <- average(indSync[,2])
+
     }
 
-    if (subject %in% c("pair", "all")) {
-      syncMatrix <- overlap(scene, "overlap", compareToSelf = T)
-      eitherMatrix <- overlap(scene, "total", compareToSelf = T)
-      pairSyncInit <- syncMatrix/eitherMatrix
-      pairSync <- matrix(nrow = n, ncol = n)
-      for (i in 1:n) {
-        pairSync[i,] <- sort(pairSyncInit[i,], decreasing = T)
-      }
+
+    # return
+    potential <- list()
+    if ("population" %in% subject) {
+      potential$pop <- popSync
     }
-
-    syncMatrix2 <- overlap(scene, "overlap", compareToSelf)
-    eitherMatrix2 <- overlap(scene, "total", compareToSelf)
-    pairSync2 <- syncMatrix2/eitherMatrix2
-
-    m <- ifelse(compareToSelf, n, n-1)
-    indSync <- data.frame(id = scene$id, synchrony = -1)
-    indSync$synchrony <- row_kth(pairSync2, (m-syncNN)-1)
-
-    popSync <- average(indSync[,2])
-
+    if ("individual" %in% subject) {
+      potential$ind <- indSync
+    }
+    if ("pairwise" %in% subject) {
+      potential$pair <- pairSync
+    }
+    if ("all" %in% subject) {
+      potential$pop <- popSync
+      potential$ind <- indSync
+      potential$pair <- pairSync
+    }
+    attr(potential, "t") <- TRUE
+    attr(potential, "s") <- FALSE
+    attr(potential, "c") <- FALSE
+    potential
   }
-
-
-  # return
-  potential <- list()
-  if ("population" %in% subject) {
-    potential$pop <- popSync
-  }
-  if ("individual" %in% subject) {
-    potential$ind <- indSync
-  }
-  if ("pairwise" %in% subject) {
-    potential$pair <- pairSync
-  }
-  if ("all" %in% subject) {
-    potential$pop <- popSync
-    potential$ind <- indSync
-    potential$pair <- pairSync
-  }
-  attr(potential, "t") <- TRUE
-  attr(potential, "s") <- FALSE
-  attr(potential, "c") <- FALSE
-  potential
 }
 
 
