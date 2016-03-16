@@ -68,6 +68,7 @@ compatibility <- function(scene, method, subject = "all",
     }
     if ("pairwise" %in% subject) {
       potential$pair <- pairCompat
+      attr(potential$pair, "idOrder") <- scene$id
     }
     if ("all" %in% subject) {
       potential$pop <- popCompat
