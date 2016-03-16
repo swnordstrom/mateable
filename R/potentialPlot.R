@@ -59,7 +59,7 @@ plotPotential <-   function(matPot,
 
   if(!'pair' %in% names(matPot[[1]])){
     if('pair' %in% subject){
-      warning('potentials object must have pairwise potential for subject to be pairwise interactions')
+      warning("mating potential object must have pairwise potential for subject to be 'pair'")
       subject <- 'ind'
     }
   }
