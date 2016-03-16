@@ -141,7 +141,7 @@ plotPotential <-   function(matPot,
           title(xlab = potential)
         }
         if (showDensity){
-          lines(density(poti[['pair']]))
+          lines(density(poti[['pair']], na.rm = T))
         }
       }
 
@@ -195,7 +195,7 @@ plotPotential <-   function(matPot,
           title(xlab = potential)
         }
         if (showDensity){
-          lines(density(poti[[subject]][,potential]))
+          lines(density(poti[[subject]][,potential], na.rm = T))
         }
       }
     }
