@@ -152,8 +152,13 @@ plotPotential <-   function(matPot,
           subMat[upper.tri(subMat, diag = TRUE)] <- 0
           im <- poti[['ind']][which(sub.iids %in% iids), potential]
           lab.cex <- 1 + (im - min(im))/(max(im) - min(im))
-          plot_web3(subMat, names = sub.iids, val = FALSE, legend = FALSE, length = 0,
-                    labz.size = lab.cex, ...)
+          if(sum(subMat >= 1) > 4){
+            plot_web3(subMat, names = sub.iids, val = FALSE, minflow = 0, maxarrow = 3, minarrow = 1, legend = FALSE, length = 0,
+                      labz.size = lab.cex, ...)
+          } else {
+            plot_web3(subMat, names = sub.iids, val = FALSE, minflow = 0, legend = FALSE, length = 0,
+                      labz.size = lab.cex, ...)
+          }
         }
         if (! 'hist' %in% pt){
           mtext(names(matPot)[i],side = 2,adj = 0.5, cex = 0.75, las = 1, font = 2)
