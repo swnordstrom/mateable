@@ -23,7 +23,7 @@
 ##'
 ##'
 plotPotential <-   function(matPot,
-                            subject = c('pair','ind'),
+                            subject = NULL,
                             plotType = 'auto',
                             showDensity = T,
                             sub.ids = NULL, N = 9, sample = "random",
@@ -78,7 +78,7 @@ plotPotential <-   function(matPot,
 
   if (subject %in% 'ind'){
     par(mfrow = c(nr,1))
-    par(oma = c(0,0,0,0))
+    par(oma = c(1,1,2,0))
   } else {
     par(mfrow = c(nr,nc))
     par(mar = c(4,0.5,0.5,2.5))
@@ -178,16 +178,17 @@ plotPotential <-   function(matPot,
       }
 
     } else if (subject %in% 'ind') {
-      par(mar = c(4,4,4,1))
+      par(mar = c(4,4,0,1))
       if ('hist' %in% pt){
         hist(poti[[subject]][,potential], prob = TRUE, breaks = 15, main = NULL, axes = F, xlab = NULL,xlim = c(hmin,hmax), ylab = NULL)
-        title(ylab = 'density', outer = T, line = -1.5)
+        title(ylab = 'density')
         axis(1)
         axis(2)
-        mtext(names(matPot)[i],side = 2,adj = 0.5, cex = 0.75, line = 5, font = 2)
-        mtext(main, side = 3, line = 4, cex = 1.5)
+        if (nr > 1){
+          mtext(names(matPot)[i],side = 2,adj = 0.5, cex = 0.75, line = 5, font = 2)
+        }
         if (i == nr){
-          par(mar = c(4,3,1,1))
+          # par(mar = c(4,3,1,1))
           title(xlab = potential)
         }
         if (showDensity){
@@ -197,7 +198,7 @@ plotPotential <-   function(matPot,
     }
   }
 
-  title(main = main, outer = T)
+  mtext(main, side = 3, line = 0, cex = 1.5)
   par(mar = nm, mfrow = nmfrow, oma = noma)
 }
 
