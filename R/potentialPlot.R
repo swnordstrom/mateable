@@ -198,7 +198,7 @@ plotPotential <-   function(matPot,
     }
   }
 
-  mtext(main, side = 3, line = 0, cex = 1.5)
+  mtext(main, side = 3, line = 0, cex = 1.5, outer = TRUE)
   par(mar = nm, mfrow = nmfrow, oma = noma)
 }
 
