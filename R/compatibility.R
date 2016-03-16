@@ -49,6 +49,7 @@ compatibility <- function(scene, method, subject = "all",
 
     if (method == "si_echinacea") {
       pairCompat <- pair_si_ech(scene$s1, scene$s2)
+      attr(pairCompat, "idOrder") <- scene$id
 
       indCompat <- data.frame(id = scene$id, compatibility = -1)
       indCompat$compatibility <- apply(pairCompat, 1, average, na.rm = T)
@@ -68,12 +69,12 @@ compatibility <- function(scene, method, subject = "all",
     }
     if ("pairwise" %in% subject) {
       potential$pair <- pairCompat
-      attr(potential$pair, "idOrder") <- scene$id
     }
     if ("all" %in% subject) {
       potential$pop <- popCompat
       potential$ind <- indCompat
       potential$pair <- pairCompat
+
     }
     attr(potential, "t") <- FALSE
     attr(potential, "s") <- FALSE
