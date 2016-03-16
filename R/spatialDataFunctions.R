@@ -70,63 +70,67 @@ proximity <- function(scene, method, proximityFun = NULL, averageType = "mean",
   method <- match.arg(method, c("maxProp", "maxPropSqrd"))
   subject <- match.arg(subject, c("all", "pair", "population", "individual"),
                        several.ok = TRUE)
-  n <- nrow(scene)
-  distMatrix <- pairDist(scene)
-  maxDist <- max(distMatrix)
-  if (averageType == "mean") {
-    average <- mean
-  } else if (averageType == "median") {
-    average <- median
-  }
-  # deal with pop size
-  if (n < 2) {
-    stop("Can't calculate proximity for population size less than 2")
-  }
-
-  if (method == "maxProp") {
-    if (subject %in% c("all", "pair")) {
-      pairProx <- 1 - distMatrix/maxDist
+  if (is.list(scene) & !is.data.frame(scene)) {
+    potential <- lapply(scene, proximity, method, proximityFun, averageType, subject)
+  } else {
+    n <- nrow(scene)
+    distMatrix <- pairDist(scene)
+    maxDist <- max(distMatrix)
+    if (averageType == "mean") {
+      average <- mean
+    } else if (averageType == "median") {
+      average <- median
+    }
+    # deal with pop size
+    if (n < 2) {
+      stop("Can't calculate proximity for population size less than 2")
     }
 
-    distNoDiag <- matrix(distMatrix[-seq(1, n^2, n+1)], nrow = n, byrow = T)
-    pairProx2 <- 1 - distNoDiag/maxDist
+    if (method == "maxProp") {
+      if (subject %in% c("all", "pair")) {
+        pairProx <- 1 - distMatrix/maxDist
+      }
 
-    indProx <- data.frame(id = scene$id, proximity = -1)
-    indProx$proximity <- apply(pairProx2, 1, average)
+      distNoDiag <- matrix(distMatrix[-seq(1, n^2, n+1)], nrow = n, byrow = T)
+      pairProx2 <- 1 - distNoDiag/maxDist
 
-    popProx <- average(indProx[,2])
-  } else if (method == "maxPropSqrd") {
-    if (subject %in% c("all", "pair")) {
-      pairProx <- (1 - distMatrix/maxDist)^2
+      indProx <- data.frame(id = scene$id, proximity = -1)
+      indProx$proximity <- apply(pairProx2, 1, average)
+
+      popProx <- average(indProx[,2])
+    } else if (method == "maxPropSqrd") {
+      if (subject %in% c("all", "pair")) {
+        pairProx <- (1 - distMatrix/maxDist)^2
+      }
+
+      distNoDiag <- matrix(distMatrix[-seq(1, n^2, n+1)], nrow = n, byrow = T)
+      pairProx2 <- (1 - distNoDiag/maxDist)^2
+
+      indProx <- data.frame(id = scene$id, proximity = -1)
+      indProx$proximity <- apply(pairProx2, 1, average)
+
+      popProx <- average(indProx[,2])
     }
 
-    distNoDiag <- matrix(distMatrix[-seq(1, n^2, n+1)], nrow = n, byrow = T)
-    pairProx2 <- (1 - distNoDiag/maxDist)^2
-
-    indProx <- data.frame(id = scene$id, proximity = -1)
-    indProx$proximity <- apply(pairProx2, 1, average)
-
-    popProx <- average(indProx[,2])
+    # return
+    potential <- list()
+    if ("population" %in% subject) {
+      potential$pop <- popProx
+    }
+    if ("individual" %in% subject) {
+      potential$ind <- indProx
+    }
+    if ("pair" %in% subject) {
+      potential$pair <- pairProx
+    }
+    if ("all" %in% subject) {
+      potential$pop <- popProx
+      potential$ind <- indProx
+      potential$pair <- pairProx
+    }
+    attr(potential, "t") <- FALSE
+    attr(potential, "s") <- TRUE
+    attr(potential, "c") <- FALSE
+    potential
   }
-
-  # return
-  potential <- list()
-  if ("population" %in% subject) {
-    potential$pop <- popProx
-  }
-  if ("individual" %in% subject) {
-    potential$ind <- indProx
-  }
-  if ("pair" %in% subject) {
-    potential$pair <- pairProx
-  }
-  if ("all" %in% subject) {
-    potential$pop <- popProx
-    potential$ind <- indProx
-    potential$pair <- pairProx
-  }
-  attr(potential, "t") <- FALSE
-  attr(potential, "s") <- TRUE
-  attr(potential, "c") <- FALSE
-  potential
 }
