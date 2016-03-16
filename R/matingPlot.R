@@ -169,8 +169,8 @@ plotScene <- function(scene, dimension = "auto",
         if (drawQuartiles ==TRUE){
           rbd <- receptivityByDay(scene.i)
           fl.density <- colSums(rbd)
-          abline(v = median(scene.i$start), col = quartileColor, cex = quartileWt, lty = 2)
-          abline(v = median(scene.i$end), col = quartileColor, cex = quartileWt, lty = 2)
+          abline(v = median(scene.i$start), col = quartileColor, lwd = quartileWt, lty = 2)
+          abline(v = median(scene.i$end), col = quartileColor, lwd = quartileWt, lty = 2)
           if (max(fl.density))
             abline(v = as.numeric(names(fl.density[fl.density == max(fl.density)])), col = peakColor, cex = quartileWt*1.5, ...)
         }
@@ -273,7 +273,6 @@ plotScene <- function(scene, dimension = "auto",
                                             format = "%b %d"),tick = 0.25)
       segments(scene[, 'start'], scene$index,scene[, 'end'],
                scene$index, col = "gray50", cex = 3, ...)
-
 
       if (!is.null(sub)){
         segments(scene[scene$id %in% sub, 'start'], scene[scene$id %in% sub, 'index'], scene[scene$id %in% sub, 'end'],
