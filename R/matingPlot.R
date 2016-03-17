@@ -193,7 +193,7 @@ plotScene <- function(scene, dimension = "auto",
           ycoord <- 'northing'
         }
         plot.default(scene.i[, 'x'], scene.i[, 'y'], type = "n",
-                     xlim = c(emin,emax), ylim = c(nmin,nmax), ylab = "",xaxt = 'n',...)
+                     xlim = c(emin,emax), ylim = c(nmin,nmax), ylab = "",xaxt = 'n', asp = 1,...)
         mtext(ycoord,side = 2,adj = 0.5, cex = 0.75, line = 2.5)
         if (i == nr){
           axis(1)
