@@ -29,7 +29,6 @@ plot3DScene <- function(scene, dimension = "auto",
   if (!is.list(scene[[1]])){
     scene <- list(scene)
   }
-  # if (is.list(scene) & !is.data.frame(scene)) {
 
   if ("auto" %in% dimension) {
     temp <- attr(scene[[1]], "t")
@@ -58,11 +57,9 @@ plot3DScene <- function(scene, dimension = "auto",
     }
   }
   nr <- length(scene)
-  par(mfrow = c(nr,1))
-  par(oma = c(1,1,4,1))
+  par(mfrow = c(nr,1), oma = c(1,1,4,1))
 
   for (i in 1:length(scene)){
-
     if (nr == 1){
       par(mar = c(3,8,1,1), xpd = T)
     } else {
@@ -72,7 +69,6 @@ plot3DScene <- function(scene, dimension = "auto",
         par(mar = c(0,8,0,1), xpd = T)
       }
     }
-
     if (spat){
       emin <- min(scene[[1]]['x'])
       emax <- max(scene[[1]]['x'])
@@ -179,9 +175,7 @@ plot3DScene <- function(scene, dimension = "auto",
         }
         par(fig = c(0, 1, 0, 1), oma = c(0, 0, 0, 0), mar = c(0, 0, 0, 0), new = TRUE)
         plot(0, 0, type = "n", bty = "n", xaxt = "n", yaxt = "n")
-        legend('topleft', legend = c(format(opening, format = "%b %d"),' ',' ',' ',
-                                     format(attr(scene.i,'origin')+round(mean(c(minstart,maxstart))),format = "%b %d"),'',' ',' ',format(attr(scene.i,'origin')+maxstart, format = "%b %d")),
-               fill = colorRampPalette(c('blue','red'))(9),ncol = 1, bty = 'n',xpd = T, y.intersp = 0.68, title = 'start date', inset = c(0.02,0.03), cex = 0.75)
+        legend('topleft', legend = c(format(opening, format = "%b %d"),' ',' ',' ',format(attr(scene.i,'origin')+round(mean(c(minstart,maxstart))),format = "%b %d"),'',' ',' ',format(attr(scene.i,'origin')+maxstart, format = "%b %d")),fill = colorRampPalette(c('blue','red'))(9),ncol = 1, bty = 'n',xpd = T, y.intersp = 0.68, title = 'start date', inset = c(0.02,0.03), cex = 0.75)
       } else {
         if (is.null(pch)) {
           text(scene.i[, 'x'], scene.i[, 'y'], scene.i[, 'id'], col = scene.i$cols, ...)
@@ -233,9 +227,7 @@ plot3DScene <- function(scene, dimension = "auto",
         }
         par(fig = c(0, 1, 0, 1), oma = c(0, 0, 0, 0), mar = c(0, 0, 0, 0), new = TRUE)
         plot(0, 0, type = "n", bty = "n", xaxt = "n", yaxt = "n")
-        legend('topleft', legend = c(format(opening, format = "%b %d"),' ',' ',' ',
-                                     format(attr(scene.i,'origin')+round(mean(c(minstart,maxstart))),format = "%b %d"),'',' ',' ',format(attr(scene.i,'origin')+maxstart, format = "%b %d")),
-               fill = colorRampPalette(c('blue','red'))(9),ncol = 1, bty = 'n',xpd = T, y.intersp = 0.68, title = 'start date', inset = c(0.02,0.03), cex = 0.75)
+        legend('topleft', legend = c(format(opening, format = "%b %d"),' ',' ',' ', format(attr(scene.i,'origin')+round(mean(c(minstart,maxstart))),format = "%b %d"),'',' ',' ',format(attr(scene.i,'origin')+maxstart, format = "%b %d")),fill = colorRampPalette(c('blue','red'))(9),ncol = 1, bty = 'n',xpd = T, y.intersp = 0.68, title = 'start date', inset = c(0.02,0.03), cex = 0.75)
       } else {
         if (is.null(pch)) {
           text(scene.i[, 'x'], scene.i[, 'y'], scene.i[, 'id'], col = scene.i$cols, ...)
@@ -306,8 +298,7 @@ plot3DScene <- function(scene, dimension = "auto",
         }
       }
     } else if (temp & comp){
-      par(xpd = F)
-      par(mar = c(1,4,0.5,1))
+      par(xpd = F, mar = c(1,4,0.5,1))
       scene.i$s1 <- as.numeric(scene.i$s1)
       scene.i$s2 <- as.numeric(scene.i$s2)
 
