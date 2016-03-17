@@ -34,7 +34,8 @@ plotScene <- function(scene, dimension = "auto",
                       sub= NULL, N = 9, xcoord = NULL, ycoord = NULL, pch = 19,
                       quartileWt = 1,
                       quartileColor = 'gray55',
-                      peakColor = 'gray27', ...){
+                      peakColor = 'gray27',
+                      labelID = FALSE, ...){
 
   dimension <- match.arg(dimension, c("auto", "t", "s", "mt"),several.ok = TRUE)
   nm <- par("mar")
@@ -152,13 +153,23 @@ plotScene <- function(scene, dimension = "auto",
       if (temp){     # temporal (flowering schedule)
         scene.i <- scene.i[order(scene.i[, 'start'], scene.i[, 'end']),]
         scene.i$index <- seq_along(scene.i[, 1])
-        plot.default(scene.i[, 'start'], scene.i$index, ylim = c(1,count), xlim = c(opening, closing), type = "n", xlab = 'date', ylab = "",xaxt = 'n', ...)
-        segments(scene.i[, 'start'], scene.i$index, scene.i[, 'end'],scene.i$index, col = "gray50", cex = 3, ...)
+        if (labelID){
+          par(mar = c(0.25,7.25,0.25,1))
+          plot.default(scene.i[, 'start'], scene.i$index, ylim = c(1,count), xlim = c(opening, closing), type = "n", xlab = 'date', ylab = "",xaxt = 'n',yaxt = 'n', ...)
+          segments(scene.i[, 'start'], scene.i$index, scene.i[, 'end'],scene.i$index, col = "gray50", cex = 3, ...)
+          axis(2, labels = scene.i$id, at = scene.i$index, las = 1, cex.axis = 0.75)
+          mtext(attr(scene.i,'originalNames')[1],side = 2,adj = 0.5, cex = 0.75, line = 7.5)
+        } else {
+          plot.default(scene.i[, 'start'], scene.i$index, ylim = c(1,count), xlim = c(opening, closing), type = "n", xlab = 'date', ylab = "",xaxt = 'n',yaxt = 'n', ...)
+          segments(scene.i[, 'start'], scene.i$index, scene.i[, 'end'],scene.i$index, col = "gray50", cex = 3, ...)
+          mtext('count',side = 2,adj = 0.5, cex = 0.75, line = 2.5)
+          axis(2)
+        }
         mtext(names(scene)[i],side = 2,adj = 0.5, cex = 0.75, line = 5, font = 2)
-        mtext('count',side = 2,adj = 0.5, cex = 0.75, line = 2.5)
+
         if (i == nr){
           datLabs <- seq(opening,closing, by = 7)
-          axis(1, at = datLabs, labels = format(as.Date(attr(scene.i, 'origin') + datLabs, origin = as.Date("1970-01-01")),format = "%b %d"), tick=0.25)
+          axis(1, at = datLabs, labels = format(as.Date(attr(scene.i, 'origin') + datLabs, origin = as.Date("1970-01-01")),format = "%b %d"), tick=0.25, cex.axis = 0.75)
           mtext('date',side = 1,adj = 0.5, cex = 0.75, line = 3)
         }
         if (i == 1){
