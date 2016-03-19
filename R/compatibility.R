@@ -43,36 +43,43 @@ compatibility <- function(scene, method, subject = "all",
     average <- median
   }
 
-  if (method == "si_echinacea") {
-    pairCompat <- pair_si_ech(scene$s1, scene$s2)
+  if (is.list(scene) & !is.data.frame(scene)) {
+    potential <- lapply(scene, compatibility, method, subject, averageType)
+  } else {
 
-    indCompat <- data.frame(id = scene$id, compatibility = -1)
-    indCompat$compatibility <- apply(pairCompat, 1, average, na.rm = T)
+    if (method == "si_echinacea") {
+      pairCompat <- pair_si_ech(scene$s1, scene$s2)
+      attr(pairCompat, "idOrder") <- scene$id
 
-    popCompat <- average(indCompat$compatibility)
-  } else if (method == "dioecious") {
+      indCompat <- data.frame(id = scene$id, compatibility = -1)
+      indCompat$compatibility <- apply(pairCompat, 1, average, na.rm = T)
+
+      popCompat <- average(indCompat$compatibility)
+    } else if (method == "dioecious") {
+
+    }
+
+    # return
+    potential <- list()
+    if ("population" %in% subject) {
+      potential$pop <- popCompat
+    }
+    if ("individual" %in% subject) {
+      potential$ind <- indCompat
+    }
+    if ("pairwise" %in% subject) {
+      potential$pair <- pairCompat
+    }
+    if ("all" %in% subject) {
+      potential$pop <- popCompat
+      potential$ind <- indCompat
+      potential$pair <- pairCompat
+
+    }
+    attr(potential, "t") <- FALSE
+    attr(potential, "s") <- FALSE
+    attr(potential, "c") <- TRUE
+    potential
 
   }
-
-  # return
-  potential <- list()
-  if ("population" %in% subject) {
-    potential$pop <- popCompat
-  }
-  if ("individual" %in% subject) {
-    potential$ind <- indCompat
-  }
-  if ("pairwise" %in% subject) {
-    potential$pair <- pairCompat
-  }
-  if ("all" %in% subject) {
-    potential$pop <- popCompat
-    potential$ind <- indCompat
-    potential$pair <- pairCompat
-  }
-  attr(potential, "t") <- FALSE
-  attr(potential, "s") <- FALSE
-  attr(potential, "c") <- TRUE
-  potential
-
 }
