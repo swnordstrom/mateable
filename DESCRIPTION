@@ -8,14 +8,19 @@ Authors@R: c(
     person("Danny", "Hanson", email = "danny.hanson52@gmail.com", role = "aut"),
     person("Amy", "Waananen", email = "amy.waananen@gmail.com", role = "aut"))
 Maintainer: Stuart Wagenius <stuart.wagenius@gmail.com>
+URL: https://github.com/stuartWagenius/mateable
+BugReports: https://github.com/stuartWagenius/mateable/issues
 Description: Provides tools to simulate, manage, visualize, and analyze
     spatially and temporally explicit datasets of mating potential.
     Implements methods to calculate synchrony, proximity, and compatibility.
 License: GPL
 LazyData: true
 Imports:
+    FNN,
+    graphics,
+    grDevices,
     Rcpp,
     sn,
-    FNN
+    stats
 LinkingTo: Rcpp
 RoxygenNote: 5.0.1
