@@ -101,7 +101,7 @@ makeScene <- function (df, multiYear = FALSE, startCol = "start", endCol = "end"
     years <- levels(as.factor(df$year))
     newScene <- list()
     for (i in 1:length(years)) {
-      newScene[[paste("y", years[i], sep = "")]] <-
+      newScene[[as.character(years[i])]] <-
         makeScene(df[df$year %in% years[i],], F, startCol, endCol, xCol, yCol,
                   s1Col, s2Col, idCol, dateFormat)
     }
