@@ -9,12 +9,13 @@
 ##' @param drawQuartiles logical indicating whether vertical lines should be drawn at population peak (see details) or quartiles
 ##' @param sub a vector containing the ids of individuals to be highlighted in the plots or a character string specifying how to choose individuals to highlight. Possible values are "random" or "all". If NULL, no subset will be identified in the plots.
 ##' @param N a positive number, the number of individuals to sample if \code{sub} = 'random'
-##' @param xcoord label for x coordinate of spatial dimension plots. If NULL, defaults to 'easting'.
-##' @param ycoord label for y coordinate of spatial dimension plots. If NULL, defaults to 'northing'.
-##' @param pch specify point type to be used in plots. Defaults to pch = 19 (filled in circle). If NULL points will be labeled by id.
-##' @param quartileWt if drawQuartiles = TRUE, specify weight of quartile and peak lines
-##' @param quartileColor if drawQuartiles = TRUE, specify color of quartile lines, defaults to 'gray81'
-##' @param peakColor if drawQuartiles = TRUE, specify color of peak lines, defaults to 'gray27'
+##' @param xlab.spat character label for x-axis of spatial dimension plots. If NULL, defaults to 'easting'.
+##' @param ylab.spat character label for y-axis of spatial dimension plots. If NULL, defaults to 'northing'.
+##' @param pch specify point type to be used in plots. Defaults to pch = 19 (filled-in circle). If NULL, points will be labeled with their id.
+##' @param cex.quartile if drawQuartiles = TRUE, specifies weight of quartile and peak lines relative to device default.
+##' @param col.quartile if drawQuartiles = TRUE, specifies color of quartile lines, defaults to 'gray81'.
+##' @param col.peak if drawQuartiles = TRUE, specify color of peak lines, defaults to 'gray27'.
+##' @param labelID if TRUE, the y-axis will be labeled with the id of the corresponding segment.
 ##' @param ... standard graphical parameters
 ##' @return nothing
 ##' @return optional arguments for the plot function
@@ -31,10 +32,10 @@
 plotScene <- function(scene, dimension = "auto",
                       opening = NULL, closing = NULL,
                       dailyPoints = TRUE, drawQuartiles = TRUE,
-                      sub= NULL, N = 9, xcoord = NULL, ycoord = NULL, pch = 19,
-                      quartileWt = 1,
-                      quartileColor = 'gray55',
-                      peakColor = 'gray27',
+                      sub= NULL, N = 9, xlab.spat = NULL, ylab.spat = NULL, pch = 19,
+                      cex.quartile = 1,
+                      col.quartile = 'gray55',
+                      col.peak = 'gray27',
                       labelID = FALSE, ...){
 
   dimension <- match.arg(dimension, c("auto", "t", "s", "mt"),several.ok = TRUE)
@@ -150,7 +151,7 @@ plotScene <- function(scene, dimension = "auto",
     for (i in 1:length(scene)){
       scene.i <- scene[[i]]
       par(mar = c(0.25,3.25,0.25,1))
-      if (temp){     # temporal (flowering schedule)
+      if (temp){
         scene.i <- scene.i[order(scene.i[, 'start'], scene.i[, 'end']),]
         scene.i$index <- seq_along(scene.i[, 1])
         if (labelID){
@@ -172,7 +173,7 @@ plotScene <- function(scene, dimension = "auto",
           axis(1, at = datLabs, labels = format(as.Date(attr(scene.i, 'origin') + datLabs, origin = as.Date("1970-01-01")),format = "%b %d"), tick=0.25, cex.axis = 0.75)
           mtext('date',side = 1,adj = 0.5, cex = 0.75, line = 3)
         }
-        if (i == 1){
+        if (i == 1 & nc > 1){
           mtext('temporal',side = 3, adj = 0.5, line = 1.5)
         }
         if (!is.null(sub)){
@@ -186,31 +187,31 @@ plotScene <- function(scene, dimension = "auto",
         if (drawQuartiles ==TRUE){
           rbd <- receptivityByDay(scene.i)
           fl.density <- colSums(rbd)
-          abline(v = median(scene.i$start), col = quartileColor, lwd = quartileWt, lty = 2)
-          abline(v = median(scene.i$end), col = quartileColor, lwd = quartileWt, lty = 2)
+          abline(v = median(scene.i$start), col = col.quartile, lwd = cex.quartile, lty = 2)
+          abline(v = median(scene.i$end), col = col.quartile, lwd = cex.quartile, lty = 2)
           if (length(fl.density[fl.density == max(fl.density)])>1){
             peak <- median(as.numeric(names(fl.density[fl.density == max(fl.density)])))
-            abline(v = peak, col = peakColor, cex = quartileWt, ...)
+            abline(v = peak, col = col.peak, cex = cex.quartile, ...)
           } else {
-            abline(v = as.numeric(names(fl.density[fl.density == max(fl.density)])), col = peakColor, cex = quartileWt, ...)
+            abline(v = as.numeric(names(fl.density[fl.density == max(fl.density)])), col = col.peak, cex = cex.quartile, ...)
           }
         }
       }
-      if (spat){     # spatial (map)
-        if (is.null(xcoord)){
-          xcoord <- 'easting'
+      if (spat){
+        if (is.null(xlab.spat)){
+          xlab.spat <- 'easting'
         }
-        if (is.null(ycoord)){
-          ycoord <- 'northing'
+        if (is.null(ylab.spat)){
+          ylab.spat <- 'northing'
         }
         plot.default(scene.i[, 'x'], scene.i[, 'y'], type = "n",
                      xlim = c(emin,emax), ylim = c(nmin,nmax), ylab = "",xaxt = 'n', asp = 1,...)
-        mtext(ycoord,side = 2,adj = 0.5, cex = 0.75, line = 2.5)
+        mtext(ylab.spat,side = 2,adj = 0.5, cex = 0.75, line = 2.5)
         if (i == nr){
           axis(1)
-          mtext(xcoord,side = 1,adj = 0.5, cex = 0.75, line = 3)
+          mtext(xlab.spat,side = 1,adj = 0.5, cex = 0.75, line = 3)
         }
-        if(i == 1){
+        if(i == 1 & nc > 1){
           mtext('spatial',side = 3, adj = 0.5, line = 1.5)
         }
         if (is.null(pch)) {
@@ -246,7 +247,7 @@ plotScene <- function(scene, dimension = "auto",
           mtext('s1',side = 1,adj = 0.5, cex = 0.75, line = 3)
           axis(1, at = smin:smax, labels = smin:smax)
         }
-        if(i == 1){
+        if(i == 1 & nc > 1){
           mtext('mating type',side = 3, adj = 0.5, line = 1.5)
         }
         if (temp == F & spat == F){
