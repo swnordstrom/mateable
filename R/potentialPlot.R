@@ -5,12 +5,10 @@
 ##' @param matPot a mating potential object
 ##' @param subject a character string indicating whether the subject to be visualized is individuals or all pairwise interactions
 ##' @param plotType a character string indivating the plots to be displayed. Options are histogram ('hist'), network diagram ('net')
-##' @param showDensity logical. If true (default), plots probability density over histogram.
+##' @param density logical. If true (default), plots probability density over histogram.
 ##' @param sub.ids a vector containing the ids of individuals to be represented in pairwise potential plots
-##' @param N a positive number, the number of individuals to sample if sub.ids = 'random'
+##' @param N a positive number indicating the number of individuals to sample if sub.ids = 'random'
 ##' @param sample a character string specifying how to choose a subset of individuals to be represented in pairwise potential plots. Possible values are "random" (default) or "all".
-##' @param lab.cex parameter indicating label size relative to plot
-##' (different than cex.lab)
 ##' @param main the main title (on top of plot)
 ##' @param ... optional arguments for the plot function
 ##' @export
@@ -25,9 +23,9 @@
 plotPotential <-   function(matPot,
                             subject = NULL,
                             plotType = 'auto',
-                            showDensity = T,
+                            density = T,
                             sub.ids = NULL, N = 9, sample = "random",
-                            lab.cex = 0.5, main = NULL, ...){
+                            main = NULL, ...){
 
   nm <- par("mar")
   noma <- par('oma')
@@ -140,7 +138,7 @@ plotPotential <-   function(matPot,
         if (i == nr){
           title(xlab = potential)
         }
-        if (showDensity){
+        if (density){
           lines(density(poti[['pair']], na.rm = T))
         }
       }
@@ -183,7 +181,7 @@ plotPotential <-   function(matPot,
       }
 
     } else if (subject %in% 'ind') {
-      par(mar = c(4,4,0,1))
+      par(mar = c(4,6,0,1))
       if ('hist' %in% pt){
         hist(poti[[subject]][,potential], prob = TRUE, breaks = 15, main = NULL, axes = F, xlab = NULL,xlim = c(hmin,hmax), ylab = NULL)
         title(ylab = 'density')
@@ -196,7 +194,7 @@ plotPotential <-   function(matPot,
           # par(mar = c(4,3,1,1))
           title(xlab = potential)
         }
-        if (showDensity){
+        if (density){
           lines(density(poti[[subject]][,potential], na.rm = T))
         }
       }
