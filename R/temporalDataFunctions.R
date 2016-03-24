@@ -267,7 +267,7 @@ synchrony <- function(scene, method, subject = "all", averageType = "mean",
 
         for (i in 1:length(ids)){
           id <- ids[i]
-          l <- do.call('rbind',lapply(focal.Scene,list2df,id = id))
+          l <- do.call('rbind',lapply(scene,l2df,id = id))
           for (j in 1:nrow(l)){
             dfl <- l[j,'start']:l[j,'end']
             index <- dfl-min(allDays)+1
@@ -309,11 +309,7 @@ synchrony <- function(scene, method, subject = "all", averageType = "mean",
       potential <- lapply(scene, synchrony, method, subject, averageType, syncNN, compareToSelf)
     }
   } else {
-
-    # some things that all methods need
     n <- nrow(scene) # population size
-
-    # deal with pop size and transposing matrices
     if (n < 2) {
       stop("Can't calculate synchrony for population size less than 2")
     }
