@@ -199,6 +199,9 @@ receptivityByDay <- function(scene) {
 ##' will be found
 ##' @param compareToSelf logical. Whether or not to include self comparisons
 ##' when calculation synchrony. Defaults to FALSE.
+##' @param frame the timeframe that synchrony is to be calculated over; options are 'within,'
+##' for synchrony within a season, or 'between,' for synchrony across multiple seasons.
+##' Defaults to 'within'.
 ##' @return A potentials object containing one more more of the following, depending the
 ##' input for \code{subject}: \cr
 ##' If \code{subject} is "population" \code{synchrony} will return a numeric
@@ -230,7 +233,7 @@ receptivityByDay <- function(scene) {
 ##' pop2 <- simulateScene(size = 1234, sdDur = 5, sk = 1)
 ##' syncVals <- synchrony(pop2, "sync_nn", "all", "median", 123)
 synchrony <- function(scene, method, subject = "all", averageType = "mean",
-                      syncNN = 1, compareToSelf = FALSE) {
+                      syncNN = 1, compareToSelf = FALSE, frame = 'within') {
 
   method <- match.arg(method, c("augspurger", "kempenaers", "sync_prop",
                                 "overlap", "sync_nn"))
@@ -239,17 +242,77 @@ synchrony <- function(scene, method, subject = "all", averageType = "mean",
                        several.ok = T)
   averageType <- match.arg(averageType, c("mean", "median"))
 
+  if (averageType == "mean") {
+    average <- mean
+  } else if (averageType == "median") {
+    average <- median
+  }
+
   if (is.list(scene) & !is.data.frame(scene)) {
-    potential <- lapply(scene, synchrony, method, subject, averageType, syncNN, compareToSelf)
+    if(frame == 'between'){
+      if(method =='sync_prop'){
+        minStart <- function(x) min(x$start) + attr(x,'origin')
+        maxEnd <- function(x) max(x$end) + attr(x,'origin')
+
+        allDays <- as.Date(min(unlist(lapply(scene, minStart))), origin = '1970-01-01'):as.Date(max(unlist(lapply(scene, maxEnd))), origin = '1970-01-01')
+        ids <- unique(unlist(lapply(scene,function(x)unique(x$id))))
+        fl <- matrix(nrow = length(ids), ncol = length(allDays),dimnames = list(ids,allDays))
+
+        l2df <- function(x,id){
+          out <- x[x$id == id,]
+          out$start <- out$start+attr(x,'origin')
+          out$end <- out$end + attr(x, 'origin')
+          return(out)
+        }
+
+        for (i in 1:length(ids)){
+          id <- ids[i]
+          l <- do.call('rbind',lapply(focal.Scene,list2df,id = id))
+          for (j in 1:nrow(l)){
+            dfl <- l[j,'start']:l[j,'end']
+            index <- dfl-min(allDays)+1
+            fl[i,index] <- T
+          }
+        }
+
+        n <- sum(fl, na.rm = T) # number of flowering days for all individuals
+        nind <- apply(fl,1, function(x)sum(x, na.rm = T)) # number of flowering days per individual
+        prop <- apply(fl,2,function(x){sum(x, na.rm = T)/n}) # proportion of all flowering that occured each day
+        indPropDaily<- t(apply(fl,1,function(x){x*prop}))
+        totalIndProp <- apply(indPropDaily,1,sum, na.rm = T) # proportion of all flowering that occured on the days an individual was flowering
+        indSync <- data.frame(id = ids, synchrony = totalIndProp, days = nind)
+        pairSync <- NULL
+        popSync <- average(indSync[,2])
+      }
+
+      potential <- list()
+      if ("population" %in% subject) {
+        potential$pop <- popSync
+      }
+      if ("individual" %in% subject) {
+        potential$ind <- indSync
+      }
+      if ("pairwise" %in% subject) {
+        potential$pair <- pairSync
+      }
+      if ("all" %in% subject) {
+        potential$pop <- popSync
+        potential$ind <- indSync
+        potential$pair <- pairSync
+      }
+      attr(potential, "t") <- TRUE
+      attr(potential, "s") <- FALSE
+      attr(potential, "c") <- FALSE
+      potential
+
+    } else {
+      potential <- lapply(scene, synchrony, method, subject, averageType, syncNN, compareToSelf)
+    }
   } else {
 
     # some things that all methods need
     n <- nrow(scene) # population size
-    if (averageType == "mean") {
-      average <- mean
-    } else if (averageType == "median") {
-      average <- median
-    }
+
     # deal with pop size and transposing matrices
     if (n < 2) {
       stop("Can't calculate synchrony for population size less than 2")
