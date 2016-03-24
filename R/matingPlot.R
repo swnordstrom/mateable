@@ -145,7 +145,7 @@ plotScene <- function(scene, dimension = "auto",
     }
 
     if ('random' %in% sub){
-      sub <- sample(scene[[1]][['id']],9)
+      sub <- sample(scene[[1]][['id']],N)
     }
 
     for (i in 1:length(scene)){
