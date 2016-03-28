@@ -3,14 +3,16 @@
 ##'
 ##' @title graphical visualization of a mating potential object
 ##' @param matPot a mating potential object
-##' @param subject a character string indicating whether the subject to be visualized is individuals or all pairwise interactions
-##' @param plotType a character string indivating the plots to be displayed. Options are histogram ('hist'), network diagram ('net')
+##' @param subject character, either 'ind' or 'pair', indicating whether the subject being visualized is individuals or pairwise interactions
+##' @param plotType character,  indicating what plots are to be displayed. See details. Options are histogram ('hist'), network diagram ('net'), and heatmap ('heat'). If mating potential object
 ##' @param density logical. If true (default), plots probability density over histogram.
 ##' @param sub.ids a vector containing the ids of individuals to be represented in pairwise potential plots
 ##' @param N a positive number indicating the number of individuals to sample if sub.ids = 'random'
-##' @param sample a character string specifying how to choose a subset of individuals to be represented in pairwise potential plots. Possible values are "random" (default) or "all".
+##' @param sample a character string specifying how to choose a subset of individuals to be represented in pairwise potential plots. Possible values are "random" (default) or "all" (see details).
 ##' @param main the main title (on top of plot)
 ##' @param ... optional arguments for the plot function
+##' @details Options for \code{plotType} are 'hist' (histogram), 'net' (network diagram), 'heat' (heatmap), and 'auto'. Default value is 'auto': if the mating potential object contains pairwise potential, 'auto' returns all plot types, otherwise it returns histograms of individual potential.
+##' @details The individuals to be represented in the pairwise potential plots can either be specified explicitly through \code{sub.ids}, chosen randomly (\code{sample} = 'random'), or all individuals can be selected (\code{sample} = 'all'). The default is to randonly select 9 individuals. If multiple years are being plotted, the subset is sampled from all years and the same individuals will be represented in each year, if possible. If fewer than three individuals from the subset are available in a year, no network diagram or heatmap will be returned for that year.
 ##' @export
 ##' @author Amy Waananen
 ##' @seealso see generic function \code{\link{points}} for values of \code{pch}
@@ -83,15 +85,14 @@ plotPotential <-   function(matPot,
     par(oma = c(4,4,4,1.5))
   }
 
-  ids <- matPot[[1]][['ind']][['id']]
-
   if (is.null(sub.ids)){
-    if (sample %in% 'all'){
-      sub.ids <- ids
-    } else {
-      sub.ids <- sample(ids, N)
+    if(sample == 'random'){
+      sub <- sample(unique(unlist(sapply(matPot, function(x)x$ind$id), use.names = F)),N)
+    } else if(sample == 'all'){
+      sub <-unique(unlist(sapply(matPot, function(x)x$ind$id), use.names = F))
     }
   }
+
 
   if ('ind' %in% subject){
     hmax <- max(hist(matPot[[1]][[subject]][,potential], breaks = 15, plot = F)$breaks)
