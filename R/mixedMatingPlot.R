@@ -3,7 +3,8 @@
 ##' @title multi-dimensional visualization of mating scene object
 ##' @param scene a matingScene object
 ##' @param dimension what dimension(s) of the mating scene should be visualized. Possible dimensions are 't' for temporal, 's' for spatial, 'mt' for mating type, and 'auto' (the default). For dimension = 'auto', all dimensions represented in the mating scene object will be plotted.
-##' @param sub a subset of the population to plot
+##' @param sub a subset of the population to plot; either a character indicating whether to subset a random sample (\code{sub}='random'), all individuals (\code{sub}='all'), or a vector containing the IDs of the individuals to subset.
+##' @param N if \code{sub} = 'random', the number of individuals to sample
 ##' @param xcoord x-axis coordinate system label
 ##' @param ycoord y-axis coordinate system label
 ##' @param pch point type, defaults to pch = 19, solid filled in circle. If pch = NULL, individuals will be labeled by their id.
@@ -51,11 +52,12 @@ plot3DScene <- function(scene, dimension = "auto",
 
   if (!is.null(sub)){
     if(sub == 'random'){
-      sub <- sample(unique(unlist(sapply(scene,function(x)x[,'id'], simplify = TRUE), use.names = F)),9)
+      sub <- sample(unique(unlist(sapply(scene,function(x)x[,'id'], simplify = TRUE), use.names = F)),N)
     } else if(sub == 'all'){
       sub <-unique(unlist(sapply(scene,function(x)x[,'id'], simplify = TRUE), use.names = F))
     }
   }
+
   nr <- length(scene)
   par(mfrow = c(nr,1), oma = c(1,1,4,1))
 
