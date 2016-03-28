@@ -78,7 +78,11 @@ plotPotential <-   function(matPot,
 
   if (subject %in% 'ind'){
     par(mfrow = c(nr,1))
-    par(oma = c(1,1,2,0))
+    if (nr > 1){
+      par(oma = c(1,1,2,1))
+    } else {
+      par(oma = c(1,0,2,1))
+    }
   } else {
     par(mfrow = c(nr,nc))
     par(mar = c(4,0.5,0.5,2.5))
@@ -87,9 +91,9 @@ plotPotential <-   function(matPot,
 
   if (is.null(sub.ids)){
     if(sample == 'random'){
-      sub <- sample(unique(unlist(sapply(matPot, function(x)x$ind$id), use.names = F)),N)
+      sub.ids <- sample(unique(unlist(sapply(matPot, function(x)x$ind$id))),N)
     } else if(sample == 'all'){
-      sub <-unique(unlist(sapply(matPot, function(x)x$ind$id), use.names = F))
+      sub.ids <-unique(unlist(sapply(matPot, function(x)x$ind$id), use.names = F))
     }
   }
 
