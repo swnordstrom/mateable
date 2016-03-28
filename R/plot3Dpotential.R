@@ -1,7 +1,7 @@
 ##' Visualize multiple dimensions of mating potential
 ##'
 ##' @title graphical visualization of multiple mating potential objects
-##' @param matPots list, contains one or multiple mating potential objects with unique potential types
+##' @param matPots list, contains one or multiple mating potential objects representing unique potential dimensions
 ##' @param subject character, indicates whether the subject to be visualized is individuals (\code{subject} = 'ind') or all pairwise interactions (\code{subject} = 'pair')
 ##' @param density logical, if TRUE (default), plots probability density over histogram
 ##' @param sub.ids vector, contains the IDs of individuals to be represented in pairwise potential plots
@@ -17,7 +17,7 @@
 ##' pop <- simulateScene()
 ##' sync <- synchrony(pop, "augs")
 ##' prox <- proximity(pop, 'maxDist')
-##' plot3DPotential(c(sync,prox))
+##' plot3DPotential(list(sync,prox))
 ##'
 ##'
 ##'
@@ -31,7 +31,9 @@ plot3DPotential <-   function(matPots,
   noma <- par('oma')
   nmfrow <- par('mfrow')
 
-  if(!sample %in% c("random", "all")) {warning("sample must be 'random' or 'all'")}
+  if(!sample %in% c("random", "all")) {stop("sample must be 'random' or 'all'")}
+
+  if(length(unique(sapply(v1, length))) != 1) {stop('mating potential objects are different lengths')}
 
   if (is.null(subject)){
     if (!'pair' %in% names(matPots[[1]])){
@@ -41,35 +43,28 @@ plot3DPotential <-   function(matPots,
     }
   }
 
-  len <- ifelse(is.list(matPots[[1]][1]),length(matPots[1]), 1)
-
   synchrony <- F
   proximity <- F
   compatibility <- F
 
-  # if (!is.list(matPots[[1]][1])){matPots <- lapply(matPots, FUN = list)}
-
   for (i in 1:length(matPots)){
-    matPot <- matPots[[i]]
-    print(str(matPot))
+    matPot <- matPots[i]
 
     if (is.null(sub.ids)){
       if(sample == 'random'){
-        sub.ids <- sample(unique(unlist(sapply(list(matPot), function(x)x$ind$id), use.names = F)),N)
+        sub.ids <- sample(unique(unlist(sapply(matPot, function(x)x$ind$id), use.names = F)),N)
       } else if(sample == 'all'){
-        sub.ids <-unique(unlist(sapply(list(matPot), function(x)x$ind$id), use.names = F))
+        sub.ids <-unique(unlist(sapply(matPot, function(x)x$ind$id), use.names = F))
       }
     }
 
-    if (length(matPot) != len){warning('matPot objects are not the same length')}
-
-    if(attr(matPot,'t')){
+    if(attr(matPot[[1]],'t')){
       synchrony <- T
       sync <- matPot
-    } else if(attr(matPot,'s')){
+    } else if(attr(matPot[[1]],'s')){
       proximity <- T
       prox <- matPot
-    } else if(attr(matPot,'c')){
+    } else if(attr(matPot[[1]],'c')){
       compatibility <- T
       compat <- matPot
     }
@@ -85,6 +80,7 @@ plot3DPotential <-   function(matPots,
   if(is.null(main) & subject %in% 'ind') main <- paste('individual potential')
   if(is.null(main) & subject %in% 'pair') main <- paste('pairwise potential')
 
+  len <- unique(sapply(matPots, length))
   par(mfrow = c(len,1))
 
   if (subject %in% 'ind'){
@@ -96,25 +92,39 @@ plot3DPotential <-   function(matPots,
 
   if (synchrony & proximity){
     if(subject %in% 'ind'){
-      spi <- mapply(function(x1,x2) merge(x1$ind, x2$ind), list(synchrony), list(proximity), SIMPLIFY = F)
-      print(synchrony)
-      print(head(proximity$ind))
-      print(spi)
-    } else if(subject %in% 'pair'){
-      # spp <-  TODO: make array of pairwise matrices
+      ind <- mapply(function(x1,x2) merge(x1$ind, x2$ind), sync, prox, SIMPLIFY = F)
+    } else {
+      pair <- mapply(function(x1,x2) array(c(x1$pair, x2$pair), dim = c(dim(x1$pair)[1],dim(x1$pair)[1],ndim)), sync, prox, SIMPLIFY = F)
     }
   } else if (synchrony & compatibility){
-    spi <- mapply(function(x1,x2) merge(x1$ind, x2$ind), l1, l2, SIMPLIFY = F)
-  } else if(subject %in% 'pair'){
-    # spp <-  TODO: make array of pairwise matrices
+    if (subject %in% 'ind'){
+      ind <- mapply(function(x1,x2) merge(x1[['ind']], x2[['ind']]), sync, compat, SIMPLIFY = F)
+    } else {
+      pair <- mapply(function(x1,x2) array(c(x1$pair, x2$pair), dim = c(dim(x1$pair)[1],dim(x1$pair)[1],ndim)), sync, compat, SIMPLIFY = F)
+    }
   } else if (proximity & compatibility){
-
+    if(subject %in% 'ind'){
+      ind <- mapply(function(x1,x2) merge(x1[['ind']], x2[['ind']]), prox, compat, SIMPLIFY = F)
+    } else {
+      pair <- mapply(function(x1,x2) array(c(x1$pair, x2$pair), dim = c(dim(x1$pair)[1],dim(x1$pair)[1],ndim)), sync, prox, SIMPLIFY = F)
+    }
   } else if (synchrony & proximity & compatibility){
-
+    if(subject %in% 'ind'){
+      ind <- mapply(function(x1,x2, x3) merge(merge(x1[['ind']], x2[['ind']]),x3[['ind']]), sync, prox, compat, SIMPLIFY = F)
+    } else {
+      pair <- mapply(function(x1,x2,x3) array(c(x1$pair, x2$pair, x3$pair), dim = c(dim(x1$pair)[1],dim(x1$pair)[1],ndim)), sync, prox,compat, SIMPLIFY = F)
+    }
   }
-
 }
-plot3DPotential(v)
 
 
 
+# pop <- simulateScene()
+# sync <- synchrony(pop, "augs")
+# prox <- proximity(pop, 'maxProp')
+plot3DPotential(list(sync,prox), subject = 'pair')
+
+# p <- list(y1 = prox, y2 = prox, y3 = prox, y4 = prox)
+# s <- list(y1 = sync, y2 = sync, y3 = sync, y4 = sync)
+#
+# v1 <- list(proximity = p , synchrony = s)
