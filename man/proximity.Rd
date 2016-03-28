@@ -5,7 +5,7 @@
 \title{Make potentials object--spatial proximity}
 \usage{
 proximity(scene, method, proximityFun = NULL, averageType = "mean",
-  subject = "all")
+  subject = "all", zeroPotDist = NULL)
 }
 \arguments{
 \item{scene}{a matingScene object}
@@ -21,6 +21,8 @@ using the mean or median}
 
 \item{subject}{whether you want pair, individual, population, or all.
 Specifying more than one is allowed.}
+
+\item{zeroPotDist}{the distance at which potential should be equal to zero}
 }
 \value{
 A potentials object containing one more more of the following, depending the
