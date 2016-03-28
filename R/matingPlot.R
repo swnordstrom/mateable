@@ -32,10 +32,9 @@
 plotScene <- function(scene, dimension = "auto",
                       opening = NULL, closing = NULL,
                       dailyPoints = TRUE, drawQuartiles = TRUE,
-                      sub= NULL, N = 9, xlab.spat = NULL, ylab.spat = NULL, pch = 19,
-                      cex.quartile = 1,
-                      col.quartile = 'gray55',
-                      col.peak = 'gray27',
+                      sub= NULL, N = 1,
+                      xlab.spat = NULL, ylab.spat = NULL,
+                      pch = 19, cex.quartile = 1, col.quartile = 'gray55', col.peak = 'gray27',
                       labelID = FALSE, ...){
 
   dimension <- match.arg(dimension, c("auto", "t", "s", "mt"),several.ok = TRUE)
@@ -166,7 +165,7 @@ plotScene <- function(scene, dimension = "auto",
           mtext('count',side = 2,adj = 0.5, cex = 0.75, line = 2.5)
           axis(2)
         }
-        mtext(names(scene)[i],side = 2,adj = 0.5, cex = 0.75, line = 5, font = 2)
+        mtext(names(scene)[i],side = 2,adj = 0.5, cex = 0.75, line = 5, font = 2, las = 3)
 
         if (i == nr){
           datLabs <- seq(opening,closing, by = 7)
@@ -225,7 +224,7 @@ plotScene <- function(scene, dimension = "auto",
           points(scene.i.sub[, 'x'], scene.i.sub[, 'y'], pch = 19,col = 'blue', ...)
         }
         if(temp == F){
-          mtext(names(scene)[i],side = 2,adj = 0.5, cex = 0.75, line = 5, font = 2)
+          mtext(names(scene)[i],side = 2,adj = 0.5, cex = 0.75, line = 5, font = 2, las = 3)
         }
       }
       if(comp){
@@ -251,7 +250,7 @@ plotScene <- function(scene, dimension = "auto",
           mtext('mating type',side = 3, adj = 0.5, line = 1.5)
         }
         if (temp == F & spat == F){
-          mtext(names(scene)[i],side = 2,adj = 0.5, cex = 0.75, line = 5, font = 2)
+          mtext(names(scene)[i],side = 2,adj = 0.5, cex = 0.75, line = 5, font = 2, las = 3)
         }
       }
     }
