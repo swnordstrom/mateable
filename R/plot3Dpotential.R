@@ -33,7 +33,7 @@ plot3DPotential <-   function(matPots,
 
   if(!sample %in% c("random", "all")) {stop("sample must be 'random' or 'all'")}
 
-  if(length(unique(sapply(v1, length))) != 1) {stop('mating potential objects are different lengths')}
+  if(length(unique(sapply(matPots, length))) != 1) {stop('mating potential objects are different lengths')}
 
   if (is.null(subject)){
     if (!'pair' %in% names(matPots[[1]])){
@@ -49,8 +49,8 @@ plot3DPotential <-   function(matPots,
 
   for (i in 1:length(matPots)){
     matPot <- matPots[i]
-
     if (is.null(sub.ids)){
+
       if(sample == 'random'){
         sub.ids <- sample(unique(unlist(sapply(matPot, function(x)x$ind$id), use.names = F)),N)
       } else if(sample == 'all'){
@@ -80,41 +80,82 @@ plot3DPotential <-   function(matPots,
   if(is.null(main) & subject %in% 'ind') main <- paste('individual potential')
   if(is.null(main) & subject %in% 'pair') main <- paste('pairwise potential')
 
-  len <- unique(sapply(matPots, length))
+
+  if(!is.list(matPots[[1]][[1]])){
+    len <- 1
+  } else {
+    len <- unique(sapply(matPots, length))
+  }
+
   par(mfrow = c(len,1))
 
   if (subject %in% 'ind'){
-    par(oma = c(1,1,2,0))
+    par(oma = c(1,1,1,0))
   } else {
     par(mar = c(4,0.5,0.5,2.5))
     par(oma = c(4,4,4,1.5))
   }
 
+  ## Set up data frames (individual potential) and arrays (pairwise potentials)
+
   if (synchrony & proximity){
     if(subject %in% 'ind'){
-      ind <- mapply(function(x1,x2) merge(x1$ind, x2$ind), sync, prox, SIMPLIFY = F)
+      ind <- mapply(function(x,y) merge(x$ind, y$ind), sync, prox, SIMPLIFY = F)
     } else {
-      pair <- mapply(function(x1,x2) array(c(x1$pair, x2$pair), dim = c(dim(x1$pair)[1],dim(x1$pair)[1],ndim)), sync, prox, SIMPLIFY = F)
+      pair <- mapply(function(x,y) array(c(x$pair, y$pair), dim = c(dim(x$pair)[1],dim(x$pair)[1],ndim)), sync, prox, SIMPLIFY = F)
     }
   } else if (synchrony & compatibility){
     if (subject %in% 'ind'){
-      ind <- mapply(function(x1,x2) merge(x1[['ind']], x2[['ind']]), sync, compat, SIMPLIFY = F)
+      ind <- mapply(function(x,y) merge(x$ind, y$ind), sync, compat, SIMPLIFY = F)
     } else {
-      pair <- mapply(function(x1,x2) array(c(x1$pair, x2$pair), dim = c(dim(x1$pair)[1],dim(x1$pair)[1],ndim)), sync, compat, SIMPLIFY = F)
+      pair <- mapply(function(x,y) array(c(x$pair, y$pair), dim = c(dim(x$pair)[1],dim(y$pair)[1],ndim)), sync, compat, SIMPLIFY = F)
     }
   } else if (proximity & compatibility){
     if(subject %in% 'ind'){
-      ind <- mapply(function(x1,x2) merge(x1[['ind']], x2[['ind']]), prox, compat, SIMPLIFY = F)
+      ind <- mapply(function(x,y) merge(x$ind, y$ind), prox, compat, SIMPLIFY = F)
     } else {
-      pair <- mapply(function(x1,x2) array(c(x1$pair, x2$pair), dim = c(dim(x1$pair)[1],dim(x1$pair)[1],ndim)), sync, prox, SIMPLIFY = F)
+      pair <- mapply(function(x,y) array(c(x$pair, y$pair), dim = c(dim(x$pair)[1],dim(x$pair)[1],ndim)), sync, prox, SIMPLIFY = F)
     }
   } else if (synchrony & proximity & compatibility){
     if(subject %in% 'ind'){
-      ind <- mapply(function(x1,x2, x3) merge(merge(x1[['ind']], x2[['ind']]),x3[['ind']]), sync, prox, compat, SIMPLIFY = F)
+      ind <- mapply(function(x,y,z) merge(merge(x$ind, y$ind),z$ind), sync, prox, compat, SIMPLIFY = F)
     } else {
-      pair <- mapply(function(x1,x2,x3) array(c(x1$pair, x2$pair, x3$pair), dim = c(dim(x1$pair)[1],dim(x1$pair)[1],ndim)), sync, prox,compat, SIMPLIFY = F)
+      pair <- mapply(function(x,y,z) array(c(x$pair, y$pair, z$pair), dim = c(dim(x$pair)[1],dim(x$pair)[1],ndim)), sync, prox, compat, SIMPLIFY = F)
     }
   }
+
+  ### Make the plots
+
+  if (sum(synchrony, proximity, compatibility) == 2){
+    if (subject %in% 'ind'){
+      for (i in 1:len){
+        plot(ind[[i]][,2],ind[[i]][,3], xlab = names(ind[[i]])[2], ylab = names(ind[[i]])[3], pch = 19, cex = 0.75)
+        # axis(1, at = pretty(xmin:xmax))
+      }
+    } else {
+      for (i in 1:len){
+        plot(pair[[i]][1],pair[[i]][2], xlab = names(pair[[i]])[1], ylab = names(pair[[i]])[2], pch = 19, cex = 0.75)
+        # axis(1, at = pretty(xmin:xmax))
+      }
+    }
+  } else if (sum(synchrony, proximity, compatiblity) == 3){
+    if (subject %in% 'ind'){
+      for (i in 1:len){
+        plot(ind[[i]][,2],ind[[i]][,3], xlab = names(ind[[i]])[2], ylab = names(ind[[i]])[3], pch = 19, cex = 0.75)
+        # axis(1, at = pretty(xmin:xmax))
+        # color points based on compatibility (ind[[i]][,4])
+      }
+    } else {
+      for (i in 1:len){
+        plot(pair[[i]][1],pair[[i]][2], xlab = names(pair[[i]])[2], ylab = names(pair[[i]])[3], pch = 19, cex = 0.75)
+        # axis(1, at = pretty(xmin:xmax))
+        # color points based on compatibility (pair[[i]][3])
+      }
+    }
+  } else {
+    stop('')
+  }
+
 }
 
 
@@ -122,7 +163,8 @@ plot3DPotential <-   function(matPots,
 # pop <- simulateScene()
 # sync <- synchrony(pop, "augs")
 # prox <- proximity(pop, 'maxProp')
-plot3DPotential(list(sync,prox), subject = 'pair')
+# v <- list(sync, prox)
+# plot3DPotential(v, subject = 'ind')
 
 # p <- list(y1 = prox, y2 = prox, y3 = prox, y4 = prox)
 # s <- list(y1 = sync, y2 = sync, y3 = sync, y4 = sync)
