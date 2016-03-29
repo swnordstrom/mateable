@@ -98,11 +98,11 @@ plot3DPotential <-   function(matPots,
 
   ## Set up data frames (individual potential) and arrays (pairwise potentials)
 
-  if (synchrony & proximity){
+  if (synchrony & proximity & compatibility){
     if(subject %in% 'ind'){
-      ind <- mapply(function(x,y) merge(x$ind, y$ind), sync, prox, SIMPLIFY = F)
+      ind <- mapply(function(x,y,z) merge(merge(x$ind, y$ind),z$ind), sync, prox, compat, SIMPLIFY = F)
     } else {
-      pair <- mapply(function(x,y) array(c(x$pair, y$pair), dim = c(dim(x$pair)[1],dim(x$pair)[1],ndim)), sync, prox, SIMPLIFY = F)
+      pair <- mapply(function(x,y,z) array(c(x$pair, y$pair, z$pair), dim = c(dim(x$pair)[1],dim(x$pair)[1],ndim)), sync, prox, compat, SIMPLIFY = F)
     }
   } else if (synchrony & compatibility){
     if (subject %in% 'ind'){
@@ -116,11 +116,11 @@ plot3DPotential <-   function(matPots,
     } else {
       pair <- mapply(function(x,y) array(c(x$pair, y$pair), dim = c(dim(x$pair)[1],dim(x$pair)[1],ndim)), sync, prox, SIMPLIFY = F)
     }
-  } else if (synchrony & proximity & compatibility){
+  } else if (synchrony & proximity){
     if(subject %in% 'ind'){
-      ind <- mapply(function(x,y,z) merge(merge(x$ind, y$ind),z$ind), sync, prox, compat, SIMPLIFY = F)
+      ind <- mapply(function(x,y) merge(x$ind, y$ind), sync, prox, SIMPLIFY = F)
     } else {
-      pair <- mapply(function(x,y,z) array(c(x$pair, y$pair, z$pair), dim = c(dim(x$pair)[1],dim(x$pair)[1],ndim)), sync, prox, compat, SIMPLIFY = F)
+      pair <- mapply(function(x,y) array(c(x$pair, y$pair), dim = c(dim(x$pair)[1],dim(x$pair)[1],ndim)), sync, prox, SIMPLIFY = F)
     }
   }
 
@@ -130,43 +130,41 @@ plot3DPotential <-   function(matPots,
     if (subject %in% 'ind'){
       for (i in 1:len){
         plot(ind[[i]][,2],ind[[i]][,3], xlab = names(ind[[i]])[2], ylab = names(ind[[i]])[3], pch = 19, cex = 0.75)
-        # axis(1, at = pretty(xmin:xmax))
       }
     } else {
       for (i in 1:len){
         plot(pair[[i]][1],pair[[i]][2], xlab = names(pair[[i]])[1], ylab = names(pair[[i]])[2], pch = 19, cex = 0.75)
-        # axis(1, at = pretty(xmin:xmax))
       }
     }
-  } else if (sum(synchrony, proximity, compatiblity) == 3){
+  } else if (sum(synchrony, proximity, compatibility) == 3){
+    palette(colorRampPalette(c('red','blue'))(4))
     if (subject %in% 'ind'){
       for (i in 1:len){
-        plot(ind[[i]][,2],ind[[i]][,3], xlab = names(ind[[i]])[2], ylab = names(ind[[i]])[3], pch = 19, cex = 0.75)
-        # axis(1, at = pretty(xmin:xmax))
-        # color points based on compatibility (ind[[i]][,4])
+        cols <- findInterval(ind[[i]][,4], c(0,0.25,0.5,1))
+        print(cols)
+        plot(ind[[i]][,2],ind[[i]][,3], xlab = names(ind[[i]])[2], ylab = names(ind[[i]])[3], pch = 19, cex = 0.75, col = cols)
       }
     } else {
       for (i in 1:len){
+        cols <- findInterval(pair[[i]][3], c(0,1))
         plot(pair[[i]][1],pair[[i]][2], xlab = names(pair[[i]])[2], ylab = names(pair[[i]])[3], pch = 19, cex = 0.75)
-        # axis(1, at = pretty(xmin:xmax))
-        # color points based on compatibility (pair[[i]][3])
       }
     }
   } else {
-    stop('')
+    stop('wrong number of potential types (dimensions) in matPots: must be a list of two or three matPot objects. If you want to visualize one matPot object, use function plotPotential.')
   }
 
 }
 
 
 
-# pop <- simulateScene()
-# sync <- synchrony(pop, "augs")
-# prox <- proximity(pop, 'maxProp')
-# v <- list(sync, prox)
-# plot3DPotential(v, subject = 'ind')
+pop <- simulateScene()
+sync <- synchrony(pop, "augs")
+prox <- proximity(pop, 'maxProp')
+compat <- compatibility(pop, method = 'si_echinacea')
+v <- list(synchrony = sync, proximity = prox, compatibility = compat)
+plot3DPotential(v, subject = 'ind')
+p <- list(y1 = prox, y2 = prox, y3 = prox, y4 = prox)
+s <- list(y1 = sync, y2 = sync, y3 = sync, y4 = sync)
 
-# p <- list(y1 = prox, y2 = prox, y3 = prox, y4 = prox)
-# s <- list(y1 = sync, y2 = sync, y3 = sync, y4 = sync)
-#
-# v1 <- list(proximity = p , synchrony = s)
+v1 <- list(proximity = p , synchrony = s)
