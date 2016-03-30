@@ -4,9 +4,8 @@
 \alias{plotPotential}
 \title{graphical visualization of a mating potential object}
 \usage{
-plotPotential(matPot, subject = c("pair", "ind"), plotType = "auto",
-  showDensity = T, sub.ids = NULL, N = 9, sample = "random",
-  lab.cex = 0.5, main = NULL, ...)
+plotPotential(matPot, subject = NULL, plotType = "auto", density = T,
+  sub.ids = NULL, N = 9, sample = "random", main = NULL, ...)
 }
 \arguments{
 \item{matPot}{a mating potential object}
@@ -15,16 +14,13 @@ plotPotential(matPot, subject = c("pair", "ind"), plotType = "auto",
 
 \item{plotType}{a character string indivating the plots to be displayed. Options are histogram ('hist'), network diagram ('net')}
 
-\item{showDensity}{logical. If true (default), plots probability density over histogram.}
+\item{density}{logical. If true (default), plots probability density over histogram.}
 
 \item{sub.ids}{a vector containing the ids of individuals to be represented in pairwise potential plots}
 
-\item{N}{a positive number, the number of individuals to sample if sub.ids = 'random'}
+\item{N}{a positive number indicating the number of individuals to sample if sub.ids = 'random'}
 
 \item{sample}{a character string specifying how to choose a subset of individuals to be represented in pairwise potential plots. Possible values are "random" (default) or "all".}
-
-\item{lab.cex}{parameter indicating label size relative to plot
-(different than cex.lab)}
 
 \item{main}{the main title (on top of plot)}
 
