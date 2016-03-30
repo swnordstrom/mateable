@@ -8,7 +8,6 @@
 ##' @param N integer, indicates the number of individuals to sample if sub.ids = 'random', default N = 9
 ##' @param sample character, specifies how to sample individuals to be represented in pairwise potential plots. Possible values are "random" (default) or "all". See details.
 ##' @param main character, the main plot title
-##' @param ... optional arguments for the plot function
 ##' @details The individuals to be represented in the pairwise potential plots can either be specified explicitly through \code{sub.ids}, chosen randomly (\code{sample} = 'random'), or all individuals can be selected (\code{sample} = 'all'). The default is to randonly select 9 individuals. If multiple years are being plotted, the subset is sampled from all years and the same individuals will be represented in each year, if possible. If fewer than three individuals from the subset are available in a year, no network diagram or heatmap will be returned for that year.
 ##' @export
 ##' @author Amy Waananen
@@ -25,13 +24,13 @@
 plot3DPotential <-   function(matPots,
                               subject = NULL,
                               density = TRUE,
-                              # sub.ids = NULL, N = 9, sample = "random",
-                              main = NULL, ...){
+                              sub.ids = NULL, N = 9, sample = "random",
+                              main = NULL){
   nm <- par("mar")
   noma <- par('oma')
   nmfrow <- par('mfrow')
 
-  #   if(!sample %in% c("random", "all")) {stop("sample must be 'random' or 'all'")}
+  if(!sample %in% c("random", "all")) {stop("sample must be 'random' or 'all'")}
 
   if(length(unique(sapply(matPots, length))) != 1) {stop('mating potential objects are different lengths')}
 
@@ -62,15 +61,6 @@ plot3DPotential <-   function(matPots,
   for (i in 1:length(matPots)){
     matPot <- matPots[[i]]
 
-    #     if (is.null(sub.ids)){
-    #
-    #       if(sample == 'random'){
-    #         sub.ids <- sample(unique(unlist(sapply(matPot, function(x)x$ind$id), use.names = F)),N)
-    #       } else if(sample == 'all'){
-    #         sub.ids <-unique(unlist(sapply(matPot, function(x)x$ind$id), use.names = F))
-    #       }
-    #     }
-
     if(attr(matPot[[1]],'t')){
       synchrony <- T
       sync <- matPot
@@ -88,14 +78,20 @@ plot3DPotential <-   function(matPots,
   if(is.null(main) & subject %in% 'ind') main <- paste('individual potential')
   if(is.null(main) & subject %in% 'pair') main <- paste('pairwise potential')
 
-  par(mfrow = c(len,1))
+  if (is.null(sub.ids)){
+    if(sample == 'random'){
+      sub.ids <- sample(unique(unlist(sapply(matPots[[1]], function(x)x$ind$id, USE.NAMES = F))),N)
+    } else if(sample == 'all'){
+      sub.ids <-unique(unlist(sapply(matPots[[1]], function(x)x$ind$id, USE.NAMES = F)))
+    }
+  }
 
+  par(mfrow = c(len,1))
+  par(mar = c(0.5,0.5,0.5,1.5))
   if (len == 1){
     par(oma = c(4,4,4,0))
-    par(mar = c(0.5,0.5,0.5,1.5))
   } else {
     par(oma = c(4,6,4,0))
-    par(mar = c(0.5,0.5,0.5,1.5))
   }
 
   if (synchrony & proximity & compatibility){
@@ -124,7 +120,13 @@ plot3DPotential <-   function(matPots,
     }
   }
 
-  if (sum(synchrony, proximity, compatibility) == 2){
+#   for (i in 1:len){
+#     ranges <- lapply(ind,function(x)apply(x[,2:],2,range))
+#   }
+
+
+
+  if (ndim == 2){
     xlab <- ifelse(synchrony, 'synchrony','proximity')
     ylab <- ifelse(proximity & xlab!= 'proximity', 'proximity','compatibility')
     for (i in 1:len){
@@ -142,7 +144,7 @@ plot3DPotential <-   function(matPots,
       }
       mtext(names(matPots[[1]][i]), 2, cex = 0.7, outer = F, line = 5, font = 1)
     }
-  } else if (sum(synchrony, proximity, compatibility) == 3){
+  } else if (ndim == 3){
     palette(colorRampPalette(c('red','green'))(3))
     for (i in 1:len){
       if (subject %in% 'pair') {
@@ -160,15 +162,18 @@ plot3DPotential <-   function(matPots,
         mtext(names(matPots[[1]][i]), 2, cex = 0.7, outer = F, line = 4, font = 1)
         par(fig = c(0, 1, 0, 1), oma = c(0, 0, 0, 0), mar = c(0, 0, 0, 0), new = TRUE)
         plot(0, 0, type = "n", bty = "n", xaxt = "n", yaxt = "n")
-        legend('topleft', legend = c('1','','0'), pch = 21, pt.bg = colorRampPalette(c('red','green'))(3), title = 'compatibility', bty = 'n')
+        if ( subject %in% 'ind'){
+          legend('topleft', legend = c('1','','0'), pch = 21, pt.bg = colorRampPalette(c('red','green'))(3), title = 'compatibility', bty = 'n')
+        } else {
+          legend('topleft', legend = c('compatible','incompatible'), pch = 21, pt.bg = c('red','white'), bty = 'n')
+        }
       }
       mtext(names(matPots[[1]][i]), 2, cex = 0.7, outer = F, line = 4, font = 1)
-
     }
   } else {
     stop('wrong number of potential types (dimensions) in matPots: must be a list of two or three matPot objects. If you want to visualize one matPot object, use function plotPotential.')
   }
-  par( oma = noma, mar = nm, mfrow = nmfrow)
+  par(oma = noma, mar = nm, mfrow = nmfrow)
 }
 
 
@@ -193,5 +198,7 @@ plot3DPotential <-   function(matPots,
 # v1 <- list(proximity = p , synchrony = s, compatibility = c)
 # v2 <- list(proximity = p, synchrony = s)
 # v3 <- list(compatibility = c, proximity = p)
-# plot3DPotential(v1, subject = 'pair')
+plot3DPotential(v3, subject = 'pair')
+
+
 
