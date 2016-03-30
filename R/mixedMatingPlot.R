@@ -122,12 +122,13 @@ plot3DScene <- function(scene, dimension = "auto",
     }
   }
 
-  vec <- seq(minstart, maxstart, length.out = 9)
+
   palette(colorRampPalette(c('blue','red'))(9))
 
   for (i in 1:length(scene)){
     scene.i <- scene[[i]]
     if (temp){
+      vec <- seq(minstart, maxstart, length.out = 9)
       scene.i$cols <- findInterval(scene.i$start,vec)
     }
     if (temp & spat & comp){
@@ -219,8 +220,8 @@ plot3DScene <- function(scene, dimension = "auto",
         }
       }
       plot(jitter(scene.i[,'s1']), jitter(scene.i[,'s2']), col = scene.i$cols,xlim = c(min(scene.i$s2),max(scene.i$s1)), ylim = c(min(scene.i$s2),max(scene.i$s1)), xaxt = 'n',yaxt = 'n', xlab = '', ylab = '', pch = pch)
-      mtext(names(scene)[i],side = 2,adj = 0.5, cex = 0.75, line = 3.5, font = 2)
-      mtext('s2', side = 2, outer = T, line = 1, cex = 0.75)
+      mtext(names(scene)[i],side = 2,cex = 0.75, line = 4.5, font = 2, las = 1)
+      mtext('s2', side = 2, outer = T, cex = 0.75)
       abline(v = c(1:10) - 0.5, lty = 'dotted', col = 'lightgray')
       abline(h = c(1:10) - 0.5 , lty = 'dotted', col = 'lightgray')
       axis(2, at = min(scene.i$s2):max(scene.i$s1), labels = min(scene.i$s2):max(scene.i$s1), cex.axis = 0.75)
