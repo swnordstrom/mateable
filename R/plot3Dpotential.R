@@ -35,6 +35,13 @@ plot3DPotential <-   function(matPots,
 
   if(length(unique(sapply(matPots, length))) != 1) {stop('mating potential objects are different lengths')}
 
+  if(!is.list(matPots[[1]][[1]][1])){
+    matPots<-lapply(matPots, function(x) list(x))
+    len <- 1
+  } else {
+    len <- unique(sapply(matPots, length))
+  }
+
   if(!'pair' %in% names(matPots[1][[1]][[1]]) & 'pair' %in% subject){
     warning("matPots does not include pairwise potential; displaying subject = 'ind'")
     subject <- 'ind'
@@ -46,13 +53,6 @@ plot3DPotential <-   function(matPots,
     } else {
       subject <- 'pair'
     }
-  }
-
-  if(!is.list(matPots[[1]][[1]][1])){
-    matPots<-lapply(matPots, function(x) list(x))
-    len <- 1
-  } else {
-    len <- unique(sapply(matPots, length))
   }
 
   synchrony <- F
@@ -90,11 +90,11 @@ plot3DPotential <-   function(matPots,
 
   par(mfrow = c(len,1))
 
-  if (subject %in% 'ind'){
-    par(oma = c(4,6,4,0))
+  if (len == 1){
+    par(oma = c(4,4,4,0))
     par(mar = c(0.5,0.5,0.5,1.5))
   } else {
-    par(oma = c(4,6,4,1.5))
+    par(oma = c(4,6,4,0))
     par(mar = c(0.5,0.5,0.5,1.5))
   }
 
@@ -129,32 +129,41 @@ plot3DPotential <-   function(matPots,
     ylab <- ifelse(proximity & xlab!= 'proximity', 'proximity','compatibility')
     for (i in 1:len){
       if (subject %in% 'pair'){
-        plot(pair[[i]][,,1],pair[[i]][,,2], ylab = '', pch = 19, xaxt = 'n', xlab = '')
+        plot(pair[[i]][,,1],pair[[i]][,,2], ylab = '', pch = 19, xaxt = 'n', yaxt = 'n', xlab = '', cex.axis = 0.85)
       } else {
-        plot(ind[[i]][,2],ind[[i]][,3], ylab = '', pch = 19, xaxt = 'n', xlab = '')
+        plot(ind[[i]][,2],ind[[i]][,3], ylab = '', pch = 19, xaxt = 'n', xlab = '', yaxt = 'n', cex.axis = 0.85)
       }
+      axis(2,  cex.axis = 0.85, las = 2)
       if (i == len){
         mtext(main, 3, outer = T, line = 1)
-        axis(1)
+        axis(1, cex.axis = 0.85)
         mtext(xlab,1, cex = 0.75, outer = TRUE, line = 2)
-        mtext(ylab,2,cex = 0.75, outer = TRUE, line = 3)
+        mtext(ylab,2,cex = 0.75, outer = TRUE, line = 2.5)
       }
+      mtext(names(matPots[[1]][i]), 2, cex = 0.7, outer = F, line = 5, font = 1)
     }
   } else if (sum(synchrony, proximity, compatibility) == 3){
     palette(colorRampPalette(c('red','green'))(3))
     for (i in 1:len){
       if (subject %in% 'pair') {
-        plot(pair[[i]][,,1],pair[[i]][,,2], ylab = '', pch = 21, bg = pair[[i]][,,3], xaxt = 'n', xlab = '')
+        plot(pair[[i]][,,1],pair[[i]][,,2], ylab = '', pch = 21, bg = pair[[i]][,,3], xaxt = 'n',yaxt = 'n', xlab = '')
       } else {
         cols <- findInterval(ind[[i]][,4], c(0,0.25,0.5,1))
-        plot(ind[[i]][,2],ind[[i]][,3], ylab = '', pch = 21, bg = cols, xaxt = 'n', xlab = '')
+        plot(ind[[i]][,2],ind[[i]][,3], ylab = '', pch = 21, bg = cols, xaxt = 'n',yaxt = 'n', xlab = '')
       }
+      axis(2,  cex.axis = 0.85, las = 2)
       if (i == len){
-        axis(1)
+        axis(1, cex.axis = 0.85)
         mtext(main, 3, outer = T, line = 1)
         mtext('synchrony',1, cex = 0.75, outer = T, line = 2)
-        mtext('proximity',2, cex = 0.75, outer = T, line = 3)
+        mtext('proximity',2, cex = 0.75, outer = T, line = 2.5)
+        mtext(names(matPots[[1]][i]), 2, cex = 0.7, outer = F, line = 4, font = 1)
+        par(fig = c(0, 1, 0, 1), oma = c(0, 0, 0, 0), mar = c(0, 0, 0, 0), new = TRUE)
+        plot(0, 0, type = "n", bty = "n", xaxt = "n", yaxt = "n")
+        legend('topleft', legend = c('1','','0'), pch = 21, pt.bg = colorRampPalette(c('red','green'))(3), title = 'compatibility', bty = 'n')
       }
+      mtext(names(matPots[[1]][i]), 2, cex = 0.7, outer = F, line = 4, font = 1)
+
     }
   } else {
     stop('wrong number of potential types (dimensions) in matPots: must be a list of two or three matPot objects. If you want to visualize one matPot object, use function plotPotential.')
@@ -163,8 +172,17 @@ plot3DPotential <-   function(matPots,
 }
 
 
+### TODO:
+# 1. make axes the same for all years in multi-year plots
+# 2. add year annotation to multi-year plot DONE
+# 3. add legend to 3D plots (for compatibility) DONE
+# 4. if only one year, change plot margins? DONE
+# 5. reconsider how to display compatibility (more colors?)
+# 6. add option to identify a subset of individuals or pairs
+
 
 # pop <- simulateScene()
+# pops <- list(y1 = pop, y2 = pop, y3 = pop)
 # sync <- synchrony(pop, "augs")
 # prox <- proximity(pop, 'maxProp')
 # compat <- compatibility(pop, method = 'si_echinacea')
@@ -175,5 +193,5 @@ plot3DPotential <-   function(matPots,
 # v1 <- list(proximity = p , synchrony = s, compatibility = c)
 # v2 <- list(proximity = p, synchrony = s)
 # v3 <- list(compatibility = c, proximity = p)
+# plot3DPotential(v1, subject = 'pair')
 
-# plot3DPotential(v3, subject = 'ind')
