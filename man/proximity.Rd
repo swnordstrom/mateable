@@ -36,7 +36,7 @@ a column containing proximity values. If \code{subject} is "all"
 the return list will contain all three of the items above.
 }
 \description{
-Calculate one or several of measures of spatial proximity
+Calculate one of several measures of spatial proximity
 }
 \details{
 If \code{method} is "maxProp" then proximity between two

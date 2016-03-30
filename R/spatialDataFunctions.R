@@ -36,7 +36,7 @@ kNearNeighbors <- function(scene, k) {
   knnMatrix
 }
 
-##' Calculate one or several of measures of spatial proximity
+##' Calculate one of several measures of spatial proximity
 ##'
 ##' @title Make potentials object--spatial proximity
 ##' @param scene a matingScene object
