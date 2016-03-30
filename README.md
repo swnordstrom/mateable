@@ -13,12 +13,17 @@ This repo provides source code for an R package called
 mateable. This package contains functions that
 help the study of mating phenology.
 
-Using the package devtools, you can use the following code to
-automatically install package mateable.
+To download the CRAN version of this package simple use the
+standard command to do so:
+
+install.packages("mateable")
+
+To get the current development version you can use the package devtools,
+and the following code to automatically install package mateable.
 
 install.packages("devtools") # if you don't already have it
 library(devtools)
-install_github("danhan52/mateable")
+install_github("stuartWagenius/mateable")
 library(mateable)
 ?mateable
 
@@ -31,9 +36,9 @@ Let me know if you have any questions.
 If you are interested in contributing to this package, fork
 the repo and modify/add functions as you see fit. After
 modifying the repo, create test code that shows that the
-modifications work in a variety of contexts. Also that when the modifications
-show error messages, they aren't indecipherable. Submit a pull
-request with your test code and someone from the Echinacea
+modifications work in a variety of contexts. Also show that when the
+modifications show error messages, they aren't indecipherable. Submit a
+pull request with your test code and someone from the Echinacea
 Project will review the code and accept, deny, or suggest
 modifications to your changes.
 For more advanced programmers, this packages uses Rcpp to take
@@ -44,7 +49,3 @@ builds.
 Happy coding!
 
 
-For Team Echinacea Members:
-Test code (more than just the example) can be found in:
-/Dropbox/mateableTestCode/
-Just ask Stuart or Danny to share it with you.
