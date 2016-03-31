@@ -209,28 +209,6 @@ plot3DPotential <-   function(matPots,
 }
 
 
-# pop <- simulateScene()
-# pop2 <- simulateScene()
-# pops <- list(y1 = pop, y2 = pop2, y3 = pop)
-# s <- synchrony(pop2, 'augspurger')
-# c <- compatibility(pop2, method = 'si_echinacea')
-# p <- proximity (pop2, 'maxProp')
-# sync <- synchrony(pops, "augs")
-# prox <- proximity(pops, 'maxProp')
-# compat <- compatibility(pops, method = 'si_echinacea')
-# v <- list(synchrony = sync, proximity = prox, compatibility = compat)
-# v1 <- list(proximity = p , synchrony = s, compatibility = c)
-# v2 <- list(proximity = p, synchrony = s)
-# plot3DPotential(v, subject = 'ind')
-# plot3DPotential(v, subject = 'ind', sample = 'random')
-# plot3DPotential(v, subject = 'ind', sample = 'all')
-# plot3DPotential(v, subject = 'pair')
-# plot3DPotential(v, subject = 'pair', sample = 'random')
-# plot3DPotential(v1, subject = 'ind')
-# plot3DPotential(v1, subject = 'pair')
-# plot3DPotential(v2, subject = 'ind')
-# plot3DPotential(v2, subject = 'pair')
-
 
 
 
