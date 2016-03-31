@@ -12,9 +12,9 @@
 ##' @param xlab.spat character label for x-axis of spatial dimension plots. If NULL, defaults to 'easting'.
 ##' @param ylab.spat character label for y-axis of spatial dimension plots. If NULL, defaults to 'northing'.
 ##' @param pch specify point type to be used in plots. Defaults to pch = 19 (filled-in circle). If NULL, points will be labeled with their id.
-##' @param cex.quartile if drawQuartiles = TRUE, specifies weight of quartile and peak lines relative to device default.
-##' @param col.quartile if drawQuartiles = TRUE, specifies color of quartile lines, defaults to 'gray81'.
-##' @param col.peak if drawQuartiles = TRUE, specify color of peak lines, defaults to 'gray27'.
+##' @param cex.quartile if \code{drawQuartiles} = TRUE, specifies weight of quartile and peak lines relative to device default.
+##' @param col.quartile if \code{drawQuartiles} = TRUE, specifies color of quartile lines, defaults to 'gray81'.
+##' @param col.peak if \code{drawQuartiles} = TRUE, specify color of peak lines, defaults to 'gray27'.
 ##' @param labelID if TRUE, the y-axis will be labeled with the id of the corresponding segment.
 ##' @param ... standard graphical parameters
 ##' @return nothing
@@ -68,8 +68,7 @@ plotScene <- function(scene, dimension = "auto",
     }
     nr <- length(scene)
     nc <- sum(temp,spat,comp)
-    par(mfrow = c(nr,nc))
-    par(oma = c(5,3,4,1))
+    par(mfrow = c(nr,nc), oma = c(5,3,4,1))
 
     if(spat){
       emin <- min(unlist(lapply(scene, function(x) x['x'])))
@@ -79,6 +78,7 @@ plotScene <- function(scene, dimension = "auto",
     }
 
     if(temp){
+      count <- max(unlist(lapply(scene, nrow)))
       if(is.null(opening)){
         opening <- min(unlist(lapply(scene, function(x) x['start'])))
       }
@@ -92,10 +92,10 @@ plotScene <- function(scene, dimension = "auto",
       smax <- max(unlist(lapply(scene, function(x) as.numeric(unlist(x[,c('s1','s2')])))))
     }
 
-    count <- max(unlist(lapply(scene, nrow)))
-
     if ('random' %in% sub){
-      sub <- sample(scene[[1]][['id']],N)
+      sub <- sample(unlist(lapply(scene, function(x)x['id'])), N)
+    } else if ('all' %in% sub){
+      sub <- unlist(lapply(scene, function(x)x['id']))
     }
 
     for (i in 1:length(scene)){
