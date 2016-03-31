@@ -171,7 +171,6 @@ plotPotential <-   function(matPot,
           mtext(names(matPot)[i],side = 2,adj = 0.5, cex = 0.75, line = 5, font = 2)
         }
         if (i == nr){
-          # par(mar = c(4,3,1,1))
           title(xlab = potential)
         }
         if (density){
@@ -180,7 +179,6 @@ plotPotential <-   function(matPot,
       }
     }
   }
-
   mtext(main, side = 3, line = 0, cex = 1.5, outer = TRUE)
   par(mar = nm, mfrow = nmfrow, oma = noma)
 }
