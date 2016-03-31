@@ -20,8 +20,6 @@
 ##' pop <- simulateScene()
 ##' sync <- synchrony(pop, "augs")
 ##' plotPotential(sync)
-##'
-##'
 plotPotential <-   function(matPot,
                             subject = NULL,
                             plotType = 'auto',
@@ -97,35 +95,12 @@ plotPotential <-   function(matPot,
     }
   }
 
-
   if ('ind' %in% subject){
-    hmax <- max(hist(matPot[[1]][[subject]][,potential], breaks = 15, plot = F)$breaks)
-    hmin <- min(hist(matPot[[1]][[subject]][,potential], breaks = 15, plot = F)$breaks)
+    hmax <- max(unlist(lapply(matPot,function(x)hist(x[[subject]][,potential], breaks = 15, plot = F)$breaks)))
+    hmin <- min(unlist(lapply(matPot,function(x)hist(x[[subject]][,potential], breaks = 15, plot = F)$breaks)))
   } else {
-    hmax <- max(hist(matPot[[1]][[subject]], breaks = 15, plot = F)$breaks)
-    hmin <- min(hist(matPot[[1]][[subject]], breaks = 15, plot = F)$breaks)
-  }
-
-
-  for (j in 1:length(matPot)){
-    potj <- matPot[[j]]
-    if('hist' %in% pt){
-      if('ind' %in% subject){
-        if (max(hist(potj[[subject]][,potential], breaks = 15, plot = F)$breaks) > hmax){
-          hmax <- max(hist(potj[[subject]][,potential], breaks = 15, plot = F)$breaks)
-        }
-        if (min(hist(potj[[subject]][,potential], breaks = 15, plot = F)$breaks) < hmin){
-          hmin <- min(hist(potj[[subject]][,potential], breaks = 15, plot = F)$breaks)
-        }
-      } else {
-        if (max(hist(potj[[subject]], breaks = 15, plot = F)$breaks) > hmax){
-          hmax <- max(hist(potj[[subject]], breaks = 15, plot = F)$breaks)
-        }
-        if (min(hist(potj[[subject]], breaks = 15, plot = F)$breaks) < hmin){
-          hmin <- min(hist(potj[[subject]], breaks = 15, plot = F)$breaks)
-        }
-      }
-    }
+    hmax <- max(unlist(lapply(matPot,function(x)hist(x[[subject]], breaks = 15, plot = F)$breaks)))
+    hmin <- min(unlist(lapply(matPot,function(x)hist(x[[subject]], breaks = 15, plot = F)$breaks)))
   }
 
   for (i in 1:length(matPot)){
@@ -212,8 +187,7 @@ plotPotential <-   function(matPot,
 
 
 
-plot_web3 <-
-  function (flowmat, names = NULL, lab.size = 1.5, add = FALSE,
+plot_web3 <- function (flowmat, names = NULL, lab.size = 1.5, add = FALSE,
             fig.size = 1.3, main = "", sub = "", sub2 = "", log = FALSE,
             mar = c(0.25, 0.25, 0.25, 0.25), nullflow = NULL, minflow = NULL, maxflow = NULL,
             legend = TRUE, leg.digit = 5, leg.title = NULL, lcol = "black",
@@ -221,8 +195,7 @@ plot_web3 <-
             val.col = "red", val.title = NULL, val.ncol = 1, budget = FALSE,
             bud.digit = 5, bud.size = 0.6, bud.title = "budget", bud.ncol = 1,
             maxarrow = 10, minarrow = 1, length = 0.1, dcirc = 1.2, bty = "o",
-            labz.size = 1.5, ...)
-  {
+            labz.size = 1.5, ...){
     nm <- par("mar")
     if (ncol(flowmat) != nrow(flowmat))
       stop("flowmat has to be square")
