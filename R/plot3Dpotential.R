@@ -16,23 +16,17 @@
 ##' pop <- simulateScene()
 ##' sync <- synchrony(pop, "augs")
 ##' prox <- proximity(pop, 'maxDist')
-##' plot3DPotential(list(sync,prox))
-##'
-##'
-##'
-##'
+##' compat <- compatibility(pop, 'si_echinacea)
+##' plot3DPotential(list(sync,prox,compat), subject = 'ind')
+
 plot3DPotential <-   function(matPots,
                               subject = NULL,
                               density = TRUE,
-                              sub.ids = NULL, N = 3, sample = "random",
+                              sub.ids = NULL, N = 3, sample = NA,
                               main = NULL){
   nm <- par("mar")
   noma <- par('oma')
   nmfrow <- par('mfrow')
-
-  if(!sample %in% c("random", "all")) {stop("sample must be 'random' or 'all'")}
-
-  if(length(unique(sapply(matPots, length))) != 1) {stop('mating potential objects are different lengths')}
 
   if(!is.list(matPots[[1]][[1]][1])){
     matPots<-lapply(matPots, function(x) list(x))
@@ -40,6 +34,8 @@ plot3DPotential <-   function(matPots,
   } else {
     len <- unique(sapply(matPots, length))
   }
+
+  if(length(unique(sapply(matPots, length))) != 1) {stop('mating potential objects are different lengths')} # this doesn't really work
 
   if(!'pair' %in% names(matPots[1][[1]][[1]]) & 'pair' %in% subject){
     warning("matPots does not include pairwise potential; displaying subject = 'ind'")
@@ -82,9 +78,9 @@ plot3DPotential <-   function(matPots,
   if(is.null(main) & subject %in% 'pair') main <- paste('pairwise potential')
 
   if (is.null(sub.ids)){
-    if(sample == 'random'){
+    if(sample %in% 'random'){
       sub.ids <- sample(unique(unlist(sapply(matPots[[1]], function(x)x$ind$id, USE.NAMES = F))),N)
-    } else if(sample == 'all'){
+    } else if(sample %in% 'all'){
       sub.ids <-unique(unlist(sapply(matPots[[1]], function(x)x$ind$id, USE.NAMES = F)))
     }
   }
@@ -123,19 +119,26 @@ plot3DPotential <-   function(matPots,
     }
   }
 
-  # str(pair)
-  #   for (i in 1:len){
-  #     ranges <- lapply(ind,function(x)apply(x[,2:],2,range))
-  #   }
+  if(subject %in% 'ind'){
+    xmax <- max(unlist(lapply(ind,function(x)x[,2])))
+    xmin <- min(unlist(lapply(ind,function(x)x[,2])))
+    ymax <- max(unlist(lapply(ind,function(x)x[,3])))
+    ymin <- min(unlist(lapply(ind,function(x)x[,3])))
+  } else {
+    xmax <- max(unlist(lapply(pair,function(x)x[,,1])))
+    xmin <- min(unlist(lapply(pair,function(x)x[,,1])))
+    ymax <- max(unlist(lapply(pair,function(x)x[,,2])))
+    ymin <- min(unlist(lapply(pair,function(x)x[,,2])))
+  }
 
   if (ndim == 2){
     xlab <- ifelse(synchrony, 'synchrony','proximity')
     ylab <- ifelse(proximity & xlab!= 'proximity', 'proximity','compatibility')
     for (i in 1:len){
       if (subject %in% 'pair'){
-        plot(pair[[i]][,,1],pair[[i]][,,2], ylab = '', pch = 19, xaxt = 'n', yaxt = 'n', xlab = '', cex.axis = 0.85)
+        plot(pair[[i]][,,1],pair[[i]][,,2], ylab = '', pch = 19, xaxt = 'n', yaxt = 'n', xlab = '', cex.axis = 0.85,ylim = c(ymin,ymax), xlim = c(xmin,xmax))
       } else {
-        plot(ind[[i]][,2],ind[[i]][,3], ylab = '', pch = 19, xaxt = 'n', xlab = '', yaxt = 'n', cex.axis = 0.85)
+        plot(ind[[i]][,2],ind[[i]][,3], ylab = '', pch = 19, xaxt = 'n', xlab = '', yaxt = 'n', cex.axis = 0.85, ylim = c(ymin,ymax), xlim = c(xmin,xmax))
       }
       axis(2,  cex.axis = 0.85, las = 2)
       if (i == len){
@@ -154,13 +157,18 @@ plot3DPotential <-   function(matPots,
       }
     }
   } else if (ndim == 3){
-    palette(colorRampPalette(c('red','green'))(3))
+    palette(colorRampPalette(c('red','green'))(10))
+    if(subject %in% 'ind'){
+      compatmax <- max(unlist(lapply(ind,function(x)x[,3])))
+      compatmin <- min(unlist(lapply(ind,function(x)x[,3])))
+      vec <- round(seq(compatmin, compatmax, length.out = 10),2)
+    }
     for (i in 1:len){
       if (subject %in% 'pair') {
-        plot(pair[[i]][,,1],pair[[i]][,,2], ylab = '', pch = 21, bg = pair[[i]][,,3], xaxt = 'n',yaxt = 'n', xlab = '')
+        plot(pair[[i]][,,1],pair[[i]][,,2], ylab = '', pch = 21, bg = pair[[i]][,,3], xaxt = 'n',yaxt = 'n', xlab = '', ylim = c(ymin,ymax), xlim = c(xmin,xmax))
       } else {
-        cols <- findInterval(ind[[i]][,4], c(0,0.25,0.5,1))
-        plot(ind[[i]][,2],ind[[i]][,3], ylab = '', pch = 21, bg = cols, xaxt = 'n',yaxt = 'n', xlab = '')
+        cols <- findInterval(ind[[i]][,4], vec)
+        plot(ind[[i]][,2],ind[[i]][,3], ylab = '', pch = 21, bg = cols, xaxt = 'n',yaxt = 'n', xlab = '', ylim = c(ymin,ymax), xlim = c(xmin,xmax))
       }
       if (!is.null(sub.ids)){
         if(subject %in% 'ind'){
@@ -178,13 +186,21 @@ plot3DPotential <-   function(matPots,
         mtext(names(matPots[[1]][i]), 2, cex = 0.7, outer = F, line = 4, font = 1)
         par(fig = c(0, 1, 0, 1), oma = c(0, 0, 0, 0), mar = c(0, 0, 0, 0), new = TRUE)
         plot(0, 0, type = "n", bty = "n", xaxt = "n", yaxt = "n")
-        if ( subject %in% 'ind'){
-          legend('topleft', legend = c('1','','0'), pch = 21, pt.bg = colorRampPalette(c('red','green'))(3), title = 'compatibility', bty = 'n')
+        if (subject %in% 'ind'){
+          if(len == 1){
+            legend('topleft', legend = vec, pch = 21, pt.bg = colorRampPalette(c('red','green'))(10), title = 'compatibility', bty = 'n', ncol = 5, title.adj = 0.05, cex = 0.7)
+          } else {
+            legend('topleft', legend = vec, pch = 21, pt.bg = colorRampPalette(c('red','green'))(10), title = 'compatibility', bty = 'n', ncol = 5, title.adj = 0.05)
+          }
         } else {
-          legend('topleft', legend = c('compatible','incompatible'), pch = 21, pt.bg = c('red','white'), bty = 'n')
+          if(len == 1){
+            legend('topleft', legend = c('compatible','incompatible'), pch = 21, pt.bg = c('red','white'), bty = 'n', cex = 0.7)
+          } else {
+            legend('topleft', legend = c('compatible','incompatible'), pch = 21, pt.bg = c('red','white'), bty = 'n')
+          }
         }
       }
-      mtext(names(matPots[[1]][i]), 2, cex = 0.7, outer = F, line = 4, font = 1)
+      mtext(names(matPots[[1]][i]), 2, cex = 0.7, outer = F, line = 5, font = 1)
     }
   } else {
     stop('wrong number of potential types (dimensions) in matPots: must be a list of two or three matPot objects. If you want to visualize one matPot object, use function plotPotential.')
@@ -193,28 +209,28 @@ plot3DPotential <-   function(matPots,
 }
 
 
-### TODO:
-# 1. make axes the same for all years in multi-year plots
-# 2. add year annotation to multi-year plot DONE
-# 3. add legend to 3D plots (for compatibility) DONE
-# 4. if only one year, change plot margins? DONE
-# 5. reconsider how to display compatibility (more colors?)
-# 6. add option to identify a subset of individuals or pairs DONE
-
-
 # pop <- simulateScene()
-# pops <- list(y1 = pop, y2 = pop, y3 = pop)
-# sync <- synchrony(pop, "augs")
-# prox <- proximity(pop, 'maxProp')
-# compat <- compatibility(pop, method = 'si_echinacea')
-# p <- list(y1 = prox, y2 = prox, y3 = prox, y4 = prox)
-# s <- list(y1 = sync, y2 = sync, y3 = sync, y4 = sync)
-# c <- list(y1= compat, y2 = compat, y3 = compat, y4 = compat)
+# pop2 <- simulateScene()
+# pops <- list(y1 = pop, y2 = pop2, y3 = pop)
+# s <- synchrony(pop2, 'augspurger')
+# c <- compatibility(pop2, method = 'si_echinacea')
+# p <- proximity (pop2, 'maxProp')
+# sync <- synchrony(pops, "augs")
+# prox <- proximity(pops, 'maxProp')
+# compat <- compatibility(pops, method = 'si_echinacea')
 # v <- list(synchrony = sync, proximity = prox, compatibility = compat)
 # v1 <- list(proximity = p , synchrony = s, compatibility = c)
 # v2 <- list(proximity = p, synchrony = s)
-# v3 <- list(compatibility = c, proximity = p)
+# plot3DPotential(v, subject = 'ind')
+# plot3DPotential(v, subject = 'ind', sample = 'random')
+# plot3DPotential(v, subject = 'ind', sample = 'all')
+# plot3DPotential(v, subject = 'pair')
+# plot3DPotential(v, subject = 'pair', sample = 'random')
+# plot3DPotential(v1, subject = 'ind')
 # plot3DPotential(v1, subject = 'pair')
+# plot3DPotential(v2, subject = 'ind')
+# plot3DPotential(v2, subject = 'pair')
+
 
 
 
