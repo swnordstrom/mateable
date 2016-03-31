@@ -72,76 +72,27 @@ plotScene <- function(scene, dimension = "auto",
     par(oma = c(5,3,4,1))
 
     if(spat){
-      emin <- min(scene[[1]]['x'])
-      emax <- max(scene[[1]]['x'])
-      nmin <- min(scene[[1]]['y'])
-      nmax <- max(scene[[1]]['y'])
+      emin <- min(unlist(lapply(scene, function(x) x['x'])))
+      emax <- max(unlist(lapply(scene, function(x) x['x'])))
+      nmin <- min(unlist(lapply(scene, function(x) x['y'])))
+      nmax <- max(unlist(lapply(scene, function(x) x['y'])))
     }
 
     if(temp){
       if(is.null(opening)){
-        opening <- min(scene[[1]]['start'])
+        opening <- min(unlist(lapply(scene, function(x) x['start'])))
       }
       if(is.null(closing)){
-        closing <- max(scene[[1]]['end'])
+        closing <- max(unlist(lapply(scene, function(x) x['end'])))
       }
     }
 
     if(comp){
-      smin <- min(as.numeric(scene[[1]][['s1']]))
-      smax <- min(as.numeric(scene[[1]][['s1']]))
+      smin <- min(unlist(lapply(scene, function(x) as.numeric(unlist(x[,c('s1','s2')])))))
+      smax <- max(unlist(lapply(scene, function(x) as.numeric(unlist(x[,c('s1','s2')])))))
     }
 
-    count <- nrow(scene[[1]])
-
-    for (i in 1:length(scene)){
-      if (nrow(scene[[i]]) > max(count)){
-        count <- nrow(scene[[i]])
-      }
-
-      if (spat){
-        if (min(scene[[i]]['x'])< emin){
-          emin <- min(scene[[i]]['x'])
-        }
-        if (max(scene[[i]]['x'])> emax){
-          emax <- max(scene[[i]]['x'])
-        }
-        if (min(scene[[i]]['y'])< nmin){
-          nmin <- min(scene[[i]]['y'])
-        }
-        if (max(scene[[i]]['y'])> nmax){
-          nmax <- max(scene[[i]]['y'])
-        }
-      }
-
-      if(comp){
-        if (max(as.numeric(scene[[i]][['s1']])>smax)){
-          smax <- max(as.numeric(scene[[i]][['s1']]))
-        }
-        if (max(as.numeric(scene[[i]][['s2']])>smax)){
-          smax <- max(as.numeric(scene[[i]][['s2']]))
-        }
-        if (min(as.numeric(scene[[i]][['s1']])<smin)){
-          smin <- min(as.numeric(scene[[i]][['s1']]))
-        }
-        if (min(as.numeric(scene[[i]][['s2']])<smin)){
-          smin <- min(as.numeric(scene[[i]][['s2']]))
-        }
-      }
-
-      if(temp){
-        if(is.null(opening)){
-          if (min(scene[[i]]['start']) < opening){
-            opening <- min(scene[[i]]['start'])
-          }
-        }
-        if(is.null(closing)){
-          if (max(scene[[i]]['end']) > closing){
-            closing <- max(scene[[i]]['end'])
-          }
-        }
-      }
-    }
+    count <- max(unlist(lapply(scene, nrow)))
 
     if ('random' %in% sub){
       sub <- sample(scene[[1]][['id']],N)
@@ -197,14 +148,9 @@ plotScene <- function(scene, dimension = "auto",
         }
       }
       if (spat){
-        if (is.null(xlab.spat)){
-          xlab.spat <- 'easting'
-        }
-        if (is.null(ylab.spat)){
-          ylab.spat <- 'northing'
-        }
-        plot.default(scene.i[, 'x'], scene.i[, 'y'], type = "n",
-                     xlim = c(emin,emax), ylim = c(nmin,nmax), ylab = "",xaxt = 'n', asp = 1,...)
+        if (is.null(xlab.spat)) xlab.spat <- 'easting'
+        if (is.null(ylab.spat)) ylab.spat <- 'northing'
+        plot.default(scene.i[, 'x'], scene.i[, 'y'], type = "n",xlim = c(emin,emax), ylim = c(nmin,nmax), ylab = "",xaxt = 'n', asp = 1,...)
         mtext(ylab.spat,side = 2,adj = 0.5, cex = 0.75, line = 2.5)
         if (i == nr){
           axis(1)
@@ -257,3 +203,4 @@ plotScene <- function(scene, dimension = "auto",
   }
   par(mar = nm, mfrow = nmfrow, oma = noma)
 }
+
