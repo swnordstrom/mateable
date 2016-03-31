@@ -5,9 +5,9 @@
 ##' @param subject character, indicates whether the subject to be visualized is individuals (\code{subject} = 'ind') or all pairwise interactions (\code{subject} = 'pair')
 ##' @param density logical, if TRUE (default), plots probability density over histogram
 ##' @param sub.ids vector, contains the IDs of individuals to be represented in pairwise potential plots
-##' @param N integer, indicates the number of individuals to sample if sub.ids = 'random', default N = 9
 ##' @param sample character, specifies how to sample individuals to be represented in pairwise potential plots. Possible values are "random" (default) or "all". See details.
-##' @param main character, the main plot title
+##' @param N integer, indicates the number of individuals to sample if sub.ids = 'random' (default N = 3)
+##' @param main character, the main plot title, if NULL, defaults to 'individual potential' or 'pairwise potential,' corresponding to \code{subject}
 ##' @details The individuals to be represented in the pairwise potential plots can either be specified explicitly through \code{sub.ids}, chosen randomly (\code{sample} = 'random'), or all individuals can be selected (\code{sample} = 'all'). The default is to randonly select 9 individuals. If multiple years are being plotted, the subset is sampled from all years and the same individuals will be represented in each year, if possible. If fewer than three individuals from the subset are available in a year, no network diagram or heatmap will be returned for that year.
 ##' @export
 ##' @author Amy Waananen
@@ -24,7 +24,7 @@
 plot3DPotential <-   function(matPots,
                               subject = NULL,
                               density = TRUE,
-                              sub.ids = NULL, N = 9, sample = "random",
+                              sub.ids = NULL, N = 3, sample = "random",
                               main = NULL){
   nm <- par("mar")
   noma <- par('oma')
@@ -64,12 +64,15 @@ plot3DPotential <-   function(matPots,
     if(attr(matPot[[1]],'t')){
       synchrony <- T
       sync <- matPot
+      d1 <- sync
     } else if(attr(matPot[[1]],'s')){
       proximity <- T
       prox <- matPot
+      d1 <- prox
     } else if(attr(matPot[[1]],'c')){
       compatibility <- T
       compat <- matPot
+      d1 <- compat
     }
   }
 
@@ -120,11 +123,10 @@ plot3DPotential <-   function(matPots,
     }
   }
 
-#   for (i in 1:len){
-#     ranges <- lapply(ind,function(x)apply(x[,2:],2,range))
-#   }
-
-
+  # str(pair)
+  #   for (i in 1:len){
+  #     ranges <- lapply(ind,function(x)apply(x[,2:],2,range))
+  #   }
 
   if (ndim == 2){
     xlab <- ifelse(synchrony, 'synchrony','proximity')
@@ -143,6 +145,13 @@ plot3DPotential <-   function(matPots,
         mtext(ylab,2,cex = 0.75, outer = TRUE, line = 2.5)
       }
       mtext(names(matPots[[1]][i]), 2, cex = 0.7, outer = F, line = 5, font = 1)
+      if (!is.null(sub.ids)){
+        if(subject %in% 'ind'){
+          text(ind[[i]][ind[[i]][,'id'] %in% sub.ids,2],ind[[i]][ind[[i]][,'id'] %in% sub.ids,3],ind[[i]][ind[[i]][,'id'] %in% sub.ids,1], pos = 2)
+        } else {
+          text(pair[[i]][attr(d1[[i]][['pair']],'idOrder') %in% sub.ids,,1], pair[[i]][attr(d1[[i]][['pair']],'idOrder') %in% sub.ids,,2], attr(d1[[i]][['pair']],'idOrder')[attr(d1[[i]][['pair']],'idOrder') %in% sub.ids] , pos = 2, cex = 0.6)
+        }
+      }
     }
   } else if (ndim == 3){
     palette(colorRampPalette(c('red','green'))(3))
@@ -152,6 +161,13 @@ plot3DPotential <-   function(matPots,
       } else {
         cols <- findInterval(ind[[i]][,4], c(0,0.25,0.5,1))
         plot(ind[[i]][,2],ind[[i]][,3], ylab = '', pch = 21, bg = cols, xaxt = 'n',yaxt = 'n', xlab = '')
+      }
+      if (!is.null(sub.ids)){
+        if(subject %in% 'ind'){
+          text(ind[[i]][ind[[i]][,'id'] %in% sub.ids,2],ind[[i]][ind[[i]][,'id'] %in% sub.ids,3],ind[[i]][ind[[i]][,'id'] %in% sub.ids,1], pos = 2)
+        } else {
+          text(pair[[i]][attr(d1[[i]][['pair']],'idOrder') %in% sub.ids,,1], pair[[i]][attr(d1[[i]][['pair']],'idOrder') %in% sub.ids,,2], attr(d1[[i]][['pair']],'idOrder')[attr(d1[[i]][['pair']],'idOrder') %in% sub.ids] , pos = 2, cex = 0.75)
+        }
       }
       axis(2,  cex.axis = 0.85, las = 2)
       if (i == len){
@@ -183,7 +199,7 @@ plot3DPotential <-   function(matPots,
 # 3. add legend to 3D plots (for compatibility) DONE
 # 4. if only one year, change plot margins? DONE
 # 5. reconsider how to display compatibility (more colors?)
-# 6. add option to identify a subset of individuals or pairs
+# 6. add option to identify a subset of individuals or pairs DONE
 
 
 # pop <- simulateScene()
@@ -198,7 +214,7 @@ plot3DPotential <-   function(matPots,
 # v1 <- list(proximity = p , synchrony = s, compatibility = c)
 # v2 <- list(proximity = p, synchrony = s)
 # v3 <- list(compatibility = c, proximity = p)
-plot3DPotential(v3, subject = 'pair')
+# plot3DPotential(v1, subject = 'pair')
 
 
 
