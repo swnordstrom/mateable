@@ -5,7 +5,7 @@
 \title{graphical visualization of a mating scene object}
 \usage{
 plotScene(scene, dimension = "auto", opening = NULL, closing = NULL,
-  dailyPoints = TRUE, drawQuartiles = TRUE, sub = NULL, N = 9,
+  dailyPoints = TRUE, drawQuartiles = TRUE, sub = NULL, N = 1,
   xlab.spat = NULL, ylab.spat = NULL, pch = 19, cex.quartile = 1,
   col.quartile = "gray55", col.peak = "gray27", labelID = FALSE, ...)
 }
@@ -32,11 +32,11 @@ plotScene(scene, dimension = "auto", opening = NULL, closing = NULL,
 
 \item{pch}{specify point type to be used in plots. Defaults to pch = 19 (filled-in circle). If NULL, points will be labeled with their id.}
 
-\item{cex.quartile}{if drawQuartiles = TRUE, specifies weight of quartile and peak lines relative to device default.}
+\item{cex.quartile}{if \code{drawQuartiles} = TRUE, specifies weight of quartile and peak lines relative to device default.}
 
-\item{col.quartile}{if drawQuartiles = TRUE, specifies color of quartile lines, defaults to 'gray81'.}
+\item{col.quartile}{if \code{drawQuartiles} = TRUE, specifies color of quartile lines, defaults to 'gray81'.}
 
-\item{col.peak}{if drawQuartiles = TRUE, specify color of peak lines, defaults to 'gray27'.}
+\item{col.peak}{if \code{drawQuartiles} = TRUE, specify color of peak lines, defaults to 'gray27'.}
 
 \item{labelID}{if TRUE, the y-axis will be labeled with the id of the corresponding segment.}
 

@@ -21,7 +21,7 @@
 ##'
 plot3DScene <- function(scene, dimension = "auto",
                         sub= NULL, ycoord = 'northing', xcoord = 'easting',
-                        pch = 19, ...){
+                        pch = 19, N = 9, ...){
   dimension <- match.arg(dimension, c("auto", "t", "s", "mt"),several.ok = TRUE)
   nm <- par("mar")
   nmfrow <- par('mfrow')

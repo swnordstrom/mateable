@@ -5,20 +5,22 @@
 \title{multi-dimensional visualization of mating scene object}
 \usage{
 plot3DScene(scene, dimension = "auto", sub = NULL, ycoord = "northing",
-  xcoord = "easting", pch = 19, ...)
+  xcoord = "easting", pch = 19, N = 9, ...)
 }
 \arguments{
 \item{scene}{a matingScene object}
 
 \item{dimension}{what dimension(s) of the mating scene should be visualized. Possible dimensions are 't' for temporal, 's' for spatial, 'mt' for mating type, and 'auto' (the default). For dimension = 'auto', all dimensions represented in the mating scene object will be plotted.}
 
-\item{sub}{a subset of the population to plot}
+\item{sub}{a subset of the population to plot; either a character indicating whether to subset a random sample (\code{sub}='random'), all individuals (\code{sub}='all'), or a vector containing the IDs of the individuals to subset.}
 
 \item{ycoord}{y-axis coordinate system label}
 
 \item{xcoord}{x-axis coordinate system label}
 
 \item{pch}{point type, defaults to pch = 19, solid filled in circle. If pch = NULL, individuals will be labeled by their id.}
+
+\item{N}{if \code{sub} = 'random', the number of individuals to sample}
 
 \item{...}{optional arguments for the plot function}
 }
