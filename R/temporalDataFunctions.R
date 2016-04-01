@@ -185,7 +185,8 @@ receptivityByDay <- function(scene) {
 ##' described in Kempenaers (1993). "sync_prop" will calculate individual
 ##'  synchrony based on the proportion of the sum of all individuals' days
 ##'  available to mate that coincided with the individual's days available for mating.
-##' "overlap" will calculate a synchrony value based on the number of days both
+##' "overlap" is based on the method described in Ison et al. (2014) and will
+##' calculate a synchrony value based on the number of days both
 ##' individuals were flowering divided by the number of days either individual
 ##' was available for mating. "sync_nn" gives the average of the kth nearest
 ##' neighbor, or rather the kth most synchronous individual.
@@ -218,14 +219,18 @@ receptivityByDay <- function(scene) {
 ##' containing the values described above for population, pairwise, and
 ##' individual synchrony.
 ##' @details Measures of synchrony are based on methods described in Augspurger (1983),
-##' Kempenaers (1983), and from Ison and Wagenius (2014), as well
+##' Kempenaers (1983), and from Ison et al. (2014), as well
 ##' as variations on different factors of those measures.
 ##' @export
 ##' @author Danny Hanson
-##' @references Kempenaers, B. (1993) The use of a breeding synchrony index.
-##' \emph{Ornis Scandinavica}, \strong{24}, 1. \cr\cr
-##' Augspurger, C.K. (1983) Phenology, flowering synchrony, and fruit set of
-##' six neotropical shrubs. \emph{Biotropica} \strong{15}, 257-267.
+##' @references Augspurger, C.K. (1983) Phenology, flowering synchrony, and fruit set of
+##' six neotropical shrubs. \emph{Biotropica} \strong{15}, 257-267. \cr\cr
+##' Ison, J.L., S. Wagenius, D. Reitz., M.V. Ashley. (2014) Mating between
+##' \emph{Echinacea angustifolia} (Asteraceae) individuals increases with
+##' their flowering synchrony and spatial proximity.
+##' \emph{American Journal of Botany} \strong{101}, 180-189 \cr\cr
+##' Kempenaers, B. (1993) The use of a breeding synchrony index.
+##' \emph{Ornis Scandinavica}, \strong{24}, 1.
 ##' @examples
 ##' pop <- simulateScene(size = 150)
 ##' synchrony(pop, "augs")

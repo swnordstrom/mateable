@@ -1,4 +1,4 @@
-##' Calculate one or several of measures of mating compatibility.
+##' Calculate one of several measures of mating compatibility.
 ##'
 ##' @title Make potentials object--mating type compatibility
 ##' @param scene a matingScene object

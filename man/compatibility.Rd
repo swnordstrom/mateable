@@ -30,7 +30,7 @@ a column containing compatibility averages. If \code{subject} is "all"
 the return list will contain all three of the items above.
 }
 \description{
-Calculate one or several of measures of mating compatibility.
+Calculate one of several measures of mating compatibility.
 }
 \details{
 When \code{method} is "si_echinacea" compatibility will be
