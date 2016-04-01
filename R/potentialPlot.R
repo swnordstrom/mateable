@@ -3,14 +3,16 @@
 ##'
 ##' @title graphical visualization of a mating potential object
 ##' @param matPot a mating potential object
-##' @param subject a character string indicating whether the subject to be visualized is individuals or all pairwise interactions
-##' @param plotType a character string indivating the plots to be displayed. Options are histogram ('hist'), network diagram ('net')
+##' @param subject character, either 'ind' or 'pair', indicating whether the subject being visualized is individuals or pairwise interactions
+##' @param plotType character,  indicating what plots are to be displayed. See details. Options are histogram ('hist'), network diagram ('net'), and heatmap ('heat'). If mating potential object
 ##' @param density logical. If true (default), plots probability density over histogram.
 ##' @param sub.ids a vector containing the ids of individuals to be represented in pairwise potential plots
 ##' @param N a positive number indicating the number of individuals to sample if sub.ids = 'random'
-##' @param sample a character string specifying how to choose a subset of individuals to be represented in pairwise potential plots. Possible values are "random" (default) or "all".
+##' @param sample a character string specifying how to choose a subset of individuals to be represented in pairwise potential plots. Possible values are "random" (default) or "all" (see details).
 ##' @param main the main title (on top of plot)
 ##' @param ... optional arguments for the plot function
+##' @details Options for \code{plotType} are 'hist' (histogram), 'net' (network diagram), 'heat' (heatmap), and 'auto'. Default value is 'auto': if the mating potential object contains pairwise potential, 'auto' returns all plot types, otherwise it returns histograms of individual potential.
+##' @details The individuals to be represented in the pairwise potential plots can either be specified explicitly through \code{sub.ids}, chosen randomly (\code{sample} = 'random'), or all individuals can be selected (\code{sample} = 'all'). The default is to randonly select 9 individuals. If multiple years are being plotted, the subset is sampled from all years and the same individuals will be represented in each year, if possible. If fewer than three individuals from the subset are available in a year, no network diagram or heatmap will be returned for that year.
 ##' @export
 ##' @author Amy Waananen
 ##' @seealso see generic function \code{\link{points}} for values of \code{pch}
@@ -18,8 +20,6 @@
 ##' pop <- simulateScene()
 ##' sync <- synchrony(pop, "augs")
 ##' plotPotential(sync)
-##'
-##'
 plotPotential <-   function(matPot,
                             subject = NULL,
                             plotType = 'auto',
@@ -76,51 +76,31 @@ plotPotential <-   function(matPot,
 
   if (subject %in% 'ind'){
     par(mfrow = c(nr,1))
-    par(oma = c(1,1,2,0))
+    if (nr > 1){
+      par(oma = c(1,1,2,1))
+    } else {
+      par(oma = c(1,0,2,1))
+    }
   } else {
     par(mfrow = c(nr,nc))
     par(mar = c(4,0.5,0.5,2.5))
     par(oma = c(4,4,4,1.5))
   }
 
-  ids <- matPot[[1]][['ind']][['id']]
-
   if (is.null(sub.ids)){
-    if (sample %in% 'all'){
-      sub.ids <- ids
-    } else {
-      sub.ids <- sample(ids, N)
+    if(sample == 'random'){
+      sub.ids <- sample(unique(unlist(sapply(matPot, function(x)x$ind$id))),N)
+    } else if(sample == 'all'){
+      sub.ids <-unique(unlist(sapply(matPot, function(x)x$ind$id), use.names = F))
     }
   }
 
   if ('ind' %in% subject){
-    hmax <- max(hist(matPot[[1]][[subject]][,potential], breaks = 15, plot = F)$breaks)
-    hmin <- min(hist(matPot[[1]][[subject]][,potential], breaks = 15, plot = F)$breaks)
+    hmax <- max(unlist(lapply(matPot,function(x)hist(x[[subject]][,potential], breaks = 15, plot = F)$breaks)))
+    hmin <- min(unlist(lapply(matPot,function(x)hist(x[[subject]][,potential], breaks = 15, plot = F)$breaks)))
   } else {
-    hmax <- max(hist(matPot[[1]][[subject]], breaks = 15, plot = F)$breaks)
-    hmin <- min(hist(matPot[[1]][[subject]], breaks = 15, plot = F)$breaks)
-  }
-
-
-  for (j in 1:length(matPot)){
-    potj <- matPot[[j]]
-    if('hist' %in% pt){
-      if('ind' %in% subject){
-        if (max(hist(potj[[subject]][,potential], breaks = 15, plot = F)$breaks) > hmax){
-          hmax <- max(hist(potj[[subject]][,potential], breaks = 15, plot = F)$breaks)
-        }
-        if (min(hist(potj[[subject]][,potential], breaks = 15, plot = F)$breaks) < hmin){
-          hmin <- min(hist(potj[[subject]][,potential], breaks = 15, plot = F)$breaks)
-        }
-      } else {
-        if (max(hist(potj[[subject]], breaks = 15, plot = F)$breaks) > hmax){
-          hmax <- max(hist(potj[[subject]], breaks = 15, plot = F)$breaks)
-        }
-        if (min(hist(potj[[subject]], breaks = 15, plot = F)$breaks) < hmin){
-          hmin <- min(hist(potj[[subject]], breaks = 15, plot = F)$breaks)
-        }
-      }
-    }
+    hmax <- max(unlist(lapply(matPot,function(x)hist(x[[subject]], breaks = 15, plot = F)$breaks)))
+    hmin <- min(unlist(lapply(matPot,function(x)hist(x[[subject]], breaks = 15, plot = F)$breaks)))
   }
 
   for (i in 1:length(matPot)){
@@ -191,7 +171,6 @@ plotPotential <-   function(matPot,
           mtext(names(matPot)[i],side = 2,adj = 0.5, cex = 0.75, line = 5, font = 2)
         }
         if (i == nr){
-          # par(mar = c(4,3,1,1))
           title(xlab = potential)
         }
         if (density){
@@ -200,15 +179,13 @@ plotPotential <-   function(matPot,
       }
     }
   }
-
   mtext(main, side = 3, line = 0, cex = 1.5, outer = TRUE)
   par(mar = nm, mfrow = nmfrow, oma = noma)
 }
 
 
 
-plot_web3 <-
-  function (flowmat, names = NULL, lab.size = 1.5, add = FALSE,
+plot_web3 <- function (flowmat, names = NULL, lab.size = 1.5, add = FALSE,
             fig.size = 1.3, main = "", sub = "", sub2 = "", log = FALSE,
             mar = c(0.25, 0.25, 0.25, 0.25), nullflow = NULL, minflow = NULL, maxflow = NULL,
             legend = TRUE, leg.digit = 5, leg.title = NULL, lcol = "black",
@@ -216,8 +193,7 @@ plot_web3 <-
             val.col = "red", val.title = NULL, val.ncol = 1, budget = FALSE,
             bud.digit = 5, bud.size = 0.6, bud.title = "budget", bud.ncol = 1,
             maxarrow = 10, minarrow = 1, length = 0.1, dcirc = 1.2, bty = "o",
-            labz.size = 1.5, ...)
-  {
+            labz.size = 1.5, ...){
     nm <- par("mar")
     if (ncol(flowmat) != nrow(flowmat))
       stop("flowmat has to be square")
