@@ -189,7 +189,15 @@ receptivityByDay <- function(scene) {
 ##' calculate a synchrony value based on the number of days both
 ##' individuals were flowering divided by the number of days either individual
 ##' was available for mating. "sync_nn" gives the average of the kth nearest
-##' neighbor, or rather the kth most synchronous individual.
+##' neighbor, or rather the kth most synchronous individual. "simple1" will
+##' calculate the number of individuals receptive on the peak day
+##' (day with highest mating receptivity) divided by the number of individuals
+##' in the population. "simple2" will calculate the number of individuals
+##' receptive on the peak day divided by the total number of observations -
+##' this method is useful for comparing to data that has no information on
+##' individuals. "simple3" calculates the mean number of individuals receptive
+##' per day divided by the maximum number of individuals receptive per day.
+##' All "simple" methods do not have pairwise or individual values.
 ##' @param subject one of "population", "pairwise", "individual", or "all"
 ##' - see Value for more details.
 ##' @param averageType character. Identifies whether to take the mean or median
@@ -241,7 +249,8 @@ synchrony <- function(scene, method, subject = "all", averageType = "mean",
                       syncNN = 1, compareToSelf = FALSE, frame = 'within') {
 
   method <- match.arg(method, c("augspurger", "kempenaers", "sync_prop",
-                                "overlap", "sync_nn"))
+                                "overlap", "sync_nn", "simple1", "simple2",
+                                "simple3"))
   subject <- match.arg(subject, c("population", "pairwise",
                                   "individual", "all"),
                        several.ok = T)
@@ -418,6 +427,27 @@ synchrony <- function(scene, method, subject = "all", averageType = "mean",
       indSync$synchrony <- row_kth(pairSync2, (m-syncNN)-1)
 
       popSync <- average(indSync[,2])
+
+    } else if (method == "simple1") {
+      pairSync <- NULL
+      indSync <- NULL
+
+      indCols <- colSums(receptivityByDay(scene))
+      popSync <- max(indCols)/n
+
+    } else if (method == "simple2") {
+      pairSync <- NULL
+      indSync <- NULL
+
+      indCols <- colSums(receptivityByDay(scene))
+      popSync <- max(indCols)/sum(indCols)
+
+    } else if (method == "simple3") {
+      pairSync <- NULL
+      indSync <- NULL
+
+      indCols <- colSums(receptivityByDay(scene))
+      popSync <- mean(indCols)/max(indCols)
 
     }
 
