@@ -170,6 +170,7 @@ receptivityByDay <- function(scene) {
 
     rownames(dailyMatrix) <- ids
     colnames(dailyMatrix) <- days
+    attr(dailyMatrix,'origin') <- attr(scene,'origin')
   }
   dailyMatrix
 }
