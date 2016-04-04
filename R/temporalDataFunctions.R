@@ -152,9 +152,9 @@ overlap <- function(scene, overlapOrTotal = c("overlap", "total"),
 ##' @examples
 ##' pop <- simulateScene(size = 10)
 ##' receptivityByDay(pop)
-receptivityByDay <- function(scene) {
+receptivityByDay <- function(scene, summary = FALSE, nameDate = TRUE) {
   if (is.list(scene) & !is.data.frame(scene)) {
-    dailyMatrix <- lapply(scene, receptivityByDay)
+    dailyReceptivity <- lapply(scene, receptivityByDay, summary, nameDate)
   } else {
     # get ids and days that flowering occurred
     ids <- scene$id
@@ -171,8 +171,18 @@ receptivityByDay <- function(scene) {
     rownames(dailyMatrix) <- ids
     colnames(dailyMatrix) <- days
     attr(dailyMatrix,'origin') <- attr(scene,'origin')
+
+    if(summary){
+      dailyVector <- colSums(dailyMatrix)
+      if (nameDate){
+        names(dailyVector) <- as.Date(as.numeric(names(dailyVector))+attr(dailyMatrix,'origin')-1)
+      }
+      dailyReceptivity <- dailyVector
+    } else{
+      dailyReceptivity <- dailyMatrix
+    }
   }
-  dailyMatrix
+  dailyReceptivity
 }
 
 ##' Calculate one of a variety of measures of mating synchrony.
@@ -355,10 +365,8 @@ synchrony <- function(scene, method, subject = "all", averageType = "mean",
       popSync <- average(indSync[,2])
 
     } else if (method == 'sync_prop') {
-      days <- min(scene$start):max(scene$end)
       fl <- receptivityByDay(scene)
       n <- sum(fl)
-
       prop <- apply(fl, 2, function(x){sum(x)/n})
       indPropDaily<- t(apply(fl,1,function(x){x*prop}))
       totalIndProp <- rowSums(indPropDaily)
