@@ -8,7 +8,11 @@
 ##' @param sample character, specifies how to sample individuals to be represented in pairwise potential plots. Possible values are "random" (default) or "all". See details.
 ##' @param N integer, indicates the number of individuals to sample if sub.ids = 'random' (default N = 3)
 ##' @param main character, the main plot title, if NULL, defaults to 'individual potential' or 'pairwise potential,' corresponding to \code{subject}
-##' @details The individuals to be represented in the pairwise potential plots can either be specified explicitly through \code{sub.ids}, chosen randomly (\code{sample} = 'random'), or all individuals can be selected (\code{sample} = 'all'). The default is to randonly select 9 individuals. If multiple years are being plotted, the subset is sampled from all years and the same individuals will be represented in each year, if possible. If fewer than three individuals from the subset are available in a year, no network diagram or heatmap will be returned for that year.
+##' @details The individuals to be represented in the pairwise potential plots can either be specified explicitly
+##' through \code{sub.ids}, chosen randomly (\code{sample} = 'random'), or all individuals can be selected (\code{sample} = 'all').
+##' The default is to randonly select 9 individuals. If multiple years are being plotted, the subset is sampled from all years
+##' and the same individuals will be represented in each year, if possible. If fewer than three individuals from the subset are available in a year,
+##' no network diagram or heatmap will be returned for that year.
 ##' @export
 ##' @author Amy Waananen
 ##' @seealso see generic function \code{\link{points}} for values of \code{pch}
@@ -207,8 +211,4 @@ plot3DPotential <-   function(matPots,
   }
   par(oma = noma, mar = nm, mfrow = nmfrow)
 }
-
-
-
-
 
