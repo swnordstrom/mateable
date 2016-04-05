@@ -4,10 +4,12 @@
 ##' @param scene a matingScene object
 ##' @param dimension what dimension(s) of the mating scene should be visualized. Possible dimensions are 't' for temporal, 's' for spatial, 'mt' for mating type, and 'auto' (the default). For dimension = 'auto', all dimensions represented in the mating scene object will be plotted.
 ##' @param sub a subset of the population to plot; either a character indicating whether to subset a random sample (\code{sub}='random'), all individuals (\code{sub}='all'), or a vector containing the IDs of the individuals to subset.
-##' @param N if \code{sub} = 'random', the number of individuals to sample
+##' @param N if \code{sub} = 'random', the number of individuals to sample (default N = 3)
 ##' @param xcoord x-axis coordinate system label
 ##' @param ycoord y-axis coordinate system label
 ##' @param pch point type, defaults to pch = 19, solid filled in circle. If pch = NULL, individuals will be labeled by their id.
+##' @param pt.cex specify point expansion factor (point size relative to device default)
+##' @param text.cex specify text expansion factor (text size relative to device default)
 ##' @param ... optional arguments for the plot function
 ##' @return nothing
 ##' @export
@@ -20,8 +22,9 @@
 ##'
 ##'
 plot3DScene <- function(scene, dimension = "auto",
-                        sub= NULL, ycoord = 'northing', xcoord = 'easting',
-                        pch = 19, ...){
+                        sub= NULL, N = 3,
+                        ycoord = 'northing', xcoord = 'easting',
+                        pch = 19, pt.cex = 0.7,text.cex = 0.7, ...){
   dimension <- match.arg(dimension, c("auto", "t", "s", "mt"),several.ok = TRUE)
   par.orig <- par("mar", "oma", "mfrow", "xpd")
   on.exit(par(par.orig))
@@ -85,22 +88,22 @@ plot3DScene <- function(scene, dimension = "auto",
       scene.i$cols <- findInterval(scene.i$start,vec)
     }
     if(spat){
-      plot.default(scene.i[, 'x'], scene.i[, 'y'], type = "n", xaxt = 'n', xlim = c(emin,emax),ylim = c(nmin,nmax), ylab = "", asp = 1, ...)
+      plot.default(scene.i[, 'x'], scene.i[, 'y'], type = "n", xaxt = 'n', xlim = c(emin,emax),ylim = c(nmin,nmax), ylab = "", asp = 1, cex = pt.cex, ...)
       mtext(ycoord, side = 2, cex = 0.75, adj = 0.5, line = 3)
       mtext(names(scene)[i],side = 2, cex = 0.75, font = 2, las = 1, adj = 0, line = 8)
     }
     if (temp & spat & comp){
       if (is.null(pch)) {
-        text(scene.i[, 'x'], scene.i[, 'y'], scene.i[, 'id'], col = scene.i$cols, ...)
+        text(scene.i[, 'x'], scene.i[, 'y'], scene.i[, 'id'], col = scene.i$cols, cex = text.cex, ...)
       } else {
-        text (scene.i[,'x'], scene.i[,'y'], paste(scene.i[,'s1'],', ',scene.i[,'s2'], sep = ""), pos = 2, cex = 0.9)
+        text (scene.i[,'x'], scene.i[,'y'], paste(scene.i[,'s1'],', ',scene.i[,'s2'], sep = ""), pos = 2, cex = text.cex)
         if (!is.null(sub)){
           scene.i.sub <- scene.i[scene.i[, 'id'] %in% sub, ]
-          text(scene.i.sub[, 'x'], scene.i.sub[, 'y'], scene.i.sub[, 'id'], pos = 3, cex =1.1, font = 2, ...)
-          points(scene.i.sub[, 'x'], scene.i.sub[, 'y'], pch = pch,cex= 1.4,col = scene.i.sub$cols,  ...)
-          points(scene.i[!scene.i[, 'id'] %in% sub, 'x'], scene.i[!scene.i[, 'id'] %in% sub, 'y'], pch = pch, col = scene.i$cols, ...)
+          text(scene.i.sub[, 'x'], scene.i.sub[, 'y'], scene.i.sub[, 'id'], pos = 3, cex =text.cex*1.2, font = 2, ...)
+          points(scene.i.sub[, 'x'], scene.i.sub[, 'y'], pch = pch,col = scene.i.sub$cols,cex = pt.cex*1.2,  ...)
+          points(scene.i[!scene.i[, 'id'] %in% sub, 'x'], scene.i[!scene.i[, 'id'] %in% sub, 'y'], pch = pch, col = scene.i$cols, cex = pt.cex, ...)
         } else {
-          points(scene.i[, 'x'], scene.i[, 'y'], pch = pch, col = scene.i$cols, ...)
+          points(scene.i[, 'x'], scene.i[, 'y'], pch = pch, col = scene.i$cols, cex = pt.cex, ...)
         }
       }
       if(i == nr){
@@ -117,11 +120,11 @@ plot3DScene <- function(scene, dimension = "auto",
       } else {
         if (!is.null(sub)){
           scene.i.sub <- scene.i[scene.i[, 'id'] %in% sub, ]
-          text(scene.i.sub[, 'x'], scene.i.sub[, 'y'], scene.i.sub[, 'id'], pos = 3, cex =1.1, font = 2, ...)
-          points(scene.i.sub[, 'x'], scene.i.sub[, 'y'], pch = pch,cex= 1.4,col = scene.i.sub$cols,  ...)
-          points(scene.i[!scene.i[, 'id'] %in% sub, 'x'], scene.i[!scene.i[, 'id'] %in% sub, 'y'], pch = pch, col = scene.i$cols, ...)
+          text(scene.i.sub[, 'x'], scene.i.sub[, 'y'], scene.i.sub[, 'id'], pos = 3, cex =text.cex, font = 2, ...)
+          points(scene.i.sub[, 'x'], scene.i.sub[, 'y'], pch = pch,col = scene.i.sub$cols,cex = pt.cex*1.2,  ...)
+          points(scene.i[!scene.i[, 'id'] %in% sub, 'x'], scene.i[!scene.i[, 'id'] %in% sub, 'y'], pch = pch, cex = pt.cex, col = scene.i$cols, ...)
         } else {
-          points(scene.i[, 'x'], scene.i[, 'y'], pch = pch, col = scene.i$cols, ...)
+          points(scene.i[, 'x'], scene.i[, 'y'], pch = pch, col = scene.i$cols, cex = pt.cex, ...)
         }
       }
       if(i == nr){
@@ -134,17 +137,17 @@ plot3DScene <- function(scene, dimension = "auto",
       }
     } else if(spat & comp){
       if (is.null(pch)) {
-        text(scene.i[, 'x'], scene.i[, 'y'], scene.i[, 'id'], ...)
+        text(scene.i[, 'x'], scene.i[, 'y'], scene.i[, 'id'], cex = text.cex, ...)
       } else {
         if (!is.null(sub)){
           scene.i.sub <- scene.i[scene.i[, 'id'] %in% sub, ]
-          text(scene.i.sub[, 'x'], scene.i.sub[, 'y'], scene.i.sub[, 'id'], pos = 3, cex =1.1, font = 2, col = 'blue', ...)
-          points(scene.i.sub[, 'x'], scene.i.sub[, 'y'], pch = pch,cex= 1.4,  ...)
-          points(scene.i[!scene.i[, 'id'] %in% sub, 'x'], scene.i[!scene.i[, 'id'] %in% sub, 'y'], pch = pch, ...)
-          text (scene.i[,'x'], scene.i[,'y'], paste(scene.i[,'s1'],', ',scene.i[,'s2'], sep = ""), pos = 2, cex = 0.9)
+          text(scene.i.sub[, 'x'], scene.i.sub[, 'y'], scene.i.sub[, 'id'], pos = 3, cex =text.cex*1.2, font = 2, col = 'blue', ...)
+          points(scene.i.sub[, 'x'], scene.i.sub[, 'y'], pch = pch, cex = pt.cex*1.2,  ...)
+          points(scene.i[!scene.i[, 'id'] %in% sub, 'x'], scene.i[!scene.i[, 'id'] %in% sub, 'y'], pch = pch, cex = pt.cex*1.2, ...)
+          text (scene.i[,'x'], scene.i[,'y'], paste(scene.i[,'s1'],', ',scene.i[,'s2'], sep = ""), pos = 2, cex = text.cex)
         } else {
-          points(scene.i[, 'x'], scene.i[, 'y'], pch = pch, ...)
-          text (scene.i[,'x'], scene.i[,'y'], paste(scene.i[,'s1'],', ',scene.i[,'s2'], sep = ""), pos = 2, cex = 0.9)
+          points(scene.i[, 'x'], scene.i[, 'y'], pch = pch, cex = pt.cex, ...)
+          text (scene.i[,'x'], scene.i[,'y'], paste(scene.i[,'s1'],', ',scene.i[,'s2'], sep = ""), pos = 2, cex = text.cex)
         }
       }
       if(i == nr){
