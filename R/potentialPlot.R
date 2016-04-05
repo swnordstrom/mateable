@@ -149,8 +149,9 @@ plotPotential <-   function(matPot,
         } else {
           diag(subMat) <- 1
           subMat[upper.tri(subMat, diag = FALSE)] <- NA
+          leg.labs <- round(seq(min(subMat, na.rm = T),max(subMat, na.rm = T),length.out = 12), digits = 2)
           image(x = 1:nrow(subMat),y = 1:nrow(subMat), z = subMat, axes = F, xlab = "", ylab = "", col = colorRampPalette(c('white','red'))(12))
-          legend("topleft", legend = round(seq(min(subMat, na.rm = T),max(subMat, na.rm = T),length.out = 12),digits = 2), fill = colorRampPalette(c('white','red'))(12),ncol = 3, bty = 'n')
+          legend("topleft", legend = c(leg.labs[1],'','',leg.labs[4],'','','',leg.labs[8],'','','',leg.labs[12]), fill = colorRampPalette(c('white','red'))(12), bty = 'n', y.intersp = 0.65, pt.cex = 1.2)
           axis(1, 1:ncol(subMat), labels = sub.iids, tick = 0, cex.axis = -0.2 + 1/log10(nrow(subMat)))
           axis(4, 1:ncol(subMat), labels = sub.iids, tick = 0, cex.axis = -0.2 + 1/log10(nrow(subMat)), las = 2)
           par(mgp = c(3,1,0))
