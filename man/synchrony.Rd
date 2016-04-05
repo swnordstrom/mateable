@@ -5,7 +5,7 @@
 \title{Make potentials object--mating synchrony}
 \usage{
 synchrony(scene, method, subject = "all", averageType = "mean",
-  syncNN = 1, compareToSelf = FALSE)
+  syncNN = 1, compareToSelf = FALSE, frame = "within")
 }
 \arguments{
 \item{scene}{a matingScene object that includes the flowering schedule for the
@@ -21,7 +21,16 @@ described in Kempenaers (1993). "sync_prop" will calculate individual
 calculate a synchrony value based on the number of days both
 individuals were flowering divided by the number of days either individual
 was available for mating. "sync_nn" gives the average of the kth nearest
-neighbor, or rather the kth most synchronous individual.}
+neighbor, or rather the kth most synchronous individual. "simple1" will
+calculate the number of individuals receptive on the peak day
+(day with highest mating receptivity) divided by the number of individuals
+in the population. "simple2" will calculate the number of individuals
+receptive on the peak day divided by the total number of observations -
+this method is useful for comparing to data that has no information on
+individuals. "simple3" calculates the average (determined by argument
+\code{averageType}) number of individuals receptive
+per day divided by the maximum number of individuals receptive per day.
+All "simple" methods do not have pairwise or individual values.}
 
 \item{subject}{one of "population", "pairwise", "individual", or "all"
 - see Value for more details.}
@@ -36,6 +45,10 @@ will be found}
 
 \item{compareToSelf}{logical. Whether or not to include self comparisons
 when calculation synchrony. Defaults to FALSE.}
+
+\item{frame}{the timeframe that synchrony is to be calculated over; options are 'within,'
+for synchrony within a season, or 'between,' for synchrony across multiple seasons.
+Defaults to 'within'.}
 }
 \value{
 A potentials object containing one more more of the following, depending the

@@ -22,5 +22,8 @@ Imports:
     Rcpp,
     sn,
     stats
+Suggests: knitr,
+    rmarkdown
 LinkingTo: Rcpp
 RoxygenNote: 5.0.1
+VignetteBuilder: knitr

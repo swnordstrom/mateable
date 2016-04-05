@@ -19,8 +19,8 @@
 ##' @examples
 ##' pop <- simulateScene()
 ##' sync <- synchrony(pop, "augs")
-##' prox <- proximity(pop, 'maxDist')
-##' compat <- compatibility(pop, 'si_echinacea)
+##' prox <- proximity(pop, 'maxProp')
+##' compat <- compatibility(pop, 'si_echinacea')
 ##' plot3DPotential(list(sync,prox,compat), subject = 'ind')
 
 plot3DPotential <-   function(matPots,

@@ -1,0 +1,97 @@
+---
+title: "All Functions with eelr2012 Dataset"
+author: "Stuart Wagenius"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{All Functions with eelr2012 Dataset}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r}
+# load package
+library(mateable)
+
+packageDescription("mateable")$Version
+
+# look at dataset
+str(eelr2012)
+
+# describe columns
+
+
+# now we make a mating scene object
+
+eelr <- makeScene(eelr2012, startCol = "firstDay", endCol = "lastDay",
+                       xCol = "Ecoord", yCol = "Ncoord", idCol = "tagNo")
+
+# summarize characteristics of mating scene
+eSum <- matingSummary(eelr)
+
+# look at metrics you are intersted in either by index
+eSum[c("meanSD", "sdSD", "meanDur", "sdDur", "peak")]
+eSum[c("minX", "minY", "k1")]
+
+# or by name...
+eSum$minX
+eSum$minY
+eSum$k1
+
+# visualize
+plotScene(eelr, "s")
+plotScene(eelr, "s", pch = 1)
+
+plotScene(eelr, "t")
+plotScene(eelr, "t", labelID = TRUE, drawQuartiles = FALSE)
+
+plot3DScene(eelr)
+plot3DScene(eelr, cex = .5)
+
+ePair <- pairDist(eelr) # matrix of distances between pairs
+hist(ePair, 40)
+
+eKnn <- kNearNeighbors(eelr, 6) # 6 nearest neighbors
+hist(eKnn[, 3], 40)
+
+eOver <- overlap(eelr, compareToSelf = T) # number of days overlapping
+str(eOver)
+eRecep <- receptivityByDay(eelr) # T/F receptive on each day
+str(eRecep)
+
+eProx <- proximity(eelr, "maxPropSqrd")
+eProx$pop
+hist(eProx$ind$proximity, 30)
+
+eSync <- synchrony(eelr, "overlap")
+eSync$pop
+
+# plotPotential(eProx)
+# Error in plot_web3(subMat, names = sub.iids, val = FALSE, minflow = 0,  :
+#   flowmat and names not compatible
+
+plotPotential(eSync)
+# we need a legend for the right panel
+
+# make scene based off eelr summary information
+simScene <- simulateScene(size = nrow(eelr), meanSD = eSum$meanSD,
+                          sdSD = eSum$sdSD, meanDur = eSum$meanDur,
+                          sdDur = eSum$sdDur, xRange = c(eSum$minX, eSum$maxX),
+                          yRange = c(eSum$minY, eSum$maxY))
+
+sProx <- proximity(simScene, "maxPropSqrd")
+sSync <- synchrony(simScene, "augspurger")
+sComp <- compatibility(simScene, "si_echinacea")
+
+plotScene(simScene)
+plot3DScene(simScene)
+plot3DPotential(list(sProx, sSync), subject = "ind")
+plot3DPotential(list(sProx, sSync, sComp))
+
+plotPotential(sSync)
+plotPotential(sProx)
+plotPotential(sComp)
+
+```
+
