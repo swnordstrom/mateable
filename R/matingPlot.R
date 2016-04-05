@@ -38,9 +38,8 @@ plotScene <- function(scene, dimension = "auto",
                       labelID = FALSE, ...){
 
   dimension <- match.arg(dimension, c("auto", "t", "s", "mt"),several.ok = TRUE)
-  nm <- par("mar")
-  nmfrow <- par('mfrow')
-  noma <- par('oma')
+  par.orig <- par("mar", "oma", "mfrow", "xpd")
+  on.exit(par(par.orig))
 
   if (!is.list(scene[[1]])){
     scene <- list(scene)
@@ -120,7 +119,7 @@ plotScene <- function(scene, dimension = "auto",
       }
       if (!is.null(sub)){
         segments(scene.i[scene.i$id %in% sub, 'start'], scene.i[scene.i$id %in% sub, 'index'], scene.i[scene.i$id %in% sub, 'end'],scene.i[scene.i$id %in% sub, 'index'], col = "blue", ...)
-        text(scene.i[scene.i$id %in% sub, 'start']-0.05*closing, scene.i[scene.i$id %in% sub, 'index'], scene.i[scene.i$id %in% sub, 'id'], cex = 0.75)
+        text(scene.i[scene.i$id %in% sub, 'start']-0.03*closing, scene.i[scene.i$id %in% sub, 'index'], scene.i[scene.i$id %in% sub, 'id'], cex = 0.7)
       }
       if (dailyPoints == TRUE){
         rbd <- receptivityByDay(scene.i)
@@ -193,6 +192,5 @@ plotScene <- function(scene, dimension = "auto",
       }
     }
   }
-  par(mar = nm, mfrow = nmfrow, oma = noma)
 }
 
