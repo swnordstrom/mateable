@@ -23,9 +23,8 @@ plot3DScene <- function(scene, dimension = "auto",
                         sub= NULL, ycoord = 'northing', xcoord = 'easting',
                         pch = 19, ...){
   dimension <- match.arg(dimension, c("auto", "t", "s", "mt"),several.ok = TRUE)
-  nm <- par("mar")
-  nmfrow <- par('mfrow')
-  noma <- par('oma')
+  par.orig <- par("mar", "oma", "mfrow", "xpd")
+  on.exit(par(par.orig))
 
   if (!is.list(scene[[1]])){
     scene <- list(scene)
@@ -187,5 +186,4 @@ plot3DScene <- function(scene, dimension = "auto",
       }
     }
   }
-  par(mar = nm, mfrow = nmfrow, oma = noma, xpd = F)
 }
