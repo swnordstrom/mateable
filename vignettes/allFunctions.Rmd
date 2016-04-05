@@ -9,77 +9,172 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r include=FALSE} 
+knitr::opts_chunk$set(fig.width=7.2, fig.height=5) 
+```
 
 
 # Introduction
 
-This
+This vignette consists of three brief inspections of mating scenes using package `mateable`. A mating scene is a bout of mating where the coordinates of participating individuals are known in three dimensions: space, time, or compatibility. From such information we can quantify mating potential, the capacity for sexual reproduction based on the location, reproductive timing, and compatibility of prospective mates. Mating potential can be quantified for a pair of individuals based on the distance between them, the timing of reproductive activity, and their compatibility. Similarly, mating potential can be defined for an individual within the context of of the mating scene or for an entire scene.
 
 
-Begin by loading the package
+Begin by loading the package.
 
 ```{r}
 library(mateable)
 packageDescription("mateable")$Version
 ```
 
-## Real dataset
+For any function in `mateable` you can learn more by typing a question mark before the function name, i.e. `?makeScene`. To learn all the functions, type `?mateable` and click index at the bottom of the page. 
 
-```{r,fig.width=9, fig.height=6}
+
+# A real dataset
+
+In this section we look at flowering during 2012 in a remnant prairie population of *Echinacea angustifolia*, the narrow-leaved purple coneflower. The data frame `eelr2012` is included in the package.
+
+```{r}
 str(eelr2012)
+```
 
-# describe columns
+This data set includes spatial and temporal information on all of 44 plants that flowered in 2012 from the East Elk Lake Road population. Each plant has a tag with a unique number for identification purposes and we listed the count of heads that the plant produced in 2012. These long-lived plants do not produce heads in every year, we removed all plants with zero heads in 2012. The columns firstDay and lastDay indicate the first and last days that each plant produced pollen. Spatial coordinates are in meters.
 
+The first thing to do is convert the data frame to a mating scene object. We have to indicate which columns contain spatial and temporal coordinates. Note that some columns are integer and numeric. Columns firstDay and lastDay are saved in a Date format. `makeScene` can read some character formats. If you want to convert character or POSIX to the Date format, read about the function `as.Date` or install package `lubridate`.
 
-# now we make a mating scene object
-
+```{r}
 eelr <- makeScene(eelr2012, startCol = "firstDay", endCol = "lastDay",
                        xCol = "Ecoord", yCol = "Ncoord", idCol = "tagNo")
+```
 
-# summarize characteristics of mating scene
-eSum <- matingSummary(eelr)
+We can do a lot with this `mating Scene` object. For example, we can look at the spatial (s) dimension with a map. Note that we can use standard R graphical parameters to change the looks of the graph.   
 
-# look at metrics you are intersted in either by index
-eSum[c("meanSD", "sdSD", "meanDur", "sdDur", "peak")]
-eSum[c("minX", "minY", "k1")]
-
-# or by name...
-eSum$minX
-eSum$minY
-eSum$k1
-
-# visualize
+```{r}
 plotScene(eelr, "s")
 plotScene(eelr, "s", pch = 1)
+```
 
-plotScene(eelr, "t")
-plotScene(eelr, "t", sub = 'all', drawQuartiles = FALSE, text.cex = 0.5)
-plotScene(eelr, c('s','t'), sub = 'random', N = 4, text.cex = 0.5)
+We can also get the distances between all pairs using function `pairDist`, and then visualize their distribution.
 
-plot3DScene(eelr)
-plot3DScene(eelr, pt.cex = .5, sub = 'random', N = 4)
+```{r}
+ePair <- pairDist(eelr) # matrix of distances
+hist(ePair, 40) # visualize histogram
+```
 
-ePair <- pairDist(eelr) # matrix of distances between pairs
-hist(ePair, 40)
+We can also calculate the distance from each individual to its nearest neighbors (aka potential mates). Here we visualize the distance to all 3rd nearest neighbors.
 
-eKnn <- kNearNeighbors(eelr, 6) # 6 nearest neighbors
-hist(eKnn[, 3], 40)
+```{r}
+eKnn <- kNearNeighbors(eelr, 6) # 6 nearest potential mate
+str(eKnn)
+hist(eKnn[, 3], 40, main = "Distance to 3rd nearst neighbor (m)")
+```
 
-eOver <- overlap(eelr, compareToSelf = T) # number of days overlapping
-str(eOver)
+Function `matingSummary` calculates many characteristics of the "whole scene." We can save summaries as a new object `eSum` and look at characteristics of the entire mating scene, either by indexing or by name. Here are some spatial summaries.
 
-eRecep <- receptivityByDay(eelr) # T/F receptive on each day
-str(eRecep)
-dailyReceptivitySummary <- receptivityByDay(eelr, summary = TRUE)
-dailyReceptivitySummary # number of flowering individuals on each day; a vector named by date
-plot(as.Date(names(dailyReceptivitySummary)), dailyReceptivitySummary, xlab = 'date', ylab = 'count of receptive individuals')
+```{r, collapse = TRUE}
+eSum <- matingSummary(eelr)
+eSum[c("minX", "minY", "k1")] # by index
+# by name
+eSum$minX 
+eSum$minY
+eSum$k1 # mean distance to 1st nearest potential mate
+```
 
+Distance is a measure of isolation from mates. To characterize mating potential, which is inversely reltaed to distance, we want proximity to mates. For this, we have function `proximity`.
+
+```{r}
 eProx <- proximity(eelr, "maxPropSqrd")
 eProx$pop
 hist(eProx$ind$proximity, 30)
 
+```
+
+Now we turn from the spatial dimension of the mating scene to the temporal dimension. We can visualize the coordinates of mating activity in time with a mating schedule. The function `plotScene` works just as well in time as in space, we jsut need to specify which dimenstion--use "t" for time. 
+
+```{r}
+plotScene(eelr, "t")
+plotScene(eelr, "t", sub = 'all', drawQuartiles = FALSE, text.cex = 0.5)
+```
+
+This figure shows the duration of reproductive period during 2012 for each of the 44 individuals in the population with a horizontal line starting on the date the individual first produced pollen and ending on the date when pollen was last produced. Here the individuals are sorted from bottom to top by their first day. The dots indicate the total number of individuals participating in mating on each day.
+
+Just as we can calculate and visualize the spatial distances between all pairs using function `pairDist`, we can do the same in the temporal dimension with function `overlap`.
+
+```{r}
+
+eOver <- overlap(eelr, compareToSelf = T) # matrix of days overlapping
+hist(eOver, 40, main = "Histogram of days overlapping between pair") # visualize histogram
+```
+
+
+
+```{r}
+eRecep <- receptivityByDay(eelr) # T/F receptive on each day
+str(eRecep)
+dailyReceptivitySummary <- receptivityByDay(eelr, summary = TRUE)
+dailyReceptivitySummary # number of flowering individuals on each day; a vector named by date
+plot(as.Date(names(dailyReceptivitySummary)), dailyReceptivitySummary, 
+     xlab = 'date', ylab = 'count of receptive individuals')
+
+```
+
+
+
+```{r}
+
 eSync <- synchrony(eelr, "overlap")
 eSync$pop
+```
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+plotScene(eelr, c('s','t'), sub = 'random', N = 4, text.cex = 0.5)
+```
+
+
+
+```{r}
+eSum <- matingSummary(eelr)
+eSum[c("meanSD", "sdSD", "meanDur", "sdDur", "peak")] # index
+eSum[c("minX", "minY", "k1")]
+eSum$minX # by name
+eSum$minY
+eSum$k1
+```
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+
+plot3DScene(eelr)
+plot3DScene(eelr, pt.cex = .5, sub = 'random', N = 4)
+
+```
+
+
+
+
+
+
+
+```{r}
 
 plotPotential(eProx)
 plotPotential(eSync)
@@ -87,9 +182,9 @@ plotPotential(eSync)
 ```
 
 
-## Simulated dataset
+# A Simulated dataset
 
-```{r,fig.width=9, fig.height=6}
+```{r}
 # make scene based off eelr summary information
 simScene <- simulateScene(size = nrow(eelr), meanSD = eSum$meanSD,
                           sdSD = eSum$sdSD, meanDur = eSum$meanDur,
@@ -119,7 +214,7 @@ plot3DPotential(list(sProx, sSync, sComp), sub.ids = c(21,4))
 
 
 ## Multi-year scenes
-```{r,fig.width=9, fig.height=7}
+```{r, fig.height=7.5}
 simScene1 <- simulateScene(size = nrow(eelr), meanSD = eSum$meanSD,
                           sdSD = eSum$sdSD, meanDur = eSum$meanDur,
                           sdDur = eSum$sdDur, xRange = c(eSum$minX, eSum$maxX),
