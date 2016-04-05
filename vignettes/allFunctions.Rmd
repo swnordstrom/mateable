@@ -56,7 +56,6 @@ plotScene(eelr, "t")
 plotScene(eelr, "t", sub = 'all', drawQuartiles = FALSE, text.cex = 0.5)
 plotScene(eelr, c('s','t'), sub = 'random', N = 4, text.cex = 0.5)
 
-
 plot3DScene(eelr)
 plot3DScene(eelr, pt.cex = .5, sub = 'random', N = 4)
 
@@ -84,8 +83,6 @@ eSync$pop
 
 plotPotential(eProx)
 plotPotential(eSync)
-
-
 
 ```
 
@@ -139,7 +136,7 @@ simScene3 <- simulateScene(size = nrow(eelr), meanSD = eSum$meanSD,
 multiYearScene <- list('2012' = simScene1,'2013' = simScene2, '2014' = simScene3)
 
 plotScene(multiYearScene)
-plot3DScene(multiYearScene)
+plot3DScene(multiYearScene, pt.cex = 1.2)
 
 syncMulti <- synchrony(multiYearScene, method = 'augs')
 proxMulti <- proximity(multiYearScene, method = 'maxPropSqrd')
