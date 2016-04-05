@@ -32,11 +32,7 @@ The individuals to be represented in the pairwise potential plots can either be 
 \examples{
 pop <- simulateScene()
 sync <- synchrony(pop, "augs")
-<<<<<<< HEAD
-prox <- proximity(pop, 'maxDist')
-=======
 prox <- proximity(pop, 'maxProp')
->>>>>>> upstream/master
 compat <- compatibility(pop, 'si_echinacea')
 plot3DPotential(list(sync,prox,compat), subject = 'ind')
 }
