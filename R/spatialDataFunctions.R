@@ -11,7 +11,7 @@
 ##' distance <- pairDist(pop)
 pairDist <- function(scene) {
   distMat <- as.matrix(dist(scene[, c("x", "y")]))
-  attr(distMat, "idOrder") <- attr(distMat, "dimnames")[[1]]
+  attr(distMat, "idOrder") <- scene$id
   attr(distMat, "dimnames") <- NULL
   distMat
 }
