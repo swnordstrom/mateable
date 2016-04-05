@@ -122,7 +122,7 @@ plotScene <- function(scene, dimension = "auto",
       }
       if (!is.null(sub)){
         segments(scene.i[scene.i$id %in% sub, 'start'], scene.i[scene.i$id %in% sub, 'index'], scene.i[scene.i$id %in% sub, 'end'],scene.i[scene.i$id %in% sub, 'index'], col = "blue", ...)
-        text(scene.i[scene.i$id %in% sub, 'start']-0.01*closing, scene.i[scene.i$id %in% sub, 'index'], scene.i[scene.i$id %in% sub, 'id'], cex = text.cex)
+        text(scene.i[scene.i$id %in% sub, 'start']-0.015*closing, scene.i[scene.i$id %in% sub, 'index'], scene.i[scene.i$id %in% sub, 'id'], cex = text.cex)
       }
       if (dailyPoints == TRUE){
         rbd <- receptivityByDay(scene.i)
