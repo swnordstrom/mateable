@@ -24,3 +24,4 @@ Imports:
     stats
 LinkingTo: Rcpp
 RoxygenNote: 5.0.1
+VignetteBuilder: knitr
