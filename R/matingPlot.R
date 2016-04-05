@@ -12,9 +12,11 @@
 ##' @param xlab.spat character label for x-axis of spatial dimension plots. If NULL, defaults to 'easting'.
 ##' @param ylab.spat character label for y-axis of spatial dimension plots. If NULL, defaults to 'northing'.
 ##' @param pch specify point type to be used in plots. Defaults to pch = 19 (filled-in circle). If NULL, points will be labeled with their id.
-##' @param cex.quartile if \code{drawQuartiles} = TRUE, specifies weight of quartile and peak lines relative to device default.
-##' @param col.quartile if \code{drawQuartiles} = TRUE, specifies color of quartile lines, defaults to 'gray81'.
-##' @param col.peak if \code{drawQuartiles} = TRUE, specify color of peak lines, defaults to 'gray27'.
+##' @param pt.cex specify point expansion factor (point size relative to device default)
+##' @param text.cex specify text expansion factor (text size relative to device default)
+##' @param quartile.lwd if \code{drawQuartiles} = TRUE, specifies weight of quartile and peak lines relative to device default.
+##' @param quartile.col if \code{drawQuartiles} = TRUE, specifies color of quartile lines, defaults to 'gray81'.
+##' @param peak.col if \code{drawQuartiles} = TRUE, specify color of peak lines, defaults to 'gray27'.
 ##' @param labelID if TRUE, the y-axis will be labeled with the id of the corresponding segment.
 ##' @param ... standard graphical parameters
 ##' @return nothing
@@ -34,7 +36,8 @@ plotScene <- function(scene, dimension = "auto",
                       dailyPoints = TRUE, drawQuartiles = TRUE,
                       sub= NULL, N = 1,
                       xlab.spat = NULL, ylab.spat = NULL,
-                      pch = 19, cex.quartile = 1, col.quartile = 'gray55', col.peak = 'gray27',
+                      pch = 19, pt.cex = 0.75, text.cex = 0.6,
+                      quartile.lwd = 1, quartile.col = 'gray55', peak.col = 'gray27',
                       labelID = FALSE, ...){
 
   dimension <- match.arg(dimension, c("auto", "t", "s", "mt"),several.ok = TRUE)
@@ -119,30 +122,30 @@ plotScene <- function(scene, dimension = "auto",
       }
       if (!is.null(sub)){
         segments(scene.i[scene.i$id %in% sub, 'start'], scene.i[scene.i$id %in% sub, 'index'], scene.i[scene.i$id %in% sub, 'end'],scene.i[scene.i$id %in% sub, 'index'], col = "blue", ...)
-        text(scene.i[scene.i$id %in% sub, 'start']-0.03*closing, scene.i[scene.i$id %in% sub, 'index'], scene.i[scene.i$id %in% sub, 'id'], cex = 0.7)
+        text(scene.i[scene.i$id %in% sub, 'start']-0.03*closing, scene.i[scene.i$id %in% sub, 'index'], scene.i[scene.i$id %in% sub, 'id'], cex = text.cex)
       }
       if (dailyPoints == TRUE){
         rbd <- receptivityByDay(scene.i)
         fl.density <- colSums(rbd)
-        points(as.numeric(names(fl.density)), fl.density, pch = pch, ...)
+        points(as.numeric(names(fl.density)), fl.density, pch = pch, cex = pt.cex, ...)
       }
       if (drawQuartiles ==TRUE){
         rbd <- receptivityByDay(scene.i)
         fl.density <- colSums(rbd)
-        abline(v = median(scene.i$start), col = col.quartile, lwd = cex.quartile, lty = 2)
-        abline(v = median(scene.i$end), col = col.quartile, lwd = cex.quartile, lty = 2)
+        abline(v = median(scene.i$start), col = quartile.col, lwd = quartile.lwd, lty = 2)
+        abline(v = median(scene.i$end), col = quartile.col, lwd = quartile.lwd, lty = 2)
         if (length(fl.density[fl.density == max(fl.density)])>1){
           peak <- median(as.numeric(names(fl.density[fl.density == max(fl.density)])))
-          abline(v = peak, col = col.peak, cex = cex.quartile, ...)
+          abline(v = peak, col = peak.col, cex = quartile.lwd, ...)
         } else {
-          abline(v = as.numeric(names(fl.density[fl.density == max(fl.density)])), col = col.peak, cex = cex.quartile, ...)
+          abline(v = as.numeric(names(fl.density[fl.density == max(fl.density)])), col = peak.col, cex = quartile.lwd, ...)
         }
       }
     }
     if (spat){
       if (is.null(xlab.spat)) xlab.spat <- 'easting'
       if (is.null(ylab.spat)) ylab.spat <- 'northing'
-      plot.default(scene.i[, 'x'], scene.i[, 'y'], type = "n",xlim = c(emin,emax), ylim = c(nmin,nmax), ylab = "",xaxt = 'n', asp = 1,...)
+      plot.default(scene.i[, 'x'], scene.i[, 'y'], type = "n",xlim = c(emin,emax), ylim = c(nmin,nmax), ylab = "",xaxt = 'n', asp = 1, cex = pt.cex,...)
       mtext(ylab.spat,side = 2,adj = 0.5, cex = 0.75, line = 2.5)
       if (i == nr){
         axis(1)
@@ -152,14 +155,14 @@ plotScene <- function(scene, dimension = "auto",
         mtext('spatial',side = 3, adj = 0.5, line = 1.5)
       }
       if (is.null(pch)) {
-        text(scene.i[, 'x'], scene.i[, 'y'], scene.i[, 'id'], ...)
+        text(scene.i[, 'x'], scene.i[, 'y'], scene.i[, 'id'],cex = text.cex, ...)
       } else {
-        points(scene.i[, 'x'], scene.i[, 'y'], pch = pch, ...)
+        points(scene.i[, 'x'], scene.i[, 'y'], pch = pch, cex = pt.cex, ...)
       }
       if (!is.null(sub)){
         scene.i.sub <- scene.i[scene.i[, 'id'] %in% sub, ]
-        text(scene.i.sub[, 'x'], scene.i.sub[, 'y'], scene.i.sub[, 'id'], pos = 3,xpd = T, ...)
-        points(scene.i.sub[, 'x'], scene.i.sub[, 'y'], pch = 19,col = 'blue', ...)
+        text(scene.i.sub[, 'x'], scene.i.sub[, 'y'], scene.i.sub[, 'id'], pos = 3,xpd = T,cex = text.cex, ...)
+        points(scene.i.sub[, 'x'], scene.i.sub[, 'y'], pch = 19,col = 'blue', cex = pt.cex, ...)
       }
       if(temp == F){
         mtext(names(scene)[i],side = 2,adj = 0.5, cex = 0.75, line = 5, font = 2, las = 3)
