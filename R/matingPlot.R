@@ -112,7 +112,7 @@ plotScene <- function(scene, dimension = "auto",
 
       if (i == nr){
         datLabs <- seq(opening,closing, by = 7)
-        axis(1, at = datLabs, labels = format(as.Date(attr(scene.i, 'origin') + datLabs, origin = as.Date("1970-01-01")),format = "%b %d"), tick=0.25, cex.axis = 0.75)
+        axis(1, at = datLabs, labels = format(as.Date(attr(scene.i, 'origin') + datLabs, origin = as.Date("1970-01-01")),format = "%b %d"), tick=0.25, cex.axis = 0.9)
         mtext('date',side = 1,adj = 0.5, cex = 0.75, line = 3)
       }
       if (i == 1 & nc > 1){
@@ -120,6 +120,7 @@ plotScene <- function(scene, dimension = "auto",
       }
       if (!is.null(sub)){
         segments(scene.i[scene.i$id %in% sub, 'start'], scene.i[scene.i$id %in% sub, 'index'], scene.i[scene.i$id %in% sub, 'end'],scene.i[scene.i$id %in% sub, 'index'], col = "blue", ...)
+        text(scene.i[scene.i$id %in% sub, 'start']-0.05*closing, scene.i[scene.i$id %in% sub, 'index'], scene.i[scene.i$id %in% sub, 'id'], cex = 0.75)
       }
       if (dailyPoints == TRUE){
         rbd <- receptivityByDay(scene.i)
