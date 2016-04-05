@@ -7,13 +7,24 @@ output: html_document
 
 \VignetteEngine{knitr::knitr}
 
+# Introduction
+
+This
+
+
+Begin by loading the package
+
 ```{r}
-# load package
 library(mateable)
 
 packageDescription("mateable")$Version
+```
 
-# look at dataset
+# Real dataset
+
+
+
+```{r}
 str(eelr2012)
 
 # describe columns
@@ -71,6 +82,13 @@ eSync$pop
 plotPotential(eSync)
 # we need a legend for the right panel
 
+
+```
+
+
+# Simulated dataset
+
+```{r}
 # make scene based off eelr summary information
 simScene <- simulateScene(size = nrow(eelr), meanSD = eSum$meanSD,
                           sdSD = eSum$sdSD, meanDur = eSum$meanDur,
@@ -91,4 +109,5 @@ plotPotential(sProx)
 plotPotential(sComp)
 
 ```
+
 
