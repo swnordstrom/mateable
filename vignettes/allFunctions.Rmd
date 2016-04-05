@@ -1,11 +1,14 @@
 ---
-title: "Untitled"
+title: "All Functions with eelr2012 Dataset"
 author: "Stuart Wagenius"
-date: "April 5, 2016"
-output: html_document
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{All Functions with eelr2012 Dataset}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
-\VignetteEngine{knitr::knitr}
 
 ```{r}
 # load package

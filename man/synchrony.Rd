@@ -27,7 +27,8 @@ calculate the number of individuals receptive on the peak day
 in the population. "simple2" will calculate the number of individuals
 receptive on the peak day divided by the total number of observations -
 this method is useful for comparing to data that has no information on
-individuals. "simple3" calculates the mean number of individuals receptive
+individuals. "simple3" calculates the average (determined by argument
+\code{averageType}) number of individuals receptive
 per day divided by the maximum number of individuals receptive per day.
 All "simple" methods do not have pairwise or individual values.}
 
