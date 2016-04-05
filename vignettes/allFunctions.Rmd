@@ -10,13 +10,22 @@ vignette: >
 ---
 
 
-```{r,fig.width=9, fig.height=6}
-# load package
+
+# Introduction
+
+This
+
+
+Begin by loading the package
+
+```{r}
 library(mateable)
-
 packageDescription("mateable")$Version
+```
 
-# look at dataset
+## Real dataset
+
+```{r,fig.width=9, fig.height=6}
 str(eelr2012)
 
 # describe columns
@@ -77,6 +86,13 @@ plotPotential(eProx)
 plotPotential(eSync)
 
 
+
+```
+
+
+## Simulated dataset
+
+```{r,fig.width=9, fig.height=6}
 # make scene based off eelr summary information
 simScene <- simulateScene(size = nrow(eelr), meanSD = eSum$meanSD,
                           sdSD = eSum$sdSD, meanDur = eSum$meanDur,
@@ -135,4 +151,5 @@ plotPotential(proxMulti)
 plot3DPotential(list(syncMulti, proxMulti, compatMulti), subject = 'ind')
 
 ```
+
 
