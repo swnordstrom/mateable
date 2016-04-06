@@ -83,7 +83,7 @@ eSum$minY
 eSum$k1 # mean distance to 1st nearest potential mate
 ```
 
-Distance is a measure of isolation from mates. To characterize mating potential, which is inversely reltaed to distance, we want proximity to mates. For this, we have function `proximity`.
+Distance is a measure of isolation from mates. To characterize mating potential, which is inversely related to distance, we want proximity to mates. For this, we have function `proximity`.
 
 ```{r}
 eProx <- proximity(eelr, "maxPropSqrd")
@@ -92,7 +92,7 @@ hist(eProx$ind$proximity, 30)
 
 ```
 
-Now that we have saved a proximity object, `eProx`, we can visualize it using function `plotPotential`. There are many ways to do it. The defaults show pairwise values of proximity, including a histogram of all pairs, and network diagram of a random subset of 9 individuals and a heatmap of all interactions betwen those those same nine.
+Now that we have saved a proximity object, `eProx`, we can visualize it using function `plotPotential`. There are many ways to do it. The defaults show pairwise values of proximity, including a histogram of all pairs, and network diagram of a random subset of 9 individuals and a heatmap of all interactions between those those same nine.
 
 ```{r}
 plotPotential(eProx)
@@ -107,7 +107,7 @@ plotPotential(eProx, plotType = "net", sub.ids = focalPlants)
 
 ## The temporal dimension of the mating scene
 
-Now we turn from the spatial dimension of the mating scene to the temporal dimension. We can visualize the coordinates of mating activity in time with a mating schedule. The function `plotScene` works just as well in time as in space, we jsut need to specify which dimenstion--use "t" for time.
+Now we turn from the spatial dimension of the mating scene to the temporal dimension. We can visualize the coordinates of mating activity in time with a mating schedule. The function `plotScene` works just as well in time as in space, we just need to specify which dimension--use "t" for time.
 
 ```{r}
 plotScene(eelr, "t")
@@ -136,7 +136,7 @@ plot(as.Date(names(dailyReceptivitySummary)), dailyReceptivitySummary,
 
 ```
 
-Many folks have calculated synchrony many ways for individuals, pairs, and populations. Our funtion `synchrony` does it all; well, it does a lot. We can specify the many different synchrony measures, with enticing names, such as these (read the help for details): "augspurger", "kempenaers", "sync\_prop", "overlap", "sync\_nn", "simple1", "simple2", and "simple3." Also, we can calculate measures for different subjects: individual, pairs, and the whole scene (population).
+Many folks have calculated synchrony many ways for individuals, pairs, and populations. Our function `synchrony` does it all; well, it does a lot. We can specify the many different synchrony measures, with enticing names, such as these (read the help for details): "augspurger", "kempenaers", "sync\_prop", "overlap", "sync\_nn", "simple1", "simple2", and "simple3." Also, we can calculate measures for different subjects: individual, pairs, and the whole scene (population).
 
 Here, for example, we calculate synchrony for all subjects using the overlap method and save it as eSync. Then we show the mean and median population values in red and blue, respectively.
 
@@ -159,7 +159,7 @@ plotPotential(eSync, sub.ids = focalPlants)
 
 ## Time and space together
 
-Function `plotScene` is really handy because it enables us to visualize all dimensions of the mating scene (in this data set we only have two dimensions). In the below figure we also hightlight the focal plants we selected above so we can see where and when they participate in mating.
+Function `plotScene` is really handy because it enables us to visualize all dimensions of the mating scene (in this data set we only have two dimensions). In the below figure we also highlight the focal plants we selected above so we can see where and when they participate in mating.
 
 ```{r}
 plotScene(eelr, c('s','t'), sub = focalPlants, N = 4, text.cex = 0.5)
@@ -173,7 +173,7 @@ plot3DScene(eelr, pt.cex = .5, sub = focalPlants, N = 4)
 
 ```
 
-Function `matingSummary` calculates many characteristis of the entire mating scene in all three dimensions. Though inthis example dataset we have only dimensions.
+Function `matingSummary` calculates many characteristics of the entire mating scene in all three dimensions. Though in this example data set we have only dimensions.
 
 ```{r}
 eSum <- matingSummary(eelr)
