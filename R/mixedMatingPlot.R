@@ -47,9 +47,9 @@ plot3DScene <- function(scene, dimension = "auto",
   }
 
   if (!is.null(sub)){
-    if(sub == 'random'){
+    if('random' %in% sub){
       sub <- sample(unique(unlist(sapply(scene,function(x)x[,'id'], simplify = TRUE), use.names = F)),N)
-    } else if(sub == 'all'){
+    } else if('all' %in% sub){
       sub <-unique(unlist(sapply(scene,function(x)x[,'id'], simplify = TRUE), use.names = F))
     }
   }
