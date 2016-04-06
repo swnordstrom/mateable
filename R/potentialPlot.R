@@ -147,7 +147,7 @@ plotPotential <-   function(matPot,
           leg.labs <- round(seq(max(subMat, na.rm = T),min(subMat, na.rm = T),length.out = 9), digits = 2)
           image(x = 1:nrow(subMat),y = 1:nrow(subMat), z = subMat, axes = F, xlab = "", ylab = "", col = colorRampPalette(c('white','red'))(9))
           legend("topleft", legend = c(leg.labs[1],'','','',leg.labs[5],'','','',leg.labs[9]), fill = colorRampPalette(c('red','white'))(9), bty = 'n', y.intersp = 0.65, pt.cex = 1.2)
-          axis(1, 1:ncol(subMat), labels = sub.iids, tick = 0, cex.axis = -0.2 + 1/log10(nrow(subMat)))
+          axis(1, 1:ncol(subMat), labels = sub.iids, tick = 0, cex.axis = -0.2 + 1/log10(nrow(subMat)), las = 3)
           axis(4, 1:ncol(subMat), labels = sub.iids, tick = 0, cex.axis = -0.2 + 1/log10(nrow(subMat)), las = 2)
         }
         if(!'hist'%in% pt &! 'net' %in% pt){
@@ -157,7 +157,6 @@ plotPotential <-   function(matPot,
 
     } else if (subject %in% 'ind') {
       if ('hist' %in% pt){
-
         hist(poti[[subject]][,potential], prob = TRUE, breaks = 15, main = NULL, axes = F, xlab = NULL,xlim = c(hmin,hmax), ylab = NULL)
         title(ylab = 'density')
         axis(1)
@@ -224,7 +223,6 @@ plot_web3 <- function (flowmat, names = NULL, lab.size = 1.5, add = FALSE,
     minflow <- log10(minflow)
   if (!add) {
     figlim <- c(-fig.size, fig.size)
-    marg <- par("mar")
     if (val)
       mar <- mar + c(0, -2, 0, 2)
     mar <- pmax(mar, 0)
