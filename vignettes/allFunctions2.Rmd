@@ -16,7 +16,7 @@ knitr::opts_chunk$set(fig.width=7.2, fig.height=5)
 
 # Introduction
 
-This vignette consists of three brief inspections of mating scenes using package `mateable`. A mating scene is a bout of mating where the coordinates of participating individuals are known in three dimensions: space, time, or compatibility. From such information we can quantify mating potential, the capacity for sexual reproduction based on the location, reproductive timing, and compatibility of prospective mates. Mating potential can be quantified for a pair of individuals based on the distance between them, the timing of reproductive activity, and their compatibility. Similarly, mating potential can be defined for an individual within the context of of the mating scene or for an entire scene.
+This vignette consists of three brief inspections of mating scenes using package `mateable`. A mating scene is a bout of mating where the coordinates of participating individuals are known in three dimensions: space, time, or compatibility. From such information we can quantify mating potential, the capacity for sexual reproduction based on the location, reproductive timing, and compatibility of prospective mates. Mating potential can be quantified for a pair of individuals based on the distance between them, the timing of reproductive activity, and their compatibility. Similarly, mating potential can be defined for an individual within the context of the mating scene or for an entire scene.
 
 
 Begin by loading the package.
@@ -46,7 +46,7 @@ eelr <- makeScene(eelr2012, startCol = "firstDay", endCol = "lastDay",
                        xCol = "Ecoord", yCol = "Ncoord", idCol = "tagNo")
 ```
 
-We can do a lot with this `mating Scene` object. Let's start by focusing on the spatial dimension of the mating scene.
+We can do a lot with this `matingScene` object. Let's start by focusing on the spatial dimension of the mating scene.
 
 ## The spatial dimension of the mating scene
 
@@ -69,7 +69,7 @@ We can also calculate the distance from each individual to its nearest neighbors
 ```{r}
 eKnn <- kNearNeighbors(eelr, 6) # 6 nearest potential mate
 str(eKnn)
-hist(eKnn[, 3], 40, main = "Distance to 3rd nearst neighbor (m)")
+hist(eKnn[, 3], 40, main = "Distance to 3rd nearest neighbor (m)")
 ```
 
 Function `matingSummary` calculates many characteristics of the "whole scene." We can save summaries as a new object `eSum` and look at characteristics of the entire mating scene, either by indexing or by name. Here are some spatial summaries.
@@ -92,7 +92,7 @@ hist(eProx$ind$proximity, 30)
 
 ```
 
-Now that we have saved a proximity object, `eProx`, we can visualize it using function `plotPotential`. There are many ways to do it. The defaults show pairwise values of proximity, including a histogram of all pairs, and network diagram of a random subset of 9 individuals and a heatmap of all interactions between those those same nine.
+Now that we have saved a proximity object, `eProx`, we can visualize it using function `plotPotential`. There are many ways to do it. The defaults show pairwise values of proximity, including a histogram of all pairs, and network diagram of a random subset of 9 individuals and a heat map of all interactions between those same nine.
 
 ```{r}
 plotPotential(eProx)
@@ -188,25 +188,44 @@ eSum$k1
 
 # A simulated dataset
 
+Along with using data from real populations, we can also simulate scenes. Here we simulate a scene and use the values from the eelr summary as inputs for the simulation parameters.
+
 ```{r}
 # make scene based off eelr summary information
 simScene <- simulateScene(size = nrow(eelr), meanSD = eSum$meanSD,
                           sdSD = eSum$sdSD, meanDur = eSum$meanDur,
                           sdDur = eSum$sdDur, xRange = c(eSum$minX, eSum$maxX),
                           yRange = c(eSum$minY, eSum$maxY))
+```
 
+A simulated scene can be treated the exact same as a scene made from real data, meaning all functions work in the same way. In addition, simulated scenes will always have all three dimensions (space, time, and compatibility) so you can examine any aspect of mating potential.
+
+```{r}
 sProx <- proximity(simScene, "maxPropSqrd")
 sSync <- synchrony(simScene, "augspurger")
 sComp <- compatibility(simScene, "si_echinacea")
+```
 
+We see here that the spatial and temporal dimensions don't line up perfectly with the original data because they are generated from uniform and normal distributions, respectively.
+
+```{r}
 plotScene(simScene)
 plot3DScene(simScene, sub = 'random')
 
 plotPotential(sSync)
 plotPotential(sProx)
+```
+
+Adding compatibility data allows us to see not only how likely mating is between two individuals, but also if it's possible for them to mate at all.
+
+```{r}
 plotPotential(sComp, density = FALSE)
 plotPotential(sComp,plotType = c('net','heat'), density = FALSE)
+```
 
+Plot3DPotential gives us an idea of relationships between different dimensions of potential.
+
+```{r}
 plot3DPotential(list(sProx, sSync), subject = "ind")
 plot3DPotential(list(sProx, sSync), subject = "ind", sample = 'all')
 plot3DPotential(list(sProx, sSync), subject = "ind", sample = 'random')

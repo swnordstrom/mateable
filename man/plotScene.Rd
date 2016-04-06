@@ -6,8 +6,9 @@
 \usage{
 plotScene(scene, dimension = "auto", opening = NULL, closing = NULL,
   dailyPoints = TRUE, drawQuartiles = TRUE, sub = NULL, N = 1,
-  xlab.spat = NULL, ylab.spat = NULL, pch = 19, cex.quartile = 1,
-  col.quartile = "gray55", col.peak = "gray27", labelID = FALSE, ...)
+  xlab.spat = NULL, ylab.spat = NULL, pch = 19, pt.cex = 0.75,
+  text.cex = 0.6, quartile.lwd = 1, quartile.col = "gray55",
+  peak.col = "gray27", labelID = FALSE, ...)
 }
 \arguments{
 \item{scene}{a matingScene object}
@@ -32,11 +33,15 @@ plotScene(scene, dimension = "auto", opening = NULL, closing = NULL,
 
 \item{pch}{specify point type to be used in plots. Defaults to pch = 19 (filled-in circle). If NULL, points will be labeled with their id.}
 
-\item{cex.quartile}{if \code{drawQuartiles} = TRUE, specifies weight of quartile and peak lines relative to device default.}
+\item{pt.cex}{specify point expansion factor (point size relative to device default)}
 
-\item{col.quartile}{if \code{drawQuartiles} = TRUE, specifies color of quartile lines, defaults to 'gray81'.}
+\item{text.cex}{specify text expansion factor (text size relative to device default)}
 
-\item{col.peak}{if \code{drawQuartiles} = TRUE, specify color of peak lines, defaults to 'gray27'.}
+\item{quartile.lwd}{if \code{drawQuartiles} = TRUE, specifies weight of quartile and peak lines relative to device default.}
+
+\item{quartile.col}{if \code{drawQuartiles} = TRUE, specifies color of quartile lines, defaults to 'gray81'.}
+
+\item{peak.col}{if \code{drawQuartiles} = TRUE, specify color of peak lines, defaults to 'gray27'.}
 
 \item{labelID}{if TRUE, the y-axis will be labeled with the id of the corresponding segment.}
 
