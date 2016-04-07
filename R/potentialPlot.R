@@ -142,7 +142,11 @@ plotPotential <-   function(matPot,
         if(length(sub.iids) <= 2){
           plot(1, type="n", axes=F, xlab="", ylab="")
         } else {
-          diag(subMat) <- 1
+          if (potential == "compatibility") {
+            diag(subMat) <- 0
+          } else {
+            diag(subMat) <- 1 
+          }
           subMat[upper.tri(subMat, diag = FALSE)] <- NA
           leg.labs <- round(seq(max(subMat, na.rm = T),min(subMat, na.rm = T),length.out = 9), digits = 2)
           image(x = 1:nrow(subMat),y = 1:nrow(subMat), z = subMat, axes = F, xlab = "", ylab = "", col = colorRampPalette(c('white','red'))(9))
