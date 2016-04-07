@@ -178,7 +178,7 @@ plotScene <- function(scene, dimension = "auto",
       }
       ptWt<- aggregate(id ~ s1 + s2, data = scene.i, length)
       ptWt$scale <- (ptWt$id - min(ptWt$id)) / diff(range(ptWt$id))
-      plot(ptWt$s1, ptWt$s2, cex = 2*ptWt$scale, pch = pch, xlim = c(smin, smax), ylim = c(smin,smax), ylab = "", xaxt = 'n')
+      plot(ptWt$s1, ptWt$s2, cex = 2*ptWt$scale, pch = pch, xlim = c(smin, smax), ylim = c(smin,smax), ylab = "", xaxt = 'n', yaxt = 'n')
       mtext('s2',side = 2,adj = 0.5, cex = 0.75, line = 2.5)
       axis(2, at = smin:smax, labels = smin:smax, tick = 0.25)
       leg.text <- levels(as.factor(ptWt$id))
