@@ -14,7 +14,7 @@ plotPotential(matPot, subject = NULL, plotType = "auto", density = T,
 
 \item{plotType}{character,  indicating what plots are to be displayed. See details. Options are histogram ('hist'), network diagram ('net'), and heatmap ('heat'). If mating potential object}
 
-\item{density}{logical. If true (default), plots probability density over histogram.}
+\item{density}{logical. If TRUE (default), plots probability density over histogram.}
 
 \item{sub.ids}{a vector containing the ids of individuals to be represented in pairwise potential plots}
 
@@ -30,9 +30,13 @@ plotPotential(matPot, subject = NULL, plotType = "auto", density = T,
 Visualize mating potential
 }
 \details{
-Options for \code{plotType} are 'hist' (histogram), 'net' (network diagram), 'heat' (heatmap), and 'auto'. Default value is 'auto': if the mating potential object contains pairwise potential, 'auto' returns all plot types, otherwise it returns histograms of individual potential.
+Options for \code{plotType} are 'hist' (histogram), 'net' (network diagram), 'heat' (heatmap), and 'auto'. Default value is 'auto':
+if the mating potential object contains pairwise potential, 'auto' returns all plot types, otherwise it returns histograms of individual potential.
 
-The individuals to be represented in the pairwise potential plots can either be specified explicitly through \code{sub.ids}, chosen randomly (\code{sample} = 'random'), or all individuals can be selected (\code{sample} = 'all'). The default is to randonly select 9 individuals. If multiple years are being plotted, the subset is sampled from all years and the same individuals will be represented in each year, if possible. If fewer than three individuals from the subset are available in a year, no network diagram or heatmap will be returned for that year.
+The individuals to be represented in the pairwise potential plots can either be specified explicitly through \code{sub.ids}, chosen randomly
+ (\code{sample} = 'random'), or all individuals can be selected (\code{sample} = 'all'). The default is to randonly select 9 individuals.
+ If multiple years are being plotted, the subset is sampled from all years and the same individuals will be represented in each year, if possible.
+ If fewer than three individuals from the subset are available in a year, no network diagram or heatmap will be returned for that year.
 }
 \examples{
 pop <- simulateScene()
