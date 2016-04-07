@@ -241,10 +241,9 @@ plot3DPotential(list(sProx, sSync, sComp))
 plot3DPotential(list(sProx, sSync, sComp), sub.ids = c(21,4))
 ```
 
-### *Brief aside about compatibility*
+## *Compatibility in animals*
 
-For those who work with animals, have no fear, we kept those in consideration while creating the mating scene objects. When using simulated data, use the option `sAlleles = 2` and choose either the number 1 or 2 to represent female or male (it doesn't matter which, they're randomly generated). If using real data, create a column with 1 or 2 for female or male and specify that column as `s1Col` in `makeScene`.
-When using compatibility, choose the method "dioecious" and compatibility will be 1 if they are not the same sex (i.e. not both 1 in column s1).
+For those who work with animals, have no fear, we kept those in consideration while creating the mating scene objects. When using simulated data, use the option `sAlleles = 2` and choose either the number 1 or 2 to represent female or male (it doesn't matter which, they're randomly generated). If using real data, create a column with 1 or 2 for female or male and specify that column as `s1Col` in `makeScene`. When using compatibility, choose the method "dioecious" and compatibility will be 1 if they are not the same sex (i.e. not both 1 in column s1).
 
 ```{r}
 simulatedCoral <- simulateScene(10, sAlleles = 2)
