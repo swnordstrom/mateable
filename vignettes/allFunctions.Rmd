@@ -247,7 +247,7 @@ For those who work with animals, have no fear, we kept those in consideration wh
 
 ```{r}
 simulatedCoral <- simulateScene(10, sAlleles = 2)
-plot3DScene(simulatedCoral, dimension = c("mt", "s"))
+plot3DScene(simulatedCoral, dimension = c("mt", "s"), dioecious = TRUE)
 (coralComp <- compatibility(simulatedCoral, "dioecious"))$pop
 plotPotential(coralComp)
 

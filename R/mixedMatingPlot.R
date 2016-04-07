@@ -102,7 +102,11 @@ plot3DScene <- function(scene, dimension = "auto",
       if (is.null(pch)) {
         text(scene.i[, 'x'], scene.i[, 'y'], scene.i[, 'id'], col = scene.i$cols, cex = text.cex, ...)
       } else {
-        text (scene.i[,'x'], scene.i[,'y'], paste(scene.i[,'s1'],', ',scene.i[,'s2'], sep = ""), pos = 2, cex = text.cex)
+        if (dioecious){
+          text (scene.i[,'x'], scene.i[,'y'], scene.i[,'s1'], pos = 2, cex = text.cex)
+        } else {
+          text (scene.i[,'x'], scene.i[,'y'], paste(scene.i[,'s1'],', ',scene.i[,'s2'], sep = ""), pos = 2, cex = text.cex)
+        }
         if (!is.null(sub)){
           scene.i.sub <- scene.i[scene.i[, 'id'] %in% sub, ]
           text(scene.i.sub[, 'x'], scene.i.sub[, 'y'], scene.i.sub[, 'id'], pos = 3, cex =text.cex*1.2, font = 2, ...)
@@ -157,8 +161,11 @@ plot3DScene <- function(scene, dimension = "auto",
           }
         } else {
           points(scene.i[, 'x'], scene.i[, 'y'], pch = pch, cex = pt.cex, ...)
-          text (scene.i[,'x'], scene.i[,'y'], paste(scene.i[,'s1'],', ',scene.i[,'s2'], sep = ""), pos = 2, cex = text.cex)
-        }
+          if (dioecious){
+            text (scene.i[,'x'], scene.i[,'y'], scene.i[,'s1'], pos = 2, cex = text.cex)
+          } else {
+            text (scene.i[,'x'], scene.i[,'y'], paste(scene.i[,'s1'],', ',scene.i[,'s2'], sep = ""), pos = 2, cex = text.cex)
+          }        }
       }
       if(i == nr){
         mtext('spatial and mating type plot', font = 2, line = 2, side = 3, outer = T)
