@@ -123,7 +123,7 @@ plotPotential <-   function(matPot,
           plot(1, type="n", axes=F, xlab="", ylab="")
         } else {
           subMat[upper.tri(subMat, diag = TRUE)] <- 0
-          im <- poti[['ind']][which(sub.iids %in% iids), potential]
+          im <- poti[['ind']][which(iids %in% sub.iids), potential]
           lab.cex <- 1 + (im - min(im))/(max(im) - min(im))
           if(sum(subMat >= 1) > 4){
             plot_web3(subMat, names = sub.iids, val = FALSE, minflow = 0, maxarrow = 3, minarrow = 1, legend = FALSE, length = 0,

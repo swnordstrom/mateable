@@ -4,8 +4,9 @@
 \alias{plot3DScene}
 \title{multi-dimensional visualization of mating scene object}
 \usage{
-plot3DScene(scene, dimension = "auto", sub = NULL, ycoord = "northing",
-  xcoord = "easting", pch = 19, N = 9, ...)
+plot3DScene(scene, dimension = "auto", sub = NULL, N = 3,
+  ycoord = "northing", xcoord = "easting", pch = 19, pt.cex = 0.7,
+  text.cex = 0.7, ...)
 }
 \arguments{
 \item{scene}{a matingScene object}
@@ -14,13 +15,17 @@ plot3DScene(scene, dimension = "auto", sub = NULL, ycoord = "northing",
 
 \item{sub}{a subset of the population to plot; either a character indicating whether to subset a random sample (\code{sub}='random'), all individuals (\code{sub}='all'), or a vector containing the IDs of the individuals to subset.}
 
+\item{N}{if \code{sub} = 'random', the number of individuals to sample (default N = 3)}
+
 \item{ycoord}{y-axis coordinate system label}
 
 \item{xcoord}{x-axis coordinate system label}
 
 \item{pch}{point type, defaults to pch = 19, solid filled in circle. If pch = NULL, individuals will be labeled by their id.}
 
-\item{N}{if \code{sub} = 'random', the number of individuals to sample}
+\item{pt.cex}{specify point expansion factor (point size relative to device default)}
+
+\item{text.cex}{specify text expansion factor (text size relative to device default)}
 
 \item{...}{optional arguments for the plot function}
 }
