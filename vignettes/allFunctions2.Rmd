@@ -1,5 +1,5 @@
 ---
-title: "All Functions with eelr2012 DatasetXXX need better title"
+title: "Investigate mating scenes with mateable"
 author: "Stuart Wagenius"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -16,7 +16,7 @@ knitr::opts_chunk$set(fig.width=7.2, fig.height=5)
 
 # Introduction
 
-This vignette consists of three brief inspections of mating scenes using package `mateable`. A mating scene is a bout of mating where the coordinates of participating individuals are known in three dimensions: space, time, or compatibility. From such information we can quantify mating potential, the capacity for sexual reproduction based on the location, reproductive timing, and compatibility of prospective mates. Mating potential can be quantified for a pair of individuals based on the distance between them, the timing of reproductive activity, and their compatibility. Similarly, mating potential can be defined for an individual within the context of the mating scene or for an entire scene.
+This vignette consists of three brief inspections of mating scenes using package `mateable`. A mating scene is a bout of mating where the coordinates of participating individuals are defined in one to three dimensions: space, time, and compatibility. From such information we can quantify mating potential, the capacity for sexual reproduction based on the location, reproductive timing, and compatibility of prospective mates. Mating potential can be quantified for a pair of individuals based on the distance between them, the timing of their reproductive activity, and their compatibility. Similarly, mating potential can be defined for an individual within the context of the mating scene or for an entire scene.
 
 
 Begin by loading the package.
@@ -37,9 +37,9 @@ In this section we look at flowering during 2012 in a remnant prairie population
 str(eelr2012)
 ```
 
-This data set includes spatial and temporal information on all of 44 plants that flowered in 2012 from the East Elk Lake Road population. Each plant has a tag with a unique number for identification purposes and we listed the count of heads that the plant produced in 2012. These long-lived plants do not produce heads in every year, we removed all plants with zero heads in 2012. The columns firstDay and lastDay indicate the first and last days that each plant produced pollen. Spatial coordinates are in meters.
+This data set includes spatial and temporal information on all 44 plants that flowered in 2012 from the East Elk Lake Road population. Each plant has a tag with a unique number for identification purposes and we listed the count of heads that the plant produced in 2012. These long-lived plants do not produce heads in every year, we removed all plants with zero heads in 2012. The columns firstDay and lastDay indicate the first and last days that each plant produced pollen. Spatial coordinates are in meters.
 
-The first thing to do is convert the data frame to a mating scene object. We have to indicate which columns contain spatial and temporal coordinates. Note that some columns are integer and numeric. Columns firstDay and lastDay are saved in a Date format. `makeScene` can read some character formats. If you want to convert character or POSIX to the Date format, read about the function `as.Date` or install package `lubridate`.
+The first thing to do is convert the data frame to a mating scene object. We must indicate which columns contain spatial and temporal coordinates. Note that some columns are integer and numeric. Columns firstDay and lastDay are saved in a Date format. `makeScene` can read some character formats. If you want to convert character or POSIX to the Date format, read about function `as.Date` or install package `lubridate`.
 
 ```{r}
 eelr <- makeScene(eelr2012, startCol = "firstDay", endCol = "lastDay",
@@ -50,9 +50,9 @@ We can do a lot with this `matingScene` object. Let's start by focusing on the s
 
 ## The spatial dimension of the mating scene
 
-We can look at the spatial (s) dimension with a map. Note that we can use standard R graphical parameters to change the looks of the graph.
+We can look at the spatial "s" dimension with a map. Note that we can use standard R graphical parameters to change the looks of the graph.
 
-```{r}
+```{r, fig.show = 'hold'}
 plotScene(eelr, "s")
 plotScene(eelr, "s", pch = 1)
 ```
@@ -64,7 +64,7 @@ ePair <- pairDist(eelr) # matrix of distances
 hist(ePair, 40) # visualize histogram
 ```
 
-We can also calculate the distance from each individual to its nearest neighbors (aka potential mates). Here we visualize the distance to all 3rd nearest neighbors.
+We can also calculate the distance from each individual to its nearest neighbors (aka potential mates). Here we visualize the distance of every plant to its 3rd nearest neighbor.
 
 ```{r}
 eKnn <- kNearNeighbors(eelr, 6) # 6 nearest potential mate
@@ -92,18 +92,20 @@ hist(eProx$ind$proximity, 30)
 
 ```
 
-Now that we have saved a proximity object, `eProx`, we can visualize it using function `plotPotential`. There are many ways to do it. The defaults show pairwise values of proximity, including a histogram of all pairs, and network diagram of a random subset of 9 individuals and a heat map of all interactions between those same nine. In the network diagram, line width corresponds to the pairwise proximity of the individuals being connected, and the size of label indicates the individual's mean proximity with all other individuals in the network. 
+Now that we have saved a proximity object, `eProx`, we can visualize it using function `plotPotential`. There are many ways to visualize it. The defaults return a three panel figure: pairwise values of proximity, including a histogram of all pairs, a network diagram of a random subset of 9 individuals, and a heat map of all interactions between those same nine. In the network diagram, line width corresponds to the pairwise proximity of the individuals being connected, and the size of label indicates the individual's mean proximity with all other individuals in the network. 
 
 ```{r}
 plotPotential(eProx)
 ```
 
-If we want to focus on a particular subset of plants, then we can define them. Here, we make only a network diagram of these focal plants. Note that by default the size of the individual labels on the network diagram scales with the individual proximity, but this can be turned off. **XXX:** These look wrong. Based on the connecting lines, I think 1509 should be the smallest font size.
+If we want to focus on a particular subset of plants, then we can define them. Here, we make only a network diagram of these focal plants. Note that by default the size of the individual labels on the network diagram scales with the individual proximity, but this can be turned off.
 
 ```{r}
 focalPlants <- c(17217, 17202, 14582, 15114, 7614, 1509, 17002)
 plotPotential(eProx, plotType = "net", sub.ids = focalPlants)
 ```
+
+Notice plant 1509 is more isolated from potential mates than the other individuals.
 
 ## The temporal dimension of the mating scene
 
@@ -114,29 +116,29 @@ plotScene(eelr, "t")
 plotScene(eelr, "t", sub = 'all', drawQuartiles = FALSE, text.cex = 0.5)
 ```
 
-This figure shows the duration of reproductive period during 2012 for each of the 44 individuals in the population with a horizontal line starting on the date the individual first produced pollen and ending on the date when pollen was last produced. Here the individuals are sorted from bottom to top by their first day. The dots indicate the total number of individuals participating in mating on each day.
+These figures shows the duration of reproductive period during 2012 for each of the 44 individuals in the population with a horizontal line starting on the date the individual first produced pollen and ending on the date when pollen was last produced. Here the individuals are sorted from bottom to top by their first day. The dots indicate the total number of individuals participating in mating on each day.
 
 Just as we can calculate and visualize the spatial distances between all pairs using function `pairDist`, we can do the same in the temporal dimension with function `overlap`. Function `overlap` makes a matrix of overlapping days for all pairs and we can use a histogram to see the distribution.
 
 ```{r}
 
 eOver <- overlap(eelr, compareToSelf = T) # matrix of days overlapping
-hist(eOver, 40, main = "Histogram of days overlapping between pair") # visualize histogram
+hist(eOver, 40, main = "Histogram of days overlapping between pair") 
 ```
 
 
 We can look at the number of individuals participating in mating every day.
-```{r}
+```{r, fig.show = 'hold'}
 eRecep <- receptivityByDay(eelr) # T/F receptive on each day
-str(eRecep)
+str(eRecep) # matrix
 dailyReceptivitySummary <- receptivityByDay(eelr, summary = TRUE)
-dailyReceptivitySummary # number of flowering individuals on each day; a vector named by date
+dailyReceptivitySummary # a named integer vector
 plot(as.Date(names(dailyReceptivitySummary)), dailyReceptivitySummary,
      xlab = 'date', ylab = 'count of receptive individuals')
 
 ```
 
-Many folks have calculated synchrony many ways for individuals, pairs, and populations. Our function `synchrony` does it all; well, it does a lot. We can specify the many different synchrony measures, with enticing names, such as these (read the help for details): "augspurger", "kempenaers", "sync\_prop", "overlap", "sync\_nn", "simple1", "simple2", and "simple3." Also, we can calculate measures for different subjects: individual, pairs, and the whole scene (population).
+Folks have calculated synchrony many ways for individuals, pairs, and populations. Our function `synchrony` does it all; well, it does a lot. We can specify  many different synchrony measures, with enticing names, such as these (read the help for details): "augspurger", "kempenaers", "sync\_prop", "overlap", "sync\_nn", "simple1", "simple2", and "simple3." Also, we can calculate measures for different subjects: individual, pairs, and the whole scene (population).
 
 Here, for example, we calculate synchrony for all subjects using the overlap method and save it as eSync. Then we show the mean and median population values in red and blue, respectively.
 
@@ -148,24 +150,26 @@ abline(v = synchrony(eelr, "overlap", averageType = "median")$pop,
        col = "blue", lwd = 2)
 ```
 
-Individual overlap indicates the proportion of individuals in the scene that were flowering averaged over all days that the individual participated in mating.
+Individual overlap indicates the proportion of potentital mates in the scene that were flowering averaged over all days that the focal individual participated in mating.
 
-Just like we visualized spatial mating potential we can visualize mating potential in the temporal dimension. Here we emphasize the same focal plants as we did above.
+Just like we visualized spatial mating potential, we can visualize mating potential in the temporal dimension. Here we emphasize the same focal plants as we did above.
 
 ```{r}
 plotPotential(eSync, sub.ids = focalPlants)
 ```
 
+Notice that 1509 is not isolated in time from potential mates.
+
 
 ## Time and space together
 
-Function `plotScene` is really handy because it enables us to visualize all dimensions of the mating scene (in this data set we only have two dimensions). In the below figure we also highlight the focal plants we selected above so we can see where and when they participate in mating.
+Function `plotScene` is useful because it enables us to visualize all dimensions of the mating scene (in this data set we only have two dimensions). In the below figure we also highlight the focal plants we selected above so we can see where and when they participate in mating.
 
 ```{r}
 plotScene(eelr, c('s','t'), sub = focalPlants, N = 4, text.cex = 0.5)
 ```
 
-Function `plot3DScene` is also really handy because it enables us to visualize two dimensions of the mating scene in one panel.
+Function `plot3DScene` is also useful because it enables us to visualize two dimensions of the mating scene in one panel.
 
 ```{r}
 plot3DScene(eelr)
@@ -175,7 +179,7 @@ plot3DScene(eelr, pt.cex = .5, sub = focalPlants, N = 4)
 
 Function `matingSummary` calculates many characteristics of the entire mating scene in all three dimensions. Though in this example data set we have only dimensions.
 
-```{r}
+```{r, collapse = TRUE, results='hold'}
 eSum <- matingSummary(eelr)
 eSum[c("meanSD", "sdSD", "meanDur", "sdDur", "peak")] # index
 eSum[c("minX", "minY", "k1")]
@@ -188,7 +192,7 @@ eSum$k1
 
 # A simulated dataset
 
-Along with using data from real populations, we can also simulate scenes. Here we simulate a scene and use the values from the eelr summary as inputs for the simulation parameters.
+Along with using data from real populations, we can also simulate scenes. Here we simulate a scene using values from the eelr summary as inputs for the simulation parameters.
 
 ```{r}
 # make scene based off eelr summary information
@@ -198,7 +202,7 @@ simScene <- simulateScene(size = nrow(eelr), meanSD = eSum$meanSD,
                           yRange = c(eSum$minY, eSum$maxY))
 ```
 
-A simulated scene can be treated the exact same as a scene made from real data, meaning all functions work in the same way. In addition, simulated scenes will always have all three dimensions (space, time, and compatibility) so you can examine any aspect of mating potential.
+A simulated scene can be treated the same way as a scene made from real data, meaning all functions work in the same way. In addition, simulated scenes will always have all three dimensions (space, time, and compatibility) so you can examine any aspect of mating potential.
 
 ```{r}
 sProx <- proximity(simScene, "maxPropSqrd")
@@ -206,9 +210,9 @@ sSync <- synchrony(simScene, "augspurger")
 sComp <- compatibility(simScene, "si_echinacea")
 ```
 
-We see here that the spatial and temporal dimensions don't line up perfectly with the original data because they are generated from uniform and normal distributions, respectively.
+The coordinates in the spatial and temporal dimensions are generated from uniform and normal distributions, respectively. The second figure shows the alleles that determine mating compatibility.
 
-```{r}
+```{r, fig.height=4, fig.show = 'hold'}
 plotScene(simScene)
 plot3DScene(simScene, sub = 'random')
 
@@ -216,7 +220,9 @@ plotPotential(sSync)
 plotPotential(sProx)
 ```
 
-Adding compatibility data allows us to see not only how likely mating is between two individuals, but also if it's possible for them to mate at all.
+Mating potentials in space and time are continuous. In contrast, mating compatibility between two individuals, as we have modeled it here, is either possible or not. Therefore mating potential for pairs is either 1 or 0. This approach is appropriate for many plant mating systems where there are several mating types. *Animals?*
+
+
 
 ```{r}
 plotPotential(sComp, density = FALSE)
