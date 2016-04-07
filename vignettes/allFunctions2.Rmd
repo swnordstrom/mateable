@@ -227,7 +227,7 @@ Plot3DPotential gives us an idea of relationships between different dimensions o
 
 ```{r}
 plot3DPotential(list(sProx, sSync), subject = "ind")
-plot3DPotential(list(sProx, sSync), subject = "ind", sample = 'all')
+plot3DPotential(list(sProx, sSync), subject = "ind", sample = 'all', text.cex = 0.5)
 plot3DPotential(list(sProx, sSync), subject = "ind", sample = 'random')
 
 plot3DPotential(list(sProx, sSync, sComp))
@@ -260,7 +260,7 @@ All of the different analysis and plotting methods can be applied directly to mu
 You can make multi-panel plots of the matingScene. The plot limits are consistent across years, making it easier to compare differences.
 
 ```{r,fig.height = 8}
-plotScene(multiYearScene,sub = c(1,6,12,18,13,24,55,45,60))
+plotScene(multiYearScene,sub = c(1,6,12,18,13,24,55,45,60), text.cex = 0.8)
 ```
 
 You can also combine mating dimensions for multi-year plots using plot3DScene.
@@ -294,7 +294,11 @@ plotPotential(proxMulti,sub.ids = c(1,6,12,18,13,24,55,45,60))
 And, like before, you can visualize combinations of synchrony, proximity, and compatibility over multiple years.
 
 ```{r, fig.height = 8}
-plot3DPotential(list(syncMulti, proxMulti, compatMulti), subject = 'ind', sub.ids = c(1,6,12,18,13,24,55,45,60))
+plot3DPotential(matPots = list(syncMulti, proxMulti, compatMulti), # list of mating potential objects
+                subject = 'ind', # specifies the the points represent individuals
+                sub.ids = c(1,6,12,18,13,24,55,45,60), # IDs to represent in heatmaps and network diagrams
+                pt.cex = 1 # point size
+                )
 ```
 
 
