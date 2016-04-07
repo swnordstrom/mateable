@@ -163,8 +163,8 @@ plot3DPotential <-   function(matPots,
   } else if (ndim == 3){
     palette(colorRampPalette(c('red','green'))(10))
     if(subject %in% 'ind'){
-      compatmax <- max(unlist(lapply(ind,function(x)x[,3])))
-      compatmin <- min(unlist(lapply(ind,function(x)x[,3])))
+      compatmax <- max(unlist(lapply(ind,function(x)x[,4])))
+      compatmin <- min(unlist(lapply(ind,function(x)x[,4])))
       vec <- round(seq(compatmin, compatmax, length.out = 10),2)
     }
     for (i in 1:len){
