@@ -16,7 +16,7 @@ knitr::opts_chunk$set(fig.width=7.2, fig.height=5)
 
 # Introduction
 
-This vignette consists of three brief inspections of mating scenes using package `mateable`. A mating scene is a bout of mating where the coordinates of participating individuals are defined in one to three dimensions: space, time, and compatibility. From such information we can quantify mating potential, the capacity for sexual reproduction based on the location, reproductive timing, and compatibility of prospective mates. Mating potential can be quantified for a pair of individuals based on the distance between them, the timing of their reproductive activity, and their compatibility. Similarly, mating potential can be defined for an individual within the context of the mating scene or for an entire scene.
+This vignette consists of three brief investigations of mating scenes using package `mateable`. A mating scene is a bout of mating where the coordinates of participating individuals are defined in one, two, or three dimensions: space, time, and compatibility. From such information we can quantify mating potential, the capacity for sexual reproduction based on the location, reproductive timing, and compatibility of prospective mates. Mating potential can be quantified for a pair of individuals based on the distance between them, the timing of their reproductive activity, and their compatibility. Similarly, mating potential can be defined for an individual within the context of the mating scene or for an entire scene.
 
 
 Begin by loading the package.
@@ -222,7 +222,7 @@ plotPotential(sSync)
 plotPotential(sProx)
 ```
 
-Mating potentials in space and time are continuous because space and time are continuous. In contrast, mating compatibility between two individuals, as we have modeled it here, is either possible or not. Therefore mating potential for pairs is either 1 or 0.
+Mating potentials in space and time are continuous because space and time are continuous. In contrast, mating compatibility between two individuals, as we have modeled it here, is either possible or not. Therefore mating potential for a pair is either 1 or 0.
 
 ```{r}
 plotPotential(sComp, density = FALSE)
@@ -241,21 +241,27 @@ plot3DPotential(list(sProx, sSync, sComp))
 plot3DPotential(list(sProx, sSync, sComp), sub.ids = c(21,4))
 ```
 
+Because these scenes are simulated, we do not expect to see correlations in potential between dimensions.
+
 ## *Compatibility in animals*
 
 For those who work with animals, have no fear, we kept those in consideration while creating the mating scene objects. When using simulated data, use the option `sAlleles = 2` and choose either the number 1 or 2 to represent female or male (it doesn't matter which, they're randomly generated). If using real data, create a column with 1 or 2 for female or male and specify that column as `s1Col` in `makeScene`. When using compatibility, choose the method "dioecious" and compatibility will be 1 if they are not the same sex (i.e. not both 1 in column s1).
 
 ```{r}
-simulatedCoral <- simulateScene(10, sAlleles = 2)
+
+simulatedCoral <- simulateScene(9, sAlleles = 2)
 plot3DScene(simulatedCoral, dimension = c("mt", "s"), dioecious = TRUE)
-(coralComp <- compatibility(simulatedCoral, "dioecious"))$pop
-plotPotential(coralComp)
+plotPotential(compatibility(simulatedCoral, "dioecious"))
+simulatedCoral
+str(simulatedCoral)
+summary(simulatedCoral)
 
 ```
 
 # Multi-year scenes
 
-You can also study the dynamics of a population's mating scene over multiple seasons. Multi-year scenes need to be formatted as lists, with each list element representing one individual mating scene (or one year). If you have a multi-year dataset, this will be done automatically with `makeScene` using the argument `multiYear = TRUE`. Alternatively, you can simulate several mating scenes and combine them in a list by hand, as we did in the example below. 
+We can also investigate the dynamics of a population's mating scene over multiple seasons. Multi-year scenes need to be formatted as lists, with each list element representing one individual mating scene (or one year). If you have a multi-year dataset, function `makeScene` will make it into a multi-year scene automatically using the argument `multiYear = TRUE`. Alternatively, we can simulate several mating scenes and combine them in a list by hand, as in the example below. 
+
 ```{r}
 simScene1 <- simulateScene(size = nrow(eelr), meanSD = eSum$meanSD,
                           sdSD = eSum$sdSD, meanDur = eSum$meanDur,
@@ -274,13 +280,13 @@ multiYearScene <- list('2012' = simScene1,'2013' = simScene2, '2014' = simScene3
 ```
 
 All of the different analysis and plotting methods can be applied directly to multi-year scenes. 
-You can make multi-panel plots of the matingScene. The plot limits are consistent across years, making it easier to compare differences.
+We can make multi-panel plots of the `matingScene` over years. The plot limits are consistent across years, making it easier to compare differences.
 
 ```{r,fig.height = 8}
 plotScene(multiYearScene,sub = c(1,6,12,18,13,24,55,45,60), text.cex = 0.8)
 ```
 
-You can also combine mating dimensions for multi-year plots using plot3DScene.
+We can also combine mating dimensions for multi-year plots using `plot3DScene`.
 
 ```{r,fig.height = 8}
 plot3DScene(multiYearScene, pt.cex = 1.2, sub = c(1,6,12,18,13,24,55,45,60))
@@ -296,22 +302,26 @@ compatMulti <- compatibility(multiYearScene, method = 'si_echinacea')
 str(syncMulti) # a list of lists
 ```
 
-The functions `plotPotential` and `plot3DPotential` will then work on multi-year potential objects. For example, you can visualize synchrony over multiple years. Note that it will try to select the same sample of individuals each year, so if there is a year when few individuals in that sample are participating in the mating scene, there will be fewer individuals displayed in that year's heatmap and network diagram.
+The functions `plotPotential` and `plot3DPotential` will then work on multi-year potential objects. For example, we can visualize synchrony over multiple years. Note that it will try to select the same sample of individuals each year, so if there is a year when few individuals in that sample are participating in the mating scene, there will be fewer individuals displayed in that year's heatmap and network diagram.
 
 ```{r, fig.height = 8}
 plotPotential(syncMulti, sub.ids = c(1,6,12,18,13,24,55,44,60))
 ```
 
-And you can visualize proximity over multiple years.
+And we can visualize proximity over multiple years.
 
 ```{r, fig.height = 8}
 plotPotential(proxMulti,sub.ids = c(1,6,12,18,13,24,55,45,60))
 ```
 
-And, like before, you can visualize combinations of synchrony, proximity, and compatibility over multiple years.
+And, like before, we can visualize combinations of synchrony, proximity, and compatibility over multiple years.
 
 ```{r, fig.height = 8}
 plot3DPotential(list(syncMulti, proxMulti, compatMulti), subject = 'ind', pt.cex = 0.8, sub.ids = c(1,6,12,18,13,24,55,45,60))
 ```
+
+## Conclusion
+
+We find `mateable` useful and hope you do too. It can get better, so we are improving it. A [development version](https://github.com/stuartWagenius/mateable) of `mateable` is available via gitHub. We welcome user suggestions for improvements. Please submit bugs and feature requests to the [mateable development page](https://github.com/stuartWagenius/mateable/issues) on github or contact Stuart directly.
 
 
