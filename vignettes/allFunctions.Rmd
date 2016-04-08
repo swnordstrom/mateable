@@ -67,7 +67,7 @@ hist(ePair, 40) # visualize histogram
 We can also calculate the distance from each individual to its nearest neighbors (aka potential mates). Here we visualize the distance of every plant to its 3rd nearest neighbor.
 
 ```{r}
-eKnn <- kNearNeighbors(eelr, 6) # 6 nearest potential mate
+eKnn <- kNearNeighbors(eelr, 6) # 1,2,...,6 nearest potential mate
 str(eKnn)
 hist(eKnn[, 3], 40, main = "Distance to 3rd nearest neighbor (m)")
 ```
@@ -250,7 +250,8 @@ For those who work with animals, have no fear, we kept those in consideration wh
 ```{r}
 
 simulatedCoral <- simulateScene(9, sAlleles = 2)
-plot3DScene(simulatedCoral, dimension = c("mt", "s"), dioecious = TRUE)
+plotScene(simulatedCoral)
+plot3DScene(simulatedCoral)
 plotPotential(compatibility(simulatedCoral, "dioecious"))
 simulatedCoral
 str(simulatedCoral)
@@ -317,7 +318,7 @@ plotPotential(proxMulti,sub.ids = c(1,6,12,18,13,24,55,45,60))
 And, like before, we can visualize combinations of synchrony, proximity, and compatibility over multiple years.
 
 ```{r, fig.height = 8}
-plot3DPotential(list(syncMulti, proxMulti, compatMulti), subject = 'ind', pt.cex = 0.8, sub.ids = c(1,6,12,18,13,24,55,45,60))
+plot3DPotential(list(syncMulti, proxMulti, compatMulti), subject = 'ind', pt.cex = 1, sub.ids = c(1,6,12,18,13,24,55,45,60))
 ```
 
 ## Conclusion
