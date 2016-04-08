@@ -88,6 +88,7 @@ plotScene <- function(scene, dimension = "auto",
     smax <- max(unlist(lapply(scene, function(x) as.numeric(unlist(x[,c('s1','s2')])))))
     if (length(unique(unlist(lapply(scene, function(x) as.numeric(unlist(x[,c('s1','s2')]))))))==2){
       dioecious <- T
+      mtmax <- max(unlist(lapply(scene, function(x)table(x$s1))))
     } else {
       dioecious <- F
     }
@@ -101,7 +102,7 @@ plotScene <- function(scene, dimension = "auto",
 
   for (i in 1:length(scene)){
     scene.i <- scene[[i]]
-    par(mar = c(0.25,3.25,0.25,1))
+    par(mar = c(0.25,3.25,1,1))
     if (temp){
       scene.i <- scene.i[order(scene.i[, 'start'], scene.i[, 'end']),]
       scene.i$index <- seq_along(scene.i[, 1])
@@ -183,10 +184,10 @@ plotScene <- function(scene, dimension = "auto",
           sr <- round(table(scene.i$s1)[1]/table(scene.i$s1)[2], digits = 2)
         }
         if (i == nr){
-          barplot(table(scene.i$s1), col = 'gray27', ylab = '', names.arg = c(mt1,mt2))
+          barplot(table(scene.i$s1), col = 'gray27', ylab = '', names.arg = c(mt1,mt2), ylim = c(0,mtmax))
           mtext('mating type',side = 1,adj = 0.5, cex = 0.75, line = 3)
         }else {
-          barplot(table(scene.i$s1), xaxt = 'n', col = 'gray27', ylab = 'count')
+          barplot(table(scene.i$s1), xaxt = 'n', col = 'gray27', ylab = '',ylim = c(0,mtmax))
         }
         leg.text <- paste('M/F sex ratio:',sr)
         mtext(leg.text, side = 3, adj = 0.5, bg = 'white', cex = 0.7, line=0.1)
