@@ -8,6 +8,8 @@
 ##' @param sample character, specifies how to sample individuals to be represented in pairwise potential plots. Possible values are "random" (default) or "all". See details.
 ##' @param N integer, indicates the number of individuals to sample if sub.ids = 'random' (default N = 3)
 ##' @param main character, the main plot title, if NULL, defaults to 'individual potential' or 'pairwise potential,' corresponding to \code{subject}
+##' @param text.cex specify text expansion factor (text size relative to device default)
+##' @param pt.cex specify point expansion factor (point size relative to device default)
 ##' @details The individuals to be represented in the pairwise potential plots can either be specified explicitly
 ##' through \code{sub.ids}, chosen randomly (\code{sample} = 'random'), or all individuals can be selected (\code{sample} = 'all').
 ##' The default is to randonly select 9 individuals. If multiple years are being plotted, the subset is sampled from all years
@@ -27,7 +29,7 @@ plot3DPotential <-   function(matPots,
                               subject = NULL,
                               density = TRUE,
                               sub.ids = NULL, N = 3, sample = NA,
-                              main = NULL){
+                              main = NULL, text.cex = 0.7, pt.cex = 0.7){
   nm <- par("mar")
   noma <- par('oma')
   nmfrow <- par('mfrow')
@@ -140,9 +142,9 @@ plot3DPotential <-   function(matPots,
     ylab <- ifelse(proximity & xlab!= 'proximity', 'proximity','compatibility')
     for (i in 1:len){
       if (subject %in% 'pair'){
-        plot(pair[[i]][,,1],pair[[i]][,,2], ylab = '', pch = 19, xaxt = 'n', yaxt = 'n', xlab = '', cex.axis = 0.85,ylim = c(ymin,ymax), xlim = c(xmin,xmax))
+        plot(pair[[i]][,,1],pair[[i]][,,2], ylab = '', pch = 19, xaxt = 'n', yaxt = 'n', xlab = '', cex.axis = 0.85,ylim = c(ymin,ymax), xlim = c(xmin,xmax), cex = pt.cex)
       } else {
-        plot(ind[[i]][,2],ind[[i]][,3], ylab = '', pch = 19, xaxt = 'n', xlab = '', yaxt = 'n', cex.axis = 0.85, ylim = c(ymin,ymax), xlim = c(xmin,xmax))
+        plot(ind[[i]][,2],ind[[i]][,3], ylab = '', pch = 19, xaxt = 'n', xlab = '', yaxt = 'n', cex.axis = 0.85, ylim = c(ymin,ymax), xlim = c(xmin,xmax), cex = pt.cex)
       }
       axis(2,  cex.axis = 0.85, las = 2)
       if (i == len){
@@ -154,9 +156,9 @@ plot3DPotential <-   function(matPots,
       mtext(names(matPots[[1]][i]), 2, cex = 0.7, outer = F, line = 5, font = 1)
       if (!is.null(sub.ids)){
         if(subject %in% 'ind'){
-          text(ind[[i]][ind[[i]][,'id'] %in% sub.ids,2],ind[[i]][ind[[i]][,'id'] %in% sub.ids,3],ind[[i]][ind[[i]][,'id'] %in% sub.ids,1], pos = 2)
+          text(ind[[i]][ind[[i]][,'id'] %in% sub.ids,2],ind[[i]][ind[[i]][,'id'] %in% sub.ids,3],ind[[i]][ind[[i]][,'id'] %in% sub.ids,1], cex = text.cex, pos = 2)
         } else {
-          text(pair[[i]][attr(d1[[i]][['pair']],'idOrder') %in% sub.ids,,1], pair[[i]][attr(d1[[i]][['pair']],'idOrder') %in% sub.ids,,2], attr(d1[[i]][['pair']],'idOrder')[attr(d1[[i]][['pair']],'idOrder') %in% sub.ids] , pos = 2, cex = 0.6)
+          text(pair[[i]][attr(d1[[i]][['pair']],'idOrder') %in% sub.ids,,1], pair[[i]][attr(d1[[i]][['pair']],'idOrder') %in% sub.ids,,2], attr(d1[[i]][['pair']],'idOrder')[attr(d1[[i]][['pair']],'idOrder') %in% sub.ids] , pos = 2, cex = text.cex)
         }
       }
     }
@@ -169,16 +171,16 @@ plot3DPotential <-   function(matPots,
     }
     for (i in 1:len){
       if (subject %in% 'pair') {
-        plot(pair[[i]][,,1],pair[[i]][,,2], ylab = '', pch = 21, bg = pair[[i]][,,3], xaxt = 'n',yaxt = 'n', xlab = '', ylim = c(ymin,ymax), xlim = c(xmin,xmax))
+        plot(pair[[i]][,,1],pair[[i]][,,2], ylab = '', pch = 21, bg = pair[[i]][,,3], xaxt = 'n',yaxt = 'n', xlab = '', ylim = c(ymin,ymax), xlim = c(xmin,xmax), cex = pt.cex)
       } else {
         cols <- findInterval(ind[[i]][,4], vec)
-        plot(ind[[i]][,2],ind[[i]][,3], ylab = '', pch = 21, bg = cols, xaxt = 'n',yaxt = 'n', xlab = '', ylim = c(ymin,ymax), xlim = c(xmin,xmax))
+        plot(ind[[i]][,2],ind[[i]][,3], ylab = '', pch = 21, bg = cols, xaxt = 'n',yaxt = 'n', xlab = '', ylim = c(ymin,ymax), xlim = c(xmin,xmax), cex = pt.cex)
       }
       if (!is.null(sub.ids)){
         if(subject %in% 'ind'){
-          text(ind[[i]][ind[[i]][,'id'] %in% sub.ids,2],ind[[i]][ind[[i]][,'id'] %in% sub.ids,3],ind[[i]][ind[[i]][,'id'] %in% sub.ids,1], pos = 2)
+          text(ind[[i]][ind[[i]][,'id'] %in% sub.ids,2],ind[[i]][ind[[i]][,'id'] %in% sub.ids,3],ind[[i]][ind[[i]][,'id'] %in% sub.ids,1], cex = text.cex, pos = 2)
         } else {
-          text(pair[[i]][attr(d1[[i]][['pair']],'idOrder') %in% sub.ids,,1], pair[[i]][attr(d1[[i]][['pair']],'idOrder') %in% sub.ids,,2], attr(d1[[i]][['pair']],'idOrder')[attr(d1[[i]][['pair']],'idOrder') %in% sub.ids] , pos = 2, cex = 0.75)
+          text(pair[[i]][attr(d1[[i]][['pair']],'idOrder') %in% sub.ids,,1], pair[[i]][attr(d1[[i]][['pair']],'idOrder') %in% sub.ids,,2], attr(d1[[i]][['pair']],'idOrder')[attr(d1[[i]][['pair']],'idOrder') %in% sub.ids] , pos = 2, cex = text.cex)
         }
       }
       axis(2,  cex.axis = 0.85, las = 2)
