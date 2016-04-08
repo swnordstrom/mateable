@@ -1,5 +1,8 @@
-mateable 0.3.0 is now available on CRAN.
+### mateable 0.3.1 is now available on CRAN.
 
+We added a vignette and many new features to this version.
+
+### mateable 0.3.0
 
 With this release you can organize mating scene data
 (makeScene and simulateScene), visualize mating scenes
@@ -8,18 +11,15 @@ basic analysis of mating scenes (synchrony, proximity,
 compatibility), and a few other useful tasks
 (matingSummary, overlap, etc.)!
 
-
-This repo provides source code for an R package called
-mateable. This package contains functions that
-help the study of mating phenology.
+### mateable
+This repo provides source code for an R package called mateable. This package provides tools to simulate, manage, visualize, and analyze spatially and temporally explicit datasets of mating potential. It implements methods to calculate synchrony, proximity, and compatibility. 
 
 To download the CRAN version of this package simple use the
 standard command to do so:
 
 install.packages("mateable")
 
-To get the current development version you can use the package devtools,
-and the following code to automatically install package mateable.
+To get the current development version you can use the package devtools, and the following code to automatically install package mateable.
 
 install.packages("devtools") # if you don't already have it
 library(devtools)
@@ -27,9 +27,7 @@ install_github("stuartWagenius/mateable")
 library(mateable)
 ?mateable
 
-You should see a help page. Look at the index link to see what
-functions are available. Copy and paste the example code to see
-what happens!
+You should see a help page. Click the index link at the bottom of the page to see what functions are available. Copy and paste the example code to see what happens!
 
 Let me know if you have any questions.
 
