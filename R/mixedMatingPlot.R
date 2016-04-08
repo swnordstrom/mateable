@@ -24,7 +24,8 @@
 plot3DScene <- function(scene, dimension = "auto",
                         sub= NULL, N = 3,
                         ycoord = 'northing', xcoord = 'easting',
-                        pch = 19, pt.cex = 0.7,text.cex = 0.7, ...){
+                        pch = 19, pt.cex = 0.7,text.cex = 0.7,
+                        dioecious = FALSE, ...){
   dimension <- match.arg(dimension, c("auto", "t", "s", "mt"),several.ok = TRUE)
   par.orig <- par("mar", "oma", "mfrow", "xpd")
   on.exit(par(par.orig))
@@ -76,8 +77,13 @@ plot3DScene <- function(scene, dimension = "auto",
   }
 
   if(comp){
-    smin <- min(unlist(lapply(scene, function(x) as.numeric(unlist(x[,c('s1','s2')])))))
-    smax <- max(unlist(lapply(scene, function(x) as.numeric(unlist(x[,c('s1','s2')])))))
+    if(dioecious){
+      smin <- 1
+      smax <- 2
+    }else {
+      smin <- min(unlist(lapply(scene, function(x) as.numeric(unlist(x[,c('s1','s2')])))))
+      smax <- max(unlist(lapply(scene, function(x) as.numeric(unlist(x[,c('s1','s2')])))))
+    }
   }
 
   for (i in 1:length(scene)){
@@ -96,7 +102,11 @@ plot3DScene <- function(scene, dimension = "auto",
       if (is.null(pch)) {
         text(scene.i[, 'x'], scene.i[, 'y'], scene.i[, 'id'], col = scene.i$cols, cex = text.cex, ...)
       } else {
-        text (scene.i[,'x'], scene.i[,'y'], paste(scene.i[,'s1'],', ',scene.i[,'s2'], sep = ""), pos = 2, cex = text.cex)
+        if (dioecious){
+          text (scene.i[,'x'], scene.i[,'y'], scene.i[,'s1'], pos = 2, cex = text.cex)
+        } else {
+          text (scene.i[,'x'], scene.i[,'y'], paste(scene.i[,'s1'],', ',scene.i[,'s2'], sep = ""), pos = 2, cex = text.cex)
+        }
         if (!is.null(sub)){
           scene.i.sub <- scene.i[scene.i[, 'id'] %in% sub, ]
           text(scene.i.sub[, 'x'], scene.i.sub[, 'y'], scene.i.sub[, 'id'], pos = 3, cex =text.cex*1.2, font = 2, ...)
@@ -144,11 +154,18 @@ plot3DScene <- function(scene, dimension = "auto",
           text(scene.i.sub[, 'x'], scene.i.sub[, 'y'], scene.i.sub[, 'id'], pos = 3, cex =text.cex*1.2, font = 2, col = 'blue', ...)
           points(scene.i.sub[, 'x'], scene.i.sub[, 'y'], pch = pch, cex = pt.cex*1.2,  ...)
           points(scene.i[!scene.i[, 'id'] %in% sub, 'x'], scene.i[!scene.i[, 'id'] %in% sub, 'y'], pch = pch, cex = pt.cex*1.2, ...)
-          text (scene.i[,'x'], scene.i[,'y'], paste(scene.i[,'s1'],', ',scene.i[,'s2'], sep = ""), pos = 2, cex = text.cex)
+          if (dioecious){
+            text (scene.i[,'x'], scene.i[,'y'], scene.i[,'s1'], pos = 2, cex = text.cex)
+          } else {
+            text (scene.i[,'x'], scene.i[,'y'], paste(scene.i[,'s1'],', ',scene.i[,'s2'], sep = ""), pos = 2, cex = text.cex)
+          }
         } else {
           points(scene.i[, 'x'], scene.i[, 'y'], pch = pch, cex = pt.cex, ...)
-          text (scene.i[,'x'], scene.i[,'y'], paste(scene.i[,'s1'],', ',scene.i[,'s2'], sep = ""), pos = 2, cex = text.cex)
-        }
+          if (dioecious){
+            text (scene.i[,'x'], scene.i[,'y'], scene.i[,'s1'], pos = 2, cex = text.cex)
+          } else {
+            text (scene.i[,'x'], scene.i[,'y'], paste(scene.i[,'s1'],', ',scene.i[,'s2'], sep = ""), pos = 2, cex = text.cex)
+          }        }
       }
       if(i == nr){
         mtext('spatial and mating type plot', font = 2, line = 2, side = 3, outer = T)
@@ -169,18 +186,14 @@ plot3DScene <- function(scene, dimension = "auto",
       mtext('s2', side = 2, outer = T, cex = 0.7)
       abline(v = c(1:10) - 0.5, lty = 'dotted', col = 'lightgray')
       abline(h = c(1:10) - 0.5 , lty = 'dotted', col = 'lightgray')
-      axis(2, at = min(scene.i$s2):max(scene.i$s1), labels = min(scene.i$s2):max(scene.i$s1), cex.axis = 0.75)
+      axis(2, at = smin:smax, labels = min(scene.i$s2):max(scene.i$s1), cex.axis = 0.75)
       if (!is.null(sub)){
-        text(scene.i.sub[, 's1'], scene.i.sub[, 's2'], scene.i.sub[, 'id'], pos = 3, cex =1, font = 2, ...)
         scene.i.sub <- scene.i[scene.i[, 'id'] %in% sub, ]
+        text(scene.i.sub[, 's1'], scene.i.sub[, 's2'], scene.i.sub[, 'id'], pos = 3, cex =1, font = 2, ...)
       }
       if (i == 1){
         legend('topleft', legend = c(format(attr(scene.i,'origin')+ minstart, format = "%b %d"),' ',' ',' ',format(attr(scene.i,'origin')+round(mean(c(minstart,maxstart))), format = "%b %d"),' ',' ',' ',format(attr(scene.i,'origin')+maxstart, format = "%b %d")), fill = colorRampPalette(c('blue','red'))(9),ncol = 1, bty = 'o',xpd = T, y.intersp = 0.68, title = 'start date', inset = c(0.02,0.03), cex = 0.75)
-        if (!is.null(sub)){
-          scene.i.sub <- scene.i[scene.i[, 'id'] %in% sub, ]
-          title(main = 'temporal and compatibility plot', outer = T)
-          text(scene.i.sub[, 's1'], scene.i.sub[, 's2'], scene.i.sub[, 'id'], pos = 3, cex =1, font = 2, ...)
-        }
+        title(main = 'temporal and compatibility plot', outer = T)
       }
       if(i == nr){
         axis(1, at = min(scene.i$s2):max(scene.i$s1), labels = min(scene.i$s2):max(scene.i$s1), cex.axis = 0.75)
