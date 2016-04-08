@@ -178,9 +178,9 @@ plotScene <- function(scene, dimension = "auto",
     if(comp){
       if (dioecious){
         if (mt1 == 'F'){
-          sr <- round(table(simulatedCoral$s1)[2]/table(simulatedCoral$s1)[1],digits = 2)
+          sr <- round(table(scene.i$s1)[2]/table(scene.i$s1)[1],digits = 2)
         } else {
-          sr <- round(table(simulatedCoral$s1)[1]/table(simulatedCoral$s1)[2], digits = 2)
+          sr <- round(table(scene.i$s1)[1]/table(scene.i$s1)[2], digits = 2)
         }
         if (i == nr){
           barplot(table(scene.i$s1), col = 'gray27', ylab = '', names.arg = c(mt1,mt2))
