@@ -6,7 +6,7 @@
 \usage{
 makeScene(df, multiYear = FALSE, startCol = "start", endCol = "end",
   xCol = "x", yCol = "y", s1Col = "s1", s2Col = "s2", idCol = "id",
-  dateFormat = "\%Y-\%m-\%d")
+  otherCols = NULL, dateFormat = "\%Y-\%m-\%d")
 }
 \arguments{
 \item{df}{a data frame containing information about a mating scene,
@@ -28,6 +28,9 @@ a list by year}
 \item{s2Col}{character name of another column with S-alleles}
 
 \item{idCol}{character name for column with unique identifier}
+
+\item{otherCols}{character vector of column(s) to include besides the 
+necessary ones for the mating scene. If NULL, it will be ignored.}
 
 \item{dateFormat}{character indicating either (1) the format of the start and end
 date columns if those columns are characters or (2) the origin for the start
