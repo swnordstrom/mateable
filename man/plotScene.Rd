@@ -8,7 +8,7 @@ plotScene(scene, dimension = "auto", opening = NULL, closing = NULL,
   dailyPoints = TRUE, drawQuartiles = TRUE, sub = NULL, N = 1,
   xlab.spat = NULL, ylab.spat = NULL, pch = 19, pt.cex = 0.75,
   text.cex = 0.6, quartile.lwd = 1, quartile.col = "gray55",
-  peak.col = "gray27", labelID = FALSE, ...)
+  peak.col = "gray27", labelID = FALSE, mt1 = "F", mt2 = "M", ...)
 }
 \arguments{
 \item{scene}{a matingScene object}
@@ -44,6 +44,10 @@ plotScene(scene, dimension = "auto", opening = NULL, closing = NULL,
 \item{peak.col}{if \code{drawQuartiles} = TRUE, specify color of peak lines, defaults to 'gray27'.}
 
 \item{labelID}{if TRUE, the y-axis will be labeled with the id of the corresponding segment.}
+
+\item{mt1}{label for mating type '1', if dioecious}
+
+\item{mt2}{label for mating type '2', if dioecious}
 
 \item{...}{standard graphical parameters}
 }

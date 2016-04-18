@@ -105,7 +105,7 @@ plotPotential <-   function(matPot,
 
     if (subject %in% 'pair'){
       diag(poti[['pair']]) <- 1
-      subMat<- poti[['pair']][which(sub.iids %in% attr(poti[['pair']],'idOrder')),which(sub.iids %in% attr(poti[['pair']],'idOrder'))]
+      subMat<- poti[['pair']][which(attr(poti[['pair']],'idOrder') %in% sub.iids),which(attr(poti[['pair']],'idOrder') %in% sub.iids)]
 
       if ('hist' %in% pt){
         hist(poti[['pair']], breaks = 15, prob = T, xlab = NULL, main = NULL, ylab = "")

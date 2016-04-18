@@ -18,6 +18,8 @@
 ##' @param quartile.col if \code{drawQuartiles} = TRUE, specifies color of quartile lines, defaults to 'gray81'.
 ##' @param peak.col if \code{drawQuartiles} = TRUE, specify color of peak lines, defaults to 'gray27'.
 ##' @param labelID if TRUE, the y-axis will be labeled with the id of the corresponding segment.
+##' @param mt1 label for mating type '1', if dioecious
+##' @param mt2 label for mating type '2', if dioecious
 ##' @param ... standard graphical parameters
 ##' @return nothing
 ##' @return optional arguments for the plot function
@@ -38,7 +40,7 @@ plotScene <- function(scene, dimension = "auto",
                       xlab.spat = NULL, ylab.spat = NULL,
                       pch = 19, pt.cex = 0.75, text.cex = 0.6,
                       quartile.lwd = 1, quartile.col = 'gray55', peak.col = 'gray27',
-                      labelID = FALSE, ...){
+                      labelID = FALSE, mt1 = 'F', mt2 = 'M', ...){
 
   dimension <- match.arg(dimension, c("auto", "t", "s", "mt"),several.ok = TRUE)
   par.orig <- par("mar", "oma", "mfrow", "xpd")
@@ -84,6 +86,11 @@ plotScene <- function(scene, dimension = "auto",
   if(comp){
     smin <- min(unlist(lapply(scene, function(x) as.numeric(unlist(x[,c('s1','s2')])))))
     smax <- max(unlist(lapply(scene, function(x) as.numeric(unlist(x[,c('s1','s2')])))))
+    if (length(unique(unlist(lapply(scene, function(x) as.numeric(unlist(x[,c('s1','s2')]))))))==2){
+      dioecious <- T
+    } else {
+      dioecious <- F
+    }
   }
 
   if ('random' %in% sub){
@@ -122,7 +129,7 @@ plotScene <- function(scene, dimension = "auto",
       }
       if (!is.null(sub)){
         segments(scene.i[scene.i$id %in% sub, 'start'], scene.i[scene.i$id %in% sub, 'index'], scene.i[scene.i$id %in% sub, 'end'],scene.i[scene.i$id %in% sub, 'index'], col = "blue", ...)
-        text(scene.i[scene.i$id %in% sub, 'start']-0.015*closing, scene.i[scene.i$id %in% sub, 'index'], scene.i[scene.i$id %in% sub, 'id'], cex = text.cex)
+        text(scene.i[scene.i$id %in% sub, 'start']-0.02*closing, scene.i[scene.i$id %in% sub, 'index'], scene.i[scene.i$id %in% sub, 'id'], cex = text.cex)
       }
       if (dailyPoints == TRUE){
         rbd <- receptivityByDay(scene.i)
@@ -169,23 +176,40 @@ plotScene <- function(scene, dimension = "auto",
       }
     }
     if(comp){
-      scene.i$s1 <- as.numeric(scene.i$s1)
-      scene.i$s2 <- as.numeric(scene.i$s2)
-      for (j in 1:nrow(scene.i)){
-        if (scene.i[j,'s1'] < scene.i[j,'s2']){
-          scene.i[j,c('s1','s2')] <- scene.i[j,c('s2','s1')]
+      if (dioecious){
+        if (mt1 == 'F'){
+          sr <- round(table(scene.i$s1)[2]/table(scene.i$s1)[1],digits = 2)
+        } else {
+          sr <- round(table(scene.i$s1)[1]/table(scene.i$s1)[2], digits = 2)
         }
-      }
-      ptWt<- aggregate(id ~ s1 + s2, data = scene.i, length)
-      ptWt$scale <- (ptWt$id - min(ptWt$id)) / diff(range(ptWt$id))
-      plot(ptWt$s1, ptWt$s2, cex = 2*ptWt$scale, pch = pch, xlim = c(smin, smax), ylim = c(smin,smax), ylab = "", xaxt = 'n')
-      mtext('s2',side = 2,adj = 0.5, cex = 0.75, line = 2.5)
-      axis(2, at = smin:smax, labels = smin:smax, tick = 0.25)
-      leg.text <- levels(as.factor(ptWt$id))
-      legend('topleft',legend = leg.text, pt.cex = 1+(as.numeric(leg.text) - min(as.numeric(leg.text)))/diff(range(as.numeric(leg.text))), pch = pch)
-      if (i == nr){
-        mtext('s1',side = 1,adj = 0.5, cex = 0.75, line = 3)
-        axis(1, at = smin:smax, labels = smin:smax)
+        if (i == nr){
+          barplot(table(scene.i$s1), col = 'gray27', ylab = '', names.arg = c(mt1,mt2))
+          mtext('mating type',side = 1,adj = 0.5, cex = 0.75, line = 3)
+        }else {
+          barplot(table(scene.i$s1), xaxt = 'n', col = 'gray27', ylab = 'count')
+        }
+        leg.text <- paste('M/F sex ratio:',sr)
+        mtext(leg.text, side = 3, adj = 0.5, bg = 'white', cex = 0.7, line=0.1)
+        mtext('count',side = 2,adj = 0.5, cex = 0.75, line = 2.5)
+      } else {
+        scene.i$s1 <- as.numeric(scene.i$s1)
+        scene.i$s2 <- as.numeric(scene.i$s2)
+        for (j in 1:nrow(scene.i)){
+          if (scene.i[j,'s1'] < scene.i[j,'s2']){
+            scene.i[j,c('s1','s2')] <- scene.i[j,c('s2','s1')]
+          }
+        }
+        ptWt<- aggregate(id ~ s1 + s2, data = scene.i, length)
+        ptWt$scale <- (ptWt$id - min(ptWt$id)) / diff(range(ptWt$id))
+        plot(ptWt$s1, ptWt$s2, cex = 2*ptWt$scale, pch = pch, xlim = c(smin, smax), ylim = c(smin,smax), ylab = "", xaxt = 'n', yaxt = 'n')
+        mtext('s2',side = 2,adj = 0.5, cex = 0.75, line = 2.5)
+        axis(2, at = smin:smax, labels = smin:smax, tick = 0.25)
+        leg.text <- levels(as.factor(ptWt$id))
+        legend('topleft',legend = leg.text, pt.cex = 1+(as.numeric(leg.text) - min(as.numeric(leg.text)))/diff(range(as.numeric(leg.text))), pch = pch)
+        if (i == nr){
+          mtext('s1',side = 1,adj = 0.5, cex = 0.75, line = 3)
+          axis(1, at = smin:smax, labels = smin:smax)
+        }
       }
       if(i == 1 & nc > 1){
         mtext('mating type',side = 3, adj = 0.5, line = 1.5)
