@@ -1,4 +1,4 @@
-### mateable 0.3.1 has been submitted to CRAN.
+### mateable 0.3.1 is now available on CRAN.
 
 We added a vignette and many new features to this version.
 
