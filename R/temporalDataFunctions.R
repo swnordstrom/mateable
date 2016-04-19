@@ -261,7 +261,7 @@ receptivityByDay <- function(scene, summary = FALSE, nameDate = TRUE) {
 ##' pop2 <- simulateScene(size = 1234, sdDur = 5, sk = 1)
 ##' syncVals <- synchrony(pop2, "sync_nn", "all", "median", 123)
 synchrony <- function(scene, method, subject = "all", averageType = "mean",
-                      syncNN = 1, compareToSelf = FALSE, frame = 'within') {
+                      syncNN = 1, compareToSelf = FALSE, frame = 'within', resolution = 'daily') {
 
   method <- match.arg(method, c("augspurger", "kempenaers", "sync_prop",
                                 "overlap", "sync_nn", "simple1", "simple2",
@@ -280,36 +280,43 @@ synchrony <- function(scene, method, subject = "all", averageType = "mean",
   if (is.list(scene) & !is.data.frame(scene)) {
     if(frame == 'between'){
       if(method =='sync_prop'){
-        minStart <- function(x) min(x$start) + attr(x,'origin')
-        maxEnd <- function(x) max(x$end) + attr(x,'origin')
+        if(resolution =='yearly'){
+          ids <- unique(unlist(lapply(scene, function(x)x$id)))
+          fl <- matrix(nrow = length(ids),ncol = length(scene))
+          for (i in 1:length(ids)){
+            id <- ids[i]
+            fl[i,] <- unlist(lapply(scene, function(l) ifelse(id %in% l$id, T, F)))
+          }
+        } else {
+          minStart <- function(x) min(x$start) + attr(x,'origin')
+          maxEnd <- function(x) max(x$end) + attr(x,'origin')
+          allDays <- as.Date(min(unlist(lapply(scene, minStart))), origin = '1970-01-01'):as.Date(max(unlist(lapply(scene, maxEnd))), origin = '1970-01-01')
+          ids <- unique(unlist(lapply(scene,function(x)unique(x$id))))
+          fl <- matrix(nrow = length(ids), ncol = length(allDays),dimnames = list(ids,allDays))
 
-        allDays <- as.Date(min(unlist(lapply(scene, minStart))), origin = '1970-01-01'):as.Date(max(unlist(lapply(scene, maxEnd))), origin = '1970-01-01')
-        ids <- unique(unlist(lapply(scene,function(x)unique(x$id))))
-        fl <- matrix(nrow = length(ids), ncol = length(allDays),dimnames = list(ids,allDays))
-
-        l2df <- function(x,id){
-          out <- x[x$id == id,]
-          out$start <- out$start+attr(x,'origin')
-          out$end <- out$end + attr(x, 'origin')
-          return(out)
-        }
-
-        for (i in 1:length(ids)){
-          id <- ids[i]
-          l <- do.call('rbind',lapply(scene,l2df,id = id))
-          for (j in 1:nrow(l)){
-            dfl <- l[j,'start']:l[j,'end']
-            index <- dfl-min(allDays)+1
-            fl[i,index] <- T
+          l2df <- function(x,id){
+            out <- x[x$id == id,]
+            out$start <- out$start+attr(x,'origin')
+            out$end <- out$end + attr(x, 'origin')
+            return(out)
+          }
+          for (i in 1:length(ids)){
+            id <- ids[i]
+            l <- do.call('rbind',lapply(scene,l2df,id = id))
+            for (j in 1:nrow(l)){
+              dfl <- l[j,'start']:l[j,'end']
+              index <- dfl-min(allDays)+1
+              fl[i,index] <- T
+            }
           }
         }
 
-        n <- sum(fl, na.rm = T) # number of flowering days for all individuals
-        nind <- apply(fl,1, function(x)sum(x, na.rm = T)) # number of flowering days per individual
-        prop <- apply(fl,2,function(x){sum(x, na.rm = T)/n}) # proportion of all flowering that occured each day
-        indPropDaily<- t(apply(fl,1,function(x){x*prop}))
-        totalIndProp <- apply(indPropDaily,1,sum, na.rm = T) # proportion of all flowering that occured on the days an individual was flowering
-        indSync <- data.frame(id = ids, synchrony = totalIndProp, days = nind)
+        n <- sum(fl, na.rm = T) # number of flowering days/years for all individuals
+        nind <- apply(fl,1, function(x)sum(x, na.rm = T)) # number of flowering days/years per individual
+        prop <- apply(fl,2,function(x){sum(x, na.rm = T)/n}) # proportion of all flowering that occured each day/year
+        indProp <- t(apply(fl,1,function(x){x*prop}))
+        totalIndProp <- apply(indProp,1,sum, na.rm = T) # proportion of all flowering that occured on the days/years an individual was flowering
+        indSync <- data.frame(id = ids, synchrony = totalIndProp, time = nind)
         pairSync <- NULL
         popSync <- average(indSync[,2])
       }
