@@ -261,7 +261,8 @@ receptivityByDay <- function(scene, summary = FALSE, nameDate = TRUE) {
 ##' pop2 <- simulateScene(size = 1234, sdDur = 5, sk = 1)
 ##' syncVals <- synchrony(pop2, "sync_nn", "all", "median", 123)
 synchrony <- function(scene, method, subject = "all", averageType = "mean",
-                      syncNN = 1, compareToSelf = FALSE, frame = 'within', resolution = 'daily') {
+                      syncNN = 1, compareToSelf = FALSE,
+                      frame = 'within', resolution = 'daily') {
 
   method <- match.arg(method, c("augspurger", "kempenaers", "sync_prop",
                                 "overlap", "sync_nn", "simple1", "simple2",
@@ -312,7 +313,7 @@ synchrony <- function(scene, method, subject = "all", averageType = "mean",
         }
 
         n <- sum(fl, na.rm = T) # number of flowering days/years for all individuals
-        nind <- apply(fl,1, function(x)sum(x, na.rm = T)) # number of flowering days/years per individual
+        nind <- apply(fl,1, sum, na.rm = T) # number of flowering days/years per individual
         prop <- apply(fl,2,function(x){sum(x, na.rm = T)/n}) # proportion of all flowering that occured each day/year
         indProp <- t(apply(fl,1,function(x){x*prop}))
         totalIndProp <- apply(indProp,1,sum, na.rm = T) # proportion of all flowering that occured on the days/years an individual was flowering
