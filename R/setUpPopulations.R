@@ -58,6 +58,8 @@ simulateScene <- function(size = 30, meanSD = "2012-07-12", sdSD = 6, meanDur = 
 ##' @param s1Col character name of one column with S-allele
 ##' @param s2Col character name of another column with S-alleles
 ##' @param idCol character name for column with unique identifier
+##' @param otherCols character vector of column(s) to include besides the 
+##' necessary ones for the mating scene. If NULL, it will be ignored.
 ##' @param dateFormat character indicating either (1) the format of the start and end
 ##' date columns if those columns are characters or (2) the origin for the start
 ##' and end date columns if those columns are numeric. It is used in as.Date
@@ -92,9 +94,9 @@ simulateScene <- function(size = 30, meanSD = "2012-07-12", sdSD = 6, meanDur = 
 ##' column labelled as startCol and set dateFormat = "%Y" and that will split
 ##' the data appropriately.
 ##' @author Danny Hanson
-makeScene <- function (df, multiYear = FALSE, startCol = "start", endCol = "end", xCol = "x",
-                       yCol = "y", s1Col = "s1", s2Col = "s2", idCol = "id",
-                       dateFormat = "%Y-%m-%d") {
+makeScene <- function (df, multiYear = FALSE, startCol = "start", endCol = "end",
+                       xCol = "x", yCol = "y", s1Col = "s1", s2Col = "s2",
+                       idCol = "id", otherCols = NULL, dateFormat = "%Y-%m-%d") {
   if (multiYear) {
     if (dateFormat == "%Y") {
       dates <- as.Date(as.character(df[, startCol]), dateFormat)
@@ -107,7 +109,7 @@ makeScene <- function (df, multiYear = FALSE, startCol = "start", endCol = "end"
     for (i in 1:length(years)) {
       newScene[[as.character(years[i])]] <-
         makeScene(df[df$year %in% years[i],], F, startCol, endCol, xCol, yCol,
-                  s1Col, s2Col, idCol, dateFormat)
+                  s1Col, s2Col, idCol, otherCols, dateFormat)
     }
   } else {
     newScene <- data.frame(id = character(nrow(df)))
@@ -147,6 +149,9 @@ makeScene <- function (df, multiYear = FALSE, startCol = "start", endCol = "end"
       newScene$s2 <- as.factor(df[, s2Col])
     }
 
+    if (!is.null(otherCols)) {
+      newScene[, otherCols] <- df[, otherCols]
+    }
     # not going to add this for now because it's unlikely we'll make our
     # own generics or use oop
     # class(newScene) <- "matingScene"
