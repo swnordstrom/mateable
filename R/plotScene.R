@@ -7,7 +7,7 @@
 ##' @param closing the number of days to adjust the end date displayed for the temporal dimension. End date defaults to maximum day of year end date in mating scene object.
 ##' @param dailyPoints logical indicating whether daily counts of individuals should be displayed for plots of the temporal dimension
 ##' @param drawQuartiles logical indicating whether vertical lines should be drawn at population peak (see details) or quartiles
-##' @param sortBy character indicating which columns to sort segments of flowering schedule by. Defaults to 'start', then 'end'. A maximum of three variables to sort by may be specified.
+##' @param sortBy character indicating which columns to sort segments of flowering schedule by. Defaults to 'start', then 'end'. Up to three variables may be specified.
 ##' @param colorBy character optional, the name of a variable to use to assign color to segments or points.
 ##' @param sub a vector containing the ids of individuals to be highlighted in the plots or a character string specifying how to choose individuals to highlight. Possible values are "random" or "all". If NULL, no subset will be identified in the plots.
 ##' @param N a positive number, the number of individuals to sample if \code{sub} = 'random'
