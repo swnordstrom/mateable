@@ -120,12 +120,22 @@ plotScene <- function(scene, dimension = "auto",
 
     if (!is.null(colorBy)){
       par(oma = c(c(7,3,4,1)))
-      palette(colorRampPalette(c('blue','red'))(9))
-      vec <- seq(min(scene.i[,colorBy]), max(scene.i[,colorBy]), length.out = 9)
-      scene.i$cols <- findInterval(scene.i[,colorBy],vec)
-      cols.seg <- scene.i$cols
-      cols.pt <- scene.i$cols
-      cols.sub <- scene.i[scene.i$id %in% sub, 'cols']
+      if (is.numeric(scene.i[,colorBy])){
+        palette(colorRampPalette(c('blue','red'))(9))
+        vec <- seq(min(scene.i[,colorBy]), max(scene.i[,colorBy]), length.out = 9)
+        scene.i$cols <- findInterval(scene.i[,colorBy],vec)
+        cols.seg <- scene.i$cols
+        cols.pt <- scene.i$cols
+        cols.sub <- scene.i[scene.i$id %in% sub, 'cols']
+      } else{
+        scene.i[,'colorBy'] <- as.factor(scene.i[,colorBy])
+        colLevels <- levels(as.factor(scene.i[,colorBy]))
+        palette(terrain.colors(length(colLevels)))
+        cols.seg <- palette(terrain.colors(length(colLevels)))[scene.i[,colorBy]]
+        cols.pt <- palette(terrain.colors(length(colLevels)))[scene.i[,colorBy]]
+        cols.sub <- scene.i[scene.i$id %in% sub, 'cols']
+      }
+
     } else {
       cols.seg <- 'gray50'
       cols.pt <- 'black'
