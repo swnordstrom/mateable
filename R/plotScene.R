@@ -128,7 +128,6 @@ plotScene <- function(scene, dimension = "auto",
         cols.pt <- scene.i$cols
         cols.sub <- scene.i[scene.i$id %in% sub, 'cols']
       } else{
-        # scene.i[,colorBy] <- as.factor(scene.i[,colorBy])
         colLevels <- levels(as.factor(scene.i[,colorBy]))
         colDF <- data.frame(var = colLevels, color = I(rainbow(length(colLevels))))
         scene.i <- merge(scene.i,colDF, by.x = colorBy, by.y = 'var')
