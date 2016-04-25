@@ -128,12 +128,13 @@ plotScene <- function(scene, dimension = "auto",
         cols.pt <- scene.i$cols
         cols.sub <- scene.i[scene.i$id %in% sub, 'cols']
       } else{
-        scene.i[,'colorBy'] <- as.factor(scene.i[,colorBy])
+        # scene.i[,colorBy] <- as.factor(scene.i[,colorBy])
         colLevels <- levels(as.factor(scene.i[,colorBy]))
-        palette(terrain.colors(length(colLevels)))
-        cols.seg <- palette(terrain.colors(length(colLevels)))[scene.i[,colorBy]]
-        cols.pt <- palette(terrain.colors(length(colLevels)))[scene.i[,colorBy]]
-        cols.sub <- scene.i[scene.i$id %in% sub, 'cols']
+        colDF <- data.frame(var = colLevels, color = I(rainbow(length(colLevels))))
+        scene.i <- merge(scene.i,colDF, by.x = colorBy, by.y = 'var')
+        cols.seg <- scene.i$color
+        cols.pt <- scene.i$color
+        cols.sub <- scene.i[scene.i$id %in% sub, 'color']
       }
 
     } else {
@@ -259,7 +260,11 @@ plotScene <- function(scene, dimension = "auto",
     if(!is.null(colorBy)){
       par(fig = c(0, 1, 0, 1), oma = c(0, 0, 0, 0), mar = c(0, 0, 0, 0), new = TRUE)
       plot(0, 0, type = "n", bty = "n", xaxt = "n", yaxt = "n")
-      legend('topleft', legend = c(round(vec,0)[9],'','','','','','','',round(vec,0)[1]), fill = colorRampPalette(c('red','blue'))(9), y.intersp = 0.68, title = colorBy, title.adj = 0.1, bty = 'n', adj = 0, x.intersp = 0.65, cex = 0.75)
+      if(is.numeric(scene.i[,colorBy])){
+        legend('topleft', legend = c(round(vec,0)[9],'','','','','','','',round(vec,0)[1]), fill = colorRampPalette(c('red','blue'))(9), y.intersp = 0.68, title = colorBy, title.adj = 0.1, bty = 'n', adj = 0, x.intersp = 0.65, cex = 0.85)
+      } else {
+        legend('topleft', legend = as.character(colDF$var), fill = colDF$color, cex = 0.85, bty = 'n', title = colorBy)
+      }
     }
   }
 }
