@@ -58,7 +58,7 @@ simulateScene <- function(size = 30, meanSD = "2012-07-12", sdSD = 6, meanDur = 
 ##' @param s1Col character name of one column with S-allele
 ##' @param s2Col character name of another column with S-alleles
 ##' @param idCol character name for column with unique identifier
-##' @param otherCols character vector of column(s) to include besides the 
+##' @param otherCols character vector of column(s) to include besides the
 ##' necessary ones for the mating scene. If NULL, it will be ignored.
 ##' @param dateFormat character indicating either (1) the format of the start and end
 ##' date columns if those columns are characters or (2) the origin for the start
@@ -96,7 +96,8 @@ simulateScene <- function(size = 30, meanSD = "2012-07-12", sdSD = 6, meanDur = 
 ##' @author Danny Hanson
 makeScene <- function (df, multiYear = FALSE, startCol = "start", endCol = "end",
                        xCol = "x", yCol = "y", s1Col = "s1", s2Col = "s2",
-                       idCol = "id", otherCols = NULL, dateFormat = "%Y-%m-%d") {
+                       idCol = "id", otherCols = NULL, dateFormat = "%Y-%m-%d",
+                       split = NULL) {
   if (multiYear) {
     if (dateFormat == "%Y") {
       dates <- as.Date(as.character(df[, startCol]), dateFormat)
@@ -109,6 +110,14 @@ makeScene <- function (df, multiYear = FALSE, startCol = "start", endCol = "end"
     for (i in 1:length(years)) {
       newScene[[as.character(years[i])]] <-
         makeScene(df[df$year %in% years[i],], F, startCol, endCol, xCol, yCol,
+                  s1Col, s2Col, idCol, otherCols, dateFormat, split)
+    }
+  } else if(!is.null(split)){
+    splitTo <- levels(as.factor(df[,split]))
+    newScene <- list()
+    for (i in 1:length(splitTo)){
+      newScene[[as.character(splitTo[i])]] <-
+        makeScene(df[df[,split] %in% splitTo[i],], F, startCol, endCol, xCol, yCol,
                   s1Col, s2Col, idCol, otherCols, dateFormat)
     }
   } else {
