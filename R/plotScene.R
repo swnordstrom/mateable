@@ -40,7 +40,7 @@ plotScene <- function(scene, dimension = "auto",
                       opening = NULL, closing = NULL,
                       dailyPoints = TRUE, drawQuartiles = TRUE,
                       sortBy = c('start','end'), colorBy = NULL,
-                      sub= NULL, N = 3, label.sub = FALSE,
+                      sub= NULL, N = 3, label.sub = TRUE,
                       xlab.spat = NULL, ylab.spat = NULL,
                       pch = 19, pt.cex = 0.75, text.cex = 0.8,
                       quartile.lwd = 1, quartile.col = 'gray55', peak.col = 'gray27',
@@ -69,6 +69,11 @@ plotScene <- function(scene, dimension = "auto",
   nr <- length(scene)
   nc <- sum(temp,spat,comp)
   par(mfrow = c(nr,nc), oma = c(5,3,4,1), xpd = F)
+  if(is.null(colorBy)){
+    par(oma = c(5,3,4,1))
+  } else {
+    par(oma = c(8,3,4,1))
+  }
 
   if(spat){
     emin <- min(unlist(lapply(scene, function(x) x['x'])))
@@ -104,6 +109,11 @@ plotScene <- function(scene, dimension = "auto",
     sub <- unlist(lapply(scene, function(x)x['id']))
   }
 
+  if(!is.null(colorBy)){
+    colFactors <- as.factor(unlist(lapply(scene, function(x)x[,colorBy])))
+    colLevels <- levels(colFactors)
+    colDF <- data.frame(var = colLevels, color = I(rainbow(length(colLevels))))
+  }
 
   for (i in 1:length(scene)){
     scene.i <- scene[[i]]
@@ -116,11 +126,8 @@ plotScene <- function(scene, dimension = "auto",
       scene.i <- scene.i[order(orderVars[,1],orderVars[,2], orderVars[,3]),]
     }
     scene.i$index <- seq_along(scene.i[, 1])
-
     par(mar = c(0.25,3.25,1,1))
-
     if (!is.null(colorBy)){
-      par(oma = c(c(7,3,4,1)))
       if (is.numeric(scene.i[,colorBy])){
         palette(colorRampPalette(c('blue','red'))(9))
         vec <- seq(min(scene.i[,colorBy]), max(scene.i[,colorBy]), length.out = 9)
@@ -129,14 +136,13 @@ plotScene <- function(scene, dimension = "auto",
         cols.pt <- scene.i$cols
         cols.sub <- scene.i[scene.i$id %in% sub, 'cols']
       } else{
-        colLevels <- levels(as.factor(scene.i[,colorBy]))
-        colDF <- data.frame(var = colLevels, color = I(rainbow(length(colLevels))))
-        scene.i <- merge(scene.i,colDF, by.x = colorBy, by.y = 'var')
-        cols.seg <- scene.i$color
-        cols.pt <- scene.i$color
-        cols.sub <- scene.i[scene.i$id %in% sub, 'color']
-      }
 
+        col.i <- merge(scene.i,colDF, by.x = colorBy, by.y = 'var', all.x = T, sort = F)
+        col.i <- col.i[order(col.i$index),]
+        cols.seg <- col.i$color
+        cols.pt <- col.i$color
+        cols.sub <- col.i[col.i$id %in% sub, 'color']
+      }
     } else {
       cols.seg <- 'gray50'
       cols.pt <- 'black'
@@ -261,14 +267,14 @@ plotScene <- function(scene, dimension = "auto",
         mtext(names(scene)[i],side = 2,adj = 0.5, cex = 0.75, line = 5, font = 2, las = 3)
       }
     }
-    if(!is.null(colorBy)){
-      par(fig = c(0, 1, 0, 1), oma = c(0, 0, 0, 0), mar = c(0, 0, 0, 0), new = TRUE)
-      plot(0, 0, type = "n", bty = "n", xaxt = "n", yaxt = "n")
-      if(is.numeric(scene.i[,colorBy])){
-        legend('topleft', legend = c(round(vec,0)[9],'','','','','','','',round(vec,0)[1]), fill = colorRampPalette(c('red','blue'))(9), y.intersp = 0.68, title = colorBy, title.adj = 0.1, bty = 'n', adj = 0, x.intersp = 0.65, cex = 0.85)
-      } else {
-        legend('topleft', legend = as.character(colDF$var), fill = colDF$color, cex = 0.85, bty = 'n', title = colorBy)
-      }
+  }
+  if(!is.null(colorBy)){
+    par(fig = c(0, 1, 0, 1), oma = c(0, 0, 0, 0), mar = c(0, 0, 0, 0), new = TRUE)
+    plot(0, 0, type = "n", bty = "n", xaxt = "n", yaxt = "n")
+    if(is.numeric(scene.i[,colorBy])){
+      legend('topleft', legend = c(round(vec,0)[9],'','','','','','','',round(vec,0)[1]), fill = colorRampPalette(c('red','blue'))(9), y.intersp = 0.68, title = colorBy, title.adj = 0.1, bty = 'n', adj = 0, x.intersp = 0.65, cex = 0.85)
+    } else {
+      legend('topleft', legend = as.character(colDF$var), fill = colDF$color, cex = 0.85, bty = 'n', title = colorBy)
     }
   }
 }
