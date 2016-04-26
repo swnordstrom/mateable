@@ -11,6 +11,7 @@
 ##' @param colorBy character optional, the name of a variable to use to assign color to segments or points.
 ##' @param sub a vector containing the ids of individuals to be highlighted in the plots or a character string specifying how to choose individuals to highlight. Possible values are "random" or "all". If NULL, no subset will be identified in the plots.
 ##' @param N a positive number, the number of individuals to sample if \code{sub} = 'random'
+##' @param label.sub logical, indicating whether specified subset should be labeled
 ##' @param xlab.spat character label for x-axis of spatial dimension plots. If NULL, defaults to 'easting'.
 ##' @param ylab.spat character label for y-axis of spatial dimension plots. If NULL, defaults to 'northing'.
 ##' @param pch specify point type to be used in plots. Defaults to pch = 19 (filled-in circle). If NULL, points will be labeled with their id.
@@ -39,7 +40,7 @@ plotScene <- function(scene, dimension = "auto",
                       opening = NULL, closing = NULL,
                       dailyPoints = TRUE, drawQuartiles = TRUE,
                       sortBy = c('start','end'), colorBy = NULL,
-                      sub= NULL, N = 3,
+                      sub= NULL, N = 3, label.sub = FALSE,
                       xlab.spat = NULL, ylab.spat = NULL,
                       pch = 19, pt.cex = 0.75, text.cex = 0.8,
                       quartile.lwd = 1, quartile.col = 'gray55', peak.col = 'gray27',
@@ -167,7 +168,9 @@ plotScene <- function(scene, dimension = "auto",
       }
       if (!is.null(sub)){
         segments(scene.i[scene.i$id %in% sub, 'start'], scene.i[scene.i$id %in% sub, 'index'], scene.i[scene.i$id %in% sub, 'end'],scene.i[scene.i$id %in% sub, 'index'], col = cols.sub, ...)
-        text(scene.i[scene.i$id %in% sub, 'start']-0.02*closing, scene.i[scene.i$id %in% sub, 'index'], scene.i[scene.i$id %in% sub, 'id'], cex = text.cex)
+        if(label.sub){
+          text(scene.i[scene.i$id %in% sub, 'start']-0.02*closing, scene.i[scene.i$id %in% sub, 'index'], scene.i[scene.i$id %in% sub, 'id'], cex = text.cex)
+        }
       }
       if (dailyPoints == TRUE){
         rbd <- receptivityByDay(scene.i)
@@ -206,7 +209,9 @@ plotScene <- function(scene, dimension = "auto",
       }
       if (!is.null(sub)){
         scene.i.sub <- scene.i[scene.i[, 'id'] %in% sub, ]
-        text(scene.i.sub[, 'x'], scene.i.sub[, 'y'], scene.i.sub[, 'id'], pos = 3,xpd = T,cex = text.cex, ...)
+        if(label.sub){
+          text(scene.i.sub[, 'x'], scene.i.sub[, 'y'], scene.i.sub[, 'id'], pos = 3,xpd = T,cex = text.cex, ...)
+        }
         points(scene.i.sub[, 'x'], scene.i.sub[, 'y'], pch = 19,col = cols.sub, cex = pt.cex, ...)
       }
       if(temp == F){
