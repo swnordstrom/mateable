@@ -9,7 +9,8 @@
 ##' @param k integer. Which nearest neighbor to calculate (only for type == "s")
 ##' @param compatMethod character indicating the method to use when calculating
 ##' compatiblity. Defaults to "si_echinacea"
-##' @return a list or a list of lists containing summary information
+##' @param as.data.frame logical. If TRUE, returns summary as a dataframe.
+##' @return a list, list of lists, or dataframe containing summary information
 ##' including:\cr
 ##' temporal - year (year), population start date (popSt), mean individual start date
 ##' (meanSD), standard deviation of start (sdSD), mean duration (meanDur),
@@ -23,13 +24,15 @@
 ##' compatible mates (meanComp)\cr
 ##' If scene is a multi-year matingScene, then the output will be a list
 ##' of lists, one list for each year.
+##' If \code{as.data.frame = TRUE}, the output will be a dataframe with columns containing summary information and, if applicable, an 'id' column identifying what portion of the matingSummary object it summarized. If the scene is a multi-year matingScene, then the output will be a list of dataframes, one list for each year.
 ##' @examples
 ##' eelr <- makeScene(eelr2012, startCol = "firstDay", endCol = "lastDay",
 ##'   xCol = "Ecoord", yCol = "Ncoord", idCol = "tagNo")
 ##' eelrSum <- matingSummary(eelr)
 ##' eelrSum[c("minX", "minY", "maxX", "maxY")]
 matingSummary <- function(scene, type = "auto", k = 1,
-                          compatMethod = "si_echinacea") {
+                          compatMethod = "si_echinacea",
+                          as.data.frame = FALSE) {
   if (is.list(scene) & !is.data.frame(scene)) {
     matSum <- lapply(scene, matingSummary)
   } else {
@@ -78,6 +81,9 @@ matingSummary <- function(scene, type = "auto", k = 1,
 
       matSum$meanComp <- compatibility(scene, compatMethod)$pop * 100
     }
+  }
+  if(as.data.frame){
+    matSum <- matingSummary.df(matSum)
   }
   matSum
 }
