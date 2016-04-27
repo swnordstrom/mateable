@@ -71,7 +71,7 @@ plotScene <- function(scene, dimension = "auto",
   par(mfrow = c(nr,nc), oma = c(5,3,4,1), xpd = F)
   if(is.null(colorBy)){
     par(oma = c(5,3,4,1))
-  } else {
+  } else if (!is.null(colorBy) | labelID) {
     par(oma = c(8,3,4,1))
   }
 
@@ -151,7 +151,6 @@ plotScene <- function(scene, dimension = "auto",
 
     if (temp){
       if (labelID){
-        par(mar = c(0.25,7.25,0.25,1))
         plot.default(scene.i[, 'start'], scene.i$index, ylim = c(1,count), xlim = c(opening, closing), type = "n", xlab = 'date', ylab = "",xaxt = 'n',yaxt = 'n', ...)
         segments(scene.i[, 'start'], scene.i$index, scene.i[, 'end'],scene.i$index, col = cols.seg, cex = 3, ...)
         axis(2, labels = scene.i$id, at = scene.i$index, las = 1, cex.axis = 0.75)
