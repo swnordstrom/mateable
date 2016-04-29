@@ -184,7 +184,7 @@ receptivityByDay <- function(scene, summary = FALSE, nameDate = TRUE) {
     if(summary){
       dailyVector <- colSums(dailyMatrix)
       if (nameDate){
-        names(dailyVector) <- as.Date(as.numeric(names(dailyVector))+attr(dailyMatrix,'origin')-1)
+        names(dailyVector) <- as.numeric(names(dailyVector)) + as.Date(attr(dailyMatrix,'origin'), format = '%Y-%m-%d')
       }
       dailyReceptivity <- dailyVector
     } else{
