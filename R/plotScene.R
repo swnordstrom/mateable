@@ -206,7 +206,9 @@ plotScene <- function(scene, dimension = "auto",
       if(!plot.lim.spat){
         par(mar = c(1.25,3.25,1,1))
         plot.default(scene.i[, 'x'], scene.i[, 'y'], type = "n", ylab = "",xaxt = 'n', asp = 1, cex = pt.cex, col = cols.pt, ...)
-        axis(1, cex.axis = 0.5)
+        if(i != nr){
+          axis(1, cex.axis = 0.75, padj = -1.5)
+        }
       } else {
         plot.default(scene.i[, 'x'], scene.i[, 'y'], type = "n",xlim = c(emin,emax), ylim = c(nmin,nmax), ylab = "",xaxt = 'n', asp = 1, cex = pt.cex, col = cols.pt, ...)
       }
