@@ -17,12 +17,14 @@
 ##' @param pch specify point type to be used in plots. Defaults to pch = 19 (filled-in circle). If NULL, points will be labeled with their id.
 ##' @param pt.cex specify point expansion factor (point size relative to device default)
 ##' @param text.cex specify text expansion factor (text size relative to device default)
+##' @param plot.lim.spat if TRUE, spatial plot limits for lists of scenes are set by the maximum from all scenes
 ##' @param quartile.lwd if \code{drawQuartiles} = TRUE, specifies weight of quartile and peak lines relative to device default.
 ##' @param quartile.col if \code{drawQuartiles} = TRUE, specifies color of quartile lines, defaults to 'gray81'.
 ##' @param peak.col if \code{drawQuartiles} = TRUE, specify color of peak lines, defaults to 'gray27'.
 ##' @param labelID if TRUE, the y-axis will be labeled with the id of the corresponding segment.
 ##' @param mt1 label for mating type '1', if dioecious
 ##' @param mt2 label for mating type '2', if dioecious
+##' @param leg.ncol number of columns to include in legend, if colorBy is not NULL
 ##' @param ... standard graphical parameters
 ##' @return nothing
 ##' @return optional arguments for the plot function
@@ -43,8 +45,9 @@ plotScene <- function(scene, dimension = "auto",
                       sub= NULL, N = 3, label.sub = TRUE,
                       xlab.spat = NULL, ylab.spat = NULL,
                       pch = 19, pt.cex = 0.75, text.cex = 0.8,
+                      plot.lim.spat  = TRUE,
                       quartile.lwd = 1, quartile.col = 'gray55', peak.col = 'gray27',
-                      labelID = FALSE, mt1 = 'F', mt2 = 'M', ...){
+                      labelID = FALSE, mt1 = 'F', mt2 = 'M', leg.ncol = 1, ...){
 
   dimension <- match.arg(dimension, c("auto", "t", "s", "mt"),several.ok = TRUE)
   par.orig <- par("mar", "oma", "mfrow", "xpd")
@@ -153,6 +156,7 @@ plotScene <- function(scene, dimension = "auto",
       if (labelID){
         par(mar = c(0.25,7.25,0.25,1))
         plot.default(scene.i[, 'start'], scene.i$index, ylim = c(1,count), xlim = c(opening, closing), type = "n", xlab = 'date', ylab = "",xaxt = 'n',yaxt = 'n', ...)
+
         segments(scene.i[, 'start'], scene.i$index, scene.i[, 'end'],scene.i$index, col = cols.seg, cex = 3, ...)
         axis(2, labels = scene.i$id, at = scene.i$index, las = 1, cex.axis = 0.75)
         mtext(attr(scene.i,'originalNames')[1],side = 2,adj = 0.5, cex = 0.75, line = 7.5)
@@ -199,7 +203,15 @@ plotScene <- function(scene, dimension = "auto",
     if (spat){
       if (is.null(xlab.spat)) xlab.spat <- 'easting'
       if (is.null(ylab.spat)) ylab.spat <- 'northing'
-      plot.default(scene.i[, 'x'], scene.i[, 'y'], type = "n",xlim = c(emin,emax), ylim = c(nmin,nmax), ylab = "",xaxt = 'n', asp = 1, cex = pt.cex, col = cols.pt, ...)
+      if(!plot.lim.spat){
+        par(mar = c(1.25,3.25,1,1))
+        plot.default(scene.i[, 'x'], scene.i[, 'y'], type = "n", ylab = "",xaxt = 'n', asp = 1, cex = pt.cex, col = cols.pt, ...)
+        if(i != nr){
+          axis(1, cex.axis = 0.75, padj = -1.5)
+        }
+      } else {
+        plot.default(scene.i[, 'x'], scene.i[, 'y'], type = "n",xlim = c(emin,emax), ylim = c(nmin,nmax), ylab = "",xaxt = 'n', asp = 1, cex = pt.cex, col = cols.pt, ...)
+      }
       mtext(ylab.spat,side = 2,adj = 0.5, cex = 0.75, line = 2.5)
       if (i == nr){
         axis(1)
@@ -274,7 +286,7 @@ plotScene <- function(scene, dimension = "auto",
     if(is.numeric(scene.i[,colorBy])){
       legend('topleft', legend = c(round(vec,0)[9],'','','','','','','',round(vec,0)[1]), fill = colorRampPalette(c('red','blue'))(9), y.intersp = 0.68, title = colorBy, title.adj = 0.1, bty = 'n', adj = 0, x.intersp = 0.65, cex = 0.85)
     } else {
-      legend('topleft', legend = as.character(colDF$var), fill = colDF$color, cex = 0.85, bty = 'n', title = colorBy)
+      legend('topleft', legend = as.character(colDF$var), fill = colDF$color, cex = 0.85, bty = 'n', title = colorBy, ncol = leg.ncol)
     }
   }
 }

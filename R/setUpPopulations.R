@@ -63,13 +63,14 @@ simulateScene <- function(size = 30, meanSD = "2012-07-12", sdSD = 6, meanDur = 
 ##' @param dateFormat character indicating either (1) the format of the start and end
 ##' date columns if those columns are characters or (2) the origin for the start
 ##' and end date columns if those columns are numeric. It is used in as.Date
+##' @param split character indicating a column to split the result into a list by the values of that column
 ##'
 ##' @return a matingScene object, either a single dataframe in standard format
 ##' or a list of dataframes. Attributes of the matingScene object indicate the type of
 ##' information in the data frame, including the original column names,
 ##' and the origin of the date columns. If multiYear = TRUE,
 ##' the return value will be a list of matingScene data frames where each
-##' element in the list represents one year. See details for more information
+##' element in the list represents one year. If split is specified, the return value will be a list of matingScene data frames where each element in the list represents a value of the specifed variable. See details for more information
 ##' on attributes and how to work with multi-year data.
 ##' @details The input dataframe can contain information about locations of
 ##' individuals in 1, 2, or 3 dimensions of a mating scenes.
