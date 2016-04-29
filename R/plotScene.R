@@ -18,7 +18,6 @@
 ##' @param pt.cex specify point expansion factor (point size relative to device default)
 ##' @param text.cex specify text expansion factor (text size relative to device default)
 ##' @param plot.lim.spat if TRUE, spatial plot limits for lists of scenes are set by the maximum from all scenes
-##' @param plot.lim.temp f TRUE, temporal plot limits for lists of scenes are set by the maximum from all scenes
 ##' @param quartile.lwd if \code{drawQuartiles} = TRUE, specifies weight of quartile and peak lines relative to device default.
 ##' @param quartile.col if \code{drawQuartiles} = TRUE, specifies color of quartile lines, defaults to 'gray81'.
 ##' @param peak.col if \code{drawQuartiles} = TRUE, specify color of peak lines, defaults to 'gray27'.
@@ -46,7 +45,7 @@ plotScene <- function(scene, dimension = "auto",
                       sub= NULL, N = 3, label.sub = TRUE,
                       xlab.spat = NULL, ylab.spat = NULL,
                       pch = 19, pt.cex = 0.75, text.cex = 0.8,
-                      plot.lim.spat  = TRUE, plot.lim.temp = TRUE,
+                      plot.lim.spat  = TRUE,
                       quartile.lwd = 1, quartile.col = 'gray55', peak.col = 'gray27',
                       labelID = FALSE, mt1 = 'F', mt2 = 'M', leg.ncol = 1, ...){
 
@@ -156,21 +155,13 @@ plotScene <- function(scene, dimension = "auto",
     if (temp){
       if (labelID){
         par(mar = c(0.25,7.25,0.25,1))
-        if(!plot.lim.temp){
-          plot.default(scene.i[, 'start'], scene.i$index, type = "n", xlab = 'date', ylab = "",xaxt = 'n',yaxt = 'n', ...)
-        } else {
-          plot.default(scene.i[, 'start'], scene.i$index, ylim = c(1,count), xlim = c(opening, closing), type = "n", xlab = 'date', ylab = "",xaxt = 'n',yaxt = 'n', ...)
-        }
+        plot.default(scene.i[, 'start'], scene.i$index, ylim = c(1,count), xlim = c(opening, closing), type = "n", xlab = 'date', ylab = "",xaxt = 'n',yaxt = 'n', ...)
+
         segments(scene.i[, 'start'], scene.i$index, scene.i[, 'end'],scene.i$index, col = cols.seg, cex = 3, ...)
         axis(2, labels = scene.i$id, at = scene.i$index, las = 1, cex.axis = 0.75)
         mtext(attr(scene.i,'originalNames')[1],side = 2,adj = 0.5, cex = 0.75, line = 7.5)
       } else {
-        if(!plot.lim.temp){
-          plot.default(scene.i[, 'start'], scene.i$index, type = "n", xlab = 'date', ylab = "",xaxt = 'n',yaxt = 'n', ...)
-        }
-        else {
-          plot.default(scene.i[, 'start'], scene.i$index, ylim = c(1,count), xlim = c(opening, closing), type = "n", xlab = 'date', ylab = "",xaxt = 'n',yaxt = 'n', ...)
-        }
+        plot.default(scene.i[, 'start'], scene.i$index, ylim = c(1,count), xlim = c(opening, closing), type = "n", xlab = 'date', ylab = "",xaxt = 'n',yaxt = 'n', ...)
         segments(scene.i[, 'start'], scene.i$index, scene.i[, 'end'],scene.i$index, col = cols.seg, cex = 3, ...)
         mtext('count',side = 2,adj = 0.5, cex = 0.75, line = 2.5)
         axis(2)
@@ -213,7 +204,9 @@ plotScene <- function(scene, dimension = "auto",
       if (is.null(xlab.spat)) xlab.spat <- 'easting'
       if (is.null(ylab.spat)) ylab.spat <- 'northing'
       if(!plot.lim.spat){
+        par(mar = c(1.25,3.25,1,1))
         plot.default(scene.i[, 'x'], scene.i[, 'y'], type = "n", ylab = "",xaxt = 'n', asp = 1, cex = pt.cex, col = cols.pt, ...)
+        axis(1, cex.axis = 0.5)
       } else {
         plot.default(scene.i[, 'x'], scene.i[, 'y'], type = "n",xlim = c(emin,emax), ylim = c(nmin,nmax), ylab = "",xaxt = 'n', asp = 1, cex = pt.cex, col = cols.pt, ...)
       }
