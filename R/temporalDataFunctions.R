@@ -78,9 +78,9 @@ matingSummary <- function(scene, type = "auto", k = 1,
     }
     if (comp) {
       matSum$nMatType <- length(union(levels(scene$s1), levels(scene$s2)))
-
       matSum$meanComp <- compatibility(scene, compatMethod)$pop * 100
     }
+    matSum$n <- nrow(scene)
   }
   if(as.data.frame){
     matSum <- matingSummary.df(matSum)
