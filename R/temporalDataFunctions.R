@@ -232,6 +232,8 @@ receptivityByDay <- function(scene, summary = FALSE, nameDate = TRUE) {
 ##' @param frame the timeframe that synchrony is to be calculated over; options are 'within,'
 ##' for synchrony within a season, or 'between,' for synchrony across multiple seasons.
 ##' Defaults to 'within'.
+##' @param resolution if \code{method = sync_prop}, indicates whether temporal resolution
+##' should be yearly or daily
 ##' @return A potentials object containing one more more of the following, depending the
 ##' input for \code{subject}: \cr
 ##' If \code{subject} is "population" \code{synchrony} will return a numeric

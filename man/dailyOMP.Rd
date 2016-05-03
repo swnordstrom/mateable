@@ -30,7 +30,7 @@ The days to calculate OMP for should be input as integers as they are in the sta
 \examples{
 pop <- simulateScene()
 omp <- dailyOMP(pop)
-omp.1 <- dailyOMP(pop, nn.constant = T) # calculates OMP for individuals based on the same nearest neighbors throughout the season
+omp.1 <- dailyOMP(pop, nn.constant = T) # same neighbors for whole season
 }
 \author{
 Stuart Wagenius
