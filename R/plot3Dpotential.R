@@ -176,11 +176,15 @@ plot3DPotential <-   function(matPots,
         cols <- findInterval(ind[[i]][,4], vec)
         plot(ind[[i]][,2],ind[[i]][,3], ylab = '', pch = 21, bg = cols, xaxt = 'n',yaxt = 'n', xlab = '', ylim = c(ymin,ymax), xlim = c(xmin,xmax), cex = pt.cex)
       }
-      if(!is.null(sub.ids) & any(ind[[i]][,'id'] %in% sub.ids)==T){
+      if(!is.null(sub.ids)){
         if(subject %in% 'ind'){
-          text(ind[[i]][ind[[i]][,'id'] %in% sub.ids,2],ind[[i]][ind[[i]][,'id'] %in% sub.ids,3],ind[[i]][ind[[i]][,'id'] %in% sub.ids,1], cex = text.cex, pos = 3)
+          if(any(sub.ids %in% ind[[i]][,'id'])){
+            text(ind[[i]][ind[[i]][,'id'] %in% sub.ids,2],ind[[i]][ind[[i]][,'id'] %in% sub.ids,3],ind[[i]][ind[[i]][,'id'] %in% sub.ids,1], cex = text.cex, pos = 3)
+          }
         } else {
-          text(pair[[i]][attr(d1[[i]][['pair']],'idOrder') %in% sub.ids,,1], pair[[i]][attr(d1[[i]][['pair']],'idOrder') %in% sub.ids,,2], attr(d1[[i]][['pair']],'idOrder')[attr(d1[[i]][['pair']],'idOrder') %in% sub.ids] , pos = 3, cex = text.cex)
+          if(any(sub.ids %in% attr(d1[[i]][['pair']],'idOrder'))){
+            text(pair[[i]][attr(d1[[i]][['pair']],'idOrder') %in% sub.ids,,1], pair[[i]][attr(d1[[i]][['pair']],'idOrder') %in% sub.ids,,2], attr(d1[[i]][['pair']],'idOrder')[attr(d1[[i]][['pair']],'idOrder') %in% sub.ids] , pos = 3, cex = text.cex)
+          }
         }
       }
       axis(2,  cex.axis = 0.85, las = 2)
