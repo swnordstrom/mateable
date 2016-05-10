@@ -10,9 +10,13 @@
 ##' pop <- simulateScene()
 ##' distance <- pairDist(pop)
 pairDist <- function(scene) {
-  distMat <- as.matrix(dist(scene[, c("x", "y")]))
-  attr(distMat, "idOrder") <- scene$id
-  attr(distMat, "dimnames") <- NULL
+  if (is.list(scene) & !is.data.frame(scene)) {
+    distMat <- lapply(scene, pairDist)
+  } else {
+    distMat <- as.matrix(dist(scene[, c("x", "y")]))
+    attr(distMat, "idOrder") <- scene$id
+    attr(distMat, "dimnames") <- NULL
+  }
   distMat
 }
 
@@ -30,9 +34,13 @@ pairDist <- function(scene) {
 ##' pop <- simulateScene(10)
 ##' kNearNeighbors(pop, 3)
 kNearNeighbors <- function(scene, k) {
-  knnMatrix <- FNN::knn.dist(scene[c("x", "y")], k = k, algorithm = "brute")
-  rownames(knnMatrix) <- scene$id
-  colnames(knnMatrix) <- paste("k", 1:k, sep = "")
+  if (is.list(scene) & !is.data.frame(scene)) {
+    knnMatrix <- lapply(scene, kNearNeighbors, k)
+  } else {
+    knnMatrix <- FNN::knn.dist(scene[c("x", "y")], k = k, algorithm = "brute")
+    rownames(knnMatrix) <- scene$id
+    colnames(knnMatrix) <- paste("k", 1:k, sep = "")
+  }
   knnMatrix
 }
 
