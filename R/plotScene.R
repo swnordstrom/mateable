@@ -7,19 +7,24 @@
 ##' @param closing the number of days to adjust the end date displayed for the temporal dimension. End date defaults to maximum day of year end date in mating scene object.
 ##' @param dailyPoints logical indicating whether daily counts of individuals should be displayed for plots of the temporal dimension
 ##' @param drawQuartiles logical indicating whether vertical lines should be drawn at population peak (see details) or quartiles
+##' @param sortBy character indicating which columns to sort segments of flowering schedule by. Defaults to 'start', then 'end'. Up to three variables may be specified.
+##' @param colorBy character optional, the name of a variable to use to assign color to segments or points.
 ##' @param sub a vector containing the ids of individuals to be highlighted in the plots or a character string specifying how to choose individuals to highlight. Possible values are "random" or "all". If NULL, no subset will be identified in the plots.
 ##' @param N a positive number, the number of individuals to sample if \code{sub} = 'random'
+##' @param label.sub logical, indicating whether specified subset should be labeled
 ##' @param xlab.spat character label for x-axis of spatial dimension plots. If NULL, defaults to 'easting'.
 ##' @param ylab.spat character label for y-axis of spatial dimension plots. If NULL, defaults to 'northing'.
 ##' @param pch specify point type to be used in plots. Defaults to pch = 19 (filled-in circle). If NULL, points will be labeled with their id.
 ##' @param pt.cex specify point expansion factor (point size relative to device default)
 ##' @param text.cex specify text expansion factor (text size relative to device default)
+##' @param plot.lim.spat if TRUE, spatial plot limits for lists of scenes are set by the maximum from all scenes
 ##' @param quartile.lwd if \code{drawQuartiles} = TRUE, specifies weight of quartile and peak lines relative to device default.
 ##' @param quartile.col if \code{drawQuartiles} = TRUE, specifies color of quartile lines, defaults to 'gray81'.
 ##' @param peak.col if \code{drawQuartiles} = TRUE, specify color of peak lines, defaults to 'gray27'.
 ##' @param labelID if TRUE, the y-axis will be labeled with the id of the corresponding segment.
 ##' @param mt1 label for mating type '1', if dioecious
 ##' @param mt2 label for mating type '2', if dioecious
+##' @param leg.ncol number of columns to include in legend, if colorBy is not NULL
 ##' @param ... standard graphical parameters
 ##' @return nothing
 ##' @return optional arguments for the plot function
@@ -36,11 +41,13 @@
 plotScene <- function(scene, dimension = "auto",
                       opening = NULL, closing = NULL,
                       dailyPoints = TRUE, drawQuartiles = TRUE,
-                      sub= NULL, N = 1,
+                      sortBy = c('start','end'), colorBy = NULL,
+                      sub= NULL, N = 3, label.sub = TRUE,
                       xlab.spat = NULL, ylab.spat = NULL,
-                      pch = 19, pt.cex = 0.75, text.cex = 0.6,
+                      pch = 19, pt.cex = 0.75, text.cex = 0.8,
+                      plot.lim.spat  = TRUE,
                       quartile.lwd = 1, quartile.col = 'gray55', peak.col = 'gray27',
-                      labelID = FALSE, mt1 = 'F', mt2 = 'M', ...){
+                      labelID = FALSE, mt1 = 'F', mt2 = 'M', leg.ncol = 1, ...){
 
   dimension <- match.arg(dimension, c("auto", "t", "s", "mt"),several.ok = TRUE)
   par.orig <- par("mar", "oma", "mfrow", "xpd")
@@ -65,6 +72,11 @@ plotScene <- function(scene, dimension = "auto",
   nr <- length(scene)
   nc <- sum(temp,spat,comp)
   par(mfrow = c(nr,nc), oma = c(5,3,4,1), xpd = F)
+  if(is.null(colorBy)){
+    par(oma = c(5,3,4,1))
+  } else if (!is.null(colorBy) | labelID) {
+    par(oma = c(8,3,4,1))
+  }
 
   if(spat){
     emin <- min(unlist(lapply(scene, function(x) x['x'])))
@@ -88,6 +100,7 @@ plotScene <- function(scene, dimension = "auto",
     smax <- max(unlist(lapply(scene, function(x) as.numeric(unlist(x[,c('s1','s2')])))))
     if (length(unique(unlist(lapply(scene, function(x) as.numeric(unlist(x[,c('s1','s2')]))))))==2){
       dioecious <- T
+      mtmax <- max(unlist(lapply(scene, function(x)table(x$s1))))
     } else {
       dioecious <- F
     }
@@ -99,21 +112,56 @@ plotScene <- function(scene, dimension = "auto",
     sub <- unlist(lapply(scene, function(x)x['id']))
   }
 
+  if(!is.null(colorBy)){
+    colFactors <- as.factor(unlist(lapply(scene, function(x)x[,colorBy])))
+    colLevels <- levels(colFactors)
+    colDF <- data.frame(var = colLevels, color = I(rainbow(length(colLevels))))
+  }
+
   for (i in 1:length(scene)){
     scene.i <- scene[[i]]
-    par(mar = c(0.25,3.25,0.25,1))
+    orderVars <- scene.i[,sortBy]
+    if (length(sortBy) == 1){
+      scene.i <- scene.i[order(orderVars),]
+    } else if (length(sortBy) == 2){
+      scene.i <- scene.i[order(orderVars[,1],orderVars[,2]),]
+    } else if (length(sortBy) == 3){
+      scene.i <- scene.i[order(orderVars[,1],orderVars[,2], orderVars[,3]),]
+    }
+    scene.i$index <- seq_along(scene.i[, 1])
+    par(mar = c(0.25,3.25,1,1))
+    if (!is.null(colorBy)){
+      if (is.numeric(scene.i[,colorBy])){
+        palette(colorRampPalette(c('blue','red'))(9))
+        vec <- seq(min(scene.i[,colorBy]), max(scene.i[,colorBy]), length.out = 9)
+        scene.i$cols <- findInterval(scene.i[,colorBy],vec)
+        cols.seg <- scene.i$cols
+        cols.pt <- scene.i$cols
+        cols.sub <- scene.i[scene.i$id %in% sub, 'cols']
+      } else{
+
+        col.i <- merge(scene.i,colDF, by.x = colorBy, by.y = 'var', all.x = T, sort = F)
+        col.i <- col.i[order(col.i$index),]
+        cols.seg <- col.i$color
+        cols.pt <- col.i$color
+        cols.sub <- col.i[col.i$id %in% sub, 'color']
+      }
+    } else {
+      cols.seg <- 'gray50'
+      cols.pt <- 'black'
+      cols.sub <- 'blue'
+    }
+
     if (temp){
-      scene.i <- scene.i[order(scene.i[, 'start'], scene.i[, 'end']),]
-      scene.i$index <- seq_along(scene.i[, 1])
       if (labelID){
-        par(mar = c(0.25,7.25,0.25,1))
         plot.default(scene.i[, 'start'], scene.i$index, ylim = c(1,count), xlim = c(opening, closing), type = "n", xlab = 'date', ylab = "",xaxt = 'n',yaxt = 'n', ...)
-        segments(scene.i[, 'start'], scene.i$index, scene.i[, 'end'],scene.i$index, col = "gray50", cex = 3, ...)
+
+        segments(scene.i[, 'start'], scene.i$index, scene.i[, 'end'],scene.i$index, col = cols.seg, cex = 3, ...)
         axis(2, labels = scene.i$id, at = scene.i$index, las = 1, cex.axis = 0.75)
         mtext(attr(scene.i,'originalNames')[1],side = 2,adj = 0.5, cex = 0.75, line = 7.5)
       } else {
         plot.default(scene.i[, 'start'], scene.i$index, ylim = c(1,count), xlim = c(opening, closing), type = "n", xlab = 'date', ylab = "",xaxt = 'n',yaxt = 'n', ...)
-        segments(scene.i[, 'start'], scene.i$index, scene.i[, 'end'],scene.i$index, col = "gray50", cex = 3, ...)
+        segments(scene.i[, 'start'], scene.i$index, scene.i[, 'end'],scene.i$index, col = cols.seg, cex = 3, ...)
         mtext('count',side = 2,adj = 0.5, cex = 0.75, line = 2.5)
         axis(2)
       }
@@ -128,8 +176,10 @@ plotScene <- function(scene, dimension = "auto",
         mtext('temporal',side = 3, adj = 0.5, line = 1.5)
       }
       if (!is.null(sub)){
-        segments(scene.i[scene.i$id %in% sub, 'start'], scene.i[scene.i$id %in% sub, 'index'], scene.i[scene.i$id %in% sub, 'end'],scene.i[scene.i$id %in% sub, 'index'], col = "blue", ...)
-        text(scene.i[scene.i$id %in% sub, 'start']-0.02*closing, scene.i[scene.i$id %in% sub, 'index'], scene.i[scene.i$id %in% sub, 'id'], cex = text.cex)
+        segments(scene.i[scene.i$id %in% sub, 'start'], scene.i[scene.i$id %in% sub, 'index'], scene.i[scene.i$id %in% sub, 'end'],scene.i[scene.i$id %in% sub, 'index'], col = cols.sub, ...)
+        if(label.sub){
+          text(scene.i[scene.i$id %in% sub, 'start']-0.02*closing, scene.i[scene.i$id %in% sub, 'index'], scene.i[scene.i$id %in% sub, 'id'], cex = text.cex)
+        }
       }
       if (dailyPoints == TRUE){
         rbd <- receptivityByDay(scene.i)
@@ -152,7 +202,15 @@ plotScene <- function(scene, dimension = "auto",
     if (spat){
       if (is.null(xlab.spat)) xlab.spat <- 'easting'
       if (is.null(ylab.spat)) ylab.spat <- 'northing'
-      plot.default(scene.i[, 'x'], scene.i[, 'y'], type = "n",xlim = c(emin,emax), ylim = c(nmin,nmax), ylab = "",xaxt = 'n', asp = 1, cex = pt.cex,...)
+      if(!plot.lim.spat){
+        par(mar = c(1.25,3.25,1,1))
+        plot.default(scene.i[, 'x'], scene.i[, 'y'], type = "n", ylab = "",xaxt = 'n', asp = 1, cex = pt.cex, col = cols.pt, ...)
+        if(i != nr){
+          axis(1, cex.axis = 0.75, padj = -1.5)
+        }
+      } else {
+        plot.default(scene.i[, 'x'], scene.i[, 'y'], type = "n",xlim = c(emin,emax), ylim = c(nmin,nmax), ylab = "",xaxt = 'n', asp = 1, cex = pt.cex, col = cols.pt, ...)
+      }
       mtext(ylab.spat,side = 2,adj = 0.5, cex = 0.75, line = 2.5)
       if (i == nr){
         axis(1)
@@ -162,14 +220,16 @@ plotScene <- function(scene, dimension = "auto",
         mtext('spatial',side = 3, adj = 0.5, line = 1.5)
       }
       if (is.null(pch)) {
-        text(scene.i[, 'x'], scene.i[, 'y'], scene.i[, 'id'],cex = text.cex, ...)
+        text(scene.i[, 'x'], scene.i[, 'y'], scene.i[, 'id'],cex = text.cex, col = cols.pt, ...)
       } else {
-        points(scene.i[, 'x'], scene.i[, 'y'], pch = pch, cex = pt.cex, ...)
+        points(scene.i[, 'x'], scene.i[, 'y'], pch = pch, cex = pt.cex, col = cols.pt, ...)
       }
       if (!is.null(sub)){
         scene.i.sub <- scene.i[scene.i[, 'id'] %in% sub, ]
-        text(scene.i.sub[, 'x'], scene.i.sub[, 'y'], scene.i.sub[, 'id'], pos = 3,xpd = T,cex = text.cex, ...)
-        points(scene.i.sub[, 'x'], scene.i.sub[, 'y'], pch = 19,col = 'blue', cex = pt.cex, ...)
+        if(label.sub){
+          text(scene.i.sub[, 'x'], scene.i.sub[, 'y'], scene.i.sub[, 'id'], pos = 3,xpd = T,cex = text.cex, ...)
+        }
+        points(scene.i.sub[, 'x'], scene.i.sub[, 'y'], pch = 19,col = cols.sub, cex = pt.cex, ...)
       }
       if(temp == F){
         mtext(names(scene)[i],side = 2,adj = 0.5, cex = 0.75, line = 5, font = 2, las = 3)
@@ -183,10 +243,10 @@ plotScene <- function(scene, dimension = "auto",
           sr <- round(table(scene.i$s1)[1]/table(scene.i$s1)[2], digits = 2)
         }
         if (i == nr){
-          barplot(table(scene.i$s1), col = 'gray27', ylab = '', names.arg = c(mt1,mt2))
+          barplot(table(scene.i$s1), col = 'gray27', ylab = '', names.arg = c(mt1,mt2), ylim = c(0,mtmax))
           mtext('mating type',side = 1,adj = 0.5, cex = 0.75, line = 3)
         }else {
-          barplot(table(scene.i$s1), xaxt = 'n', col = 'gray27', ylab = 'count')
+          barplot(table(scene.i$s1), xaxt = 'n', col = 'gray27', ylab = '',ylim = c(0,mtmax))
         }
         leg.text <- paste('M/F sex ratio:',sr)
         mtext(leg.text, side = 3, adj = 0.5, bg = 'white', cex = 0.7, line=0.1)
@@ -217,6 +277,15 @@ plotScene <- function(scene, dimension = "auto",
       if (temp == F & spat == F){
         mtext(names(scene)[i],side = 2,adj = 0.5, cex = 0.75, line = 5, font = 2, las = 3)
       }
+    }
+  }
+  if(!is.null(colorBy)){
+    par(fig = c(0, 1, 0, 1), oma = c(0, 0, 0, 0), mar = c(0, 0, 0, 0), new = TRUE)
+    plot(0, 0, type = "n", bty = "n", xaxt = "n", yaxt = "n")
+    if(is.numeric(scene.i[,colorBy])){
+      legend('topleft', legend = c(round(vec,0)[9],'','','','','','','',round(vec,0)[1]), fill = colorRampPalette(c('red','blue'))(9), y.intersp = 0.68, title = colorBy, title.adj = 0.1, bty = 'n', adj = 0, x.intersp = 0.65, cex = 0.85)
+    } else {
+      legend('topleft', legend = as.character(colDF$var), fill = colDF$color, cex = 0.85, bty = 'n', title = colorBy, ncol = leg.ncol)
     }
   }
 }

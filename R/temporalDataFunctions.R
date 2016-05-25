@@ -9,7 +9,8 @@
 ##' @param k integer. Which nearest neighbor to calculate (only for type == "s")
 ##' @param compatMethod character indicating the method to use when calculating
 ##' compatiblity. Defaults to "si_echinacea"
-##' @return a list or a list of lists containing summary information
+##' @param as.data.frame logical. If TRUE, returns summary as a dataframe.
+##' @return a list, list of lists, or dataframe containing summary information
 ##' including:\cr
 ##' temporal - year (year), population start date (popSt), mean individual start date
 ##' (meanSD), standard deviation of start (sdSD), mean duration (meanDur),
@@ -23,13 +24,15 @@
 ##' compatible mates (meanComp)\cr
 ##' If scene is a multi-year matingScene, then the output will be a list
 ##' of lists, one list for each year.
+##' If \code{as.data.frame = TRUE}, the output will be a dataframe with columns containing summary information and, if applicable, an 'id' column identifying what portion of the matingSummary object it summarized. If the scene is a multi-year matingScene, then the output will be a list of dataframes, one list for each year.
 ##' @examples
 ##' eelr <- makeScene(eelr2012, startCol = "firstDay", endCol = "lastDay",
 ##'   xCol = "Ecoord", yCol = "Ncoord", idCol = "tagNo")
 ##' eelrSum <- matingSummary(eelr)
 ##' eelrSum[c("minX", "minY", "maxX", "maxY")]
 matingSummary <- function(scene, type = "auto", k = 1,
-                          compatMethod = "si_echinacea") {
+                          compatMethod = "si_echinacea",
+                          as.data.frame = FALSE) {
   if (is.list(scene) & !is.data.frame(scene)) {
     matSum <- lapply(scene, matingSummary)
   } else {
@@ -75,9 +78,12 @@ matingSummary <- function(scene, type = "auto", k = 1,
     }
     if (comp) {
       matSum$nMatType <- length(union(levels(scene$s1), levels(scene$s2)))
-
       matSum$meanComp <- compatibility(scene, compatMethod)$pop * 100
     }
+    matSum$n <- nrow(scene)
+  }
+  if(as.data.frame){
+    matSum <- matingSummary.df(matSum)
   }
   matSum
 }
@@ -178,7 +184,7 @@ receptivityByDay <- function(scene, summary = FALSE, nameDate = TRUE) {
     if(summary){
       dailyVector <- colSums(dailyMatrix)
       if (nameDate){
-        names(dailyVector) <- as.Date(as.numeric(names(dailyVector))+attr(dailyMatrix,'origin')-1)
+        names(dailyVector) <- as.numeric(names(dailyVector)) + as.Date(attr(dailyMatrix,'origin'), format = '%Y-%m-%d')
       }
       dailyReceptivity <- dailyVector
     } else{
@@ -226,6 +232,8 @@ receptivityByDay <- function(scene, summary = FALSE, nameDate = TRUE) {
 ##' @param frame the timeframe that synchrony is to be calculated over; options are 'within,'
 ##' for synchrony within a season, or 'between,' for synchrony across multiple seasons.
 ##' Defaults to 'within'.
+##' @param resolution if \code{method = sync_prop}, indicates whether temporal resolution
+##' should be yearly or daily
 ##' @return A potentials object containing one more more of the following, depending the
 ##' input for \code{subject}: \cr
 ##' If \code{subject} is "population" \code{synchrony} will return a numeric
@@ -261,7 +269,8 @@ receptivityByDay <- function(scene, summary = FALSE, nameDate = TRUE) {
 ##' pop2 <- simulateScene(size = 1234, sdDur = 5, sk = 1)
 ##' syncVals <- synchrony(pop2, "sync_nn", "all", "median", 123)
 synchrony <- function(scene, method, subject = "all", averageType = "mean",
-                      syncNN = 1, compareToSelf = FALSE, frame = 'within') {
+                      syncNN = 1, compareToSelf = FALSE,
+                      frame = 'within', resolution = 'daily') {
 
   method <- match.arg(method, c("augspurger", "kempenaers", "sync_prop",
                                 "overlap", "sync_nn", "simple1", "simple2",
@@ -280,36 +289,43 @@ synchrony <- function(scene, method, subject = "all", averageType = "mean",
   if (is.list(scene) & !is.data.frame(scene)) {
     if(frame == 'between'){
       if(method =='sync_prop'){
-        minStart <- function(x) min(x$start) + attr(x,'origin')
-        maxEnd <- function(x) max(x$end) + attr(x,'origin')
+        if(resolution =='yearly'){
+          ids <- unique(unlist(lapply(scene, function(x)x$id)))
+          fl <- matrix(nrow = length(ids),ncol = length(scene))
+          for (i in 1:length(ids)){
+            id <- ids[i]
+            fl[i,] <- unlist(lapply(scene, function(l) ifelse(id %in% l$id, T, F)))
+          }
+        } else {
+          minStart <- function(x) min(x$start) + attr(x,'origin')
+          maxEnd <- function(x) max(x$end) + attr(x,'origin')
+          allDays <- as.Date(min(unlist(lapply(scene, minStart))), origin = '1970-01-01'):as.Date(max(unlist(lapply(scene, maxEnd))), origin = '1970-01-01')
+          ids <- unique(unlist(lapply(scene,function(x)unique(x$id))))
+          fl <- matrix(nrow = length(ids), ncol = length(allDays),dimnames = list(ids,allDays))
 
-        allDays <- as.Date(min(unlist(lapply(scene, minStart))), origin = '1970-01-01'):as.Date(max(unlist(lapply(scene, maxEnd))), origin = '1970-01-01')
-        ids <- unique(unlist(lapply(scene,function(x)unique(x$id))))
-        fl <- matrix(nrow = length(ids), ncol = length(allDays),dimnames = list(ids,allDays))
-
-        l2df <- function(x,id){
-          out <- x[x$id == id,]
-          out$start <- out$start+attr(x,'origin')
-          out$end <- out$end + attr(x, 'origin')
-          return(out)
-        }
-
-        for (i in 1:length(ids)){
-          id <- ids[i]
-          l <- do.call('rbind',lapply(scene,l2df,id = id))
-          for (j in 1:nrow(l)){
-            dfl <- l[j,'start']:l[j,'end']
-            index <- dfl-min(allDays)+1
-            fl[i,index] <- T
+          l2df <- function(x,id){
+            out <- x[x$id == id,]
+            out$start <- out$start+attr(x,'origin')
+            out$end <- out$end + attr(x, 'origin')
+            return(out)
+          }
+          for (i in 1:length(ids)){
+            id <- ids[i]
+            l <- do.call('rbind',lapply(scene,l2df,id = id))
+            for (j in 1:nrow(l)){
+              dfl <- l[j,'start']:l[j,'end']
+              index <- dfl-min(allDays)+1
+              fl[i,index] <- T
+            }
           }
         }
 
-        n <- sum(fl, na.rm = T) # number of flowering days for all individuals
-        nind <- apply(fl,1, function(x)sum(x, na.rm = T)) # number of flowering days per individual
-        prop <- apply(fl,2,function(x){sum(x, na.rm = T)/n}) # proportion of all flowering that occured each day
-        indPropDaily<- t(apply(fl,1,function(x){x*prop}))
-        totalIndProp <- apply(indPropDaily,1,sum, na.rm = T) # proportion of all flowering that occured on the days an individual was flowering
-        indSync <- data.frame(id = ids, synchrony = totalIndProp, days = nind)
+        n <- sum(fl, na.rm = T) # number of flowering days/years for all individuals
+        nind <- apply(fl,1, sum, na.rm = T) # number of flowering days/years per individual
+        prop <- apply(fl,2,function(x){sum(x, na.rm = T)/n}) # proportion of all flowering that occured each day/year
+        indProp <- t(apply(fl,1,function(x){x*prop}))
+        totalIndProp <- apply(indProp,1,sum, na.rm = T) # proportion of all flowering that occured on the days/years an individual was flowering
+        indSync <- data.frame(id = ids, synchrony = totalIndProp, time = nind)
         pairSync <- NULL
         popSync <- average(indSync[,2])
       }

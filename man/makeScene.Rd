@@ -6,7 +6,7 @@
 \usage{
 makeScene(df, multiYear = FALSE, startCol = "start", endCol = "end",
   xCol = "x", yCol = "y", s1Col = "s1", s2Col = "s2", idCol = "id",
-  dateFormat = "\%Y-\%m-\%d")
+  otherCols = NULL, dateFormat = "\%Y-\%m-\%d", split = NULL)
 }
 \arguments{
 \item{df}{a data frame containing information about a mating scene,
@@ -29,9 +29,14 @@ a list by year}
 
 \item{idCol}{character name for column with unique identifier}
 
+\item{otherCols}{character vector of column(s) to include besides the
+necessary ones for the mating scene. If NULL, it will be ignored.}
+
 \item{dateFormat}{character indicating either (1) the format of the start and end
 date columns if those columns are characters or (2) the origin for the start
 and end date columns if those columns are numeric. It is used in as.Date}
+
+\item{split}{character indicating a column to split the result into a list by the values of that column}
 }
 \value{
 a matingScene object, either a single dataframe in standard format
@@ -39,7 +44,7 @@ or a list of dataframes. Attributes of the matingScene object indicate the type 
 information in the data frame, including the original column names,
 and the origin of the date columns. If multiYear = TRUE,
 the return value will be a list of matingScene data frames where each
-element in the list represents one year. See details for more information
+element in the list represents one year. If split is specified, the return value will be a list of matingScene data frames where each element in the list represents a value of the specifed variable. See details for more information
 on attributes and how to work with multi-year data.
 }
 \description{

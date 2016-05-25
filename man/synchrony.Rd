@@ -5,7 +5,8 @@
 \title{Make potentials object--mating synchrony}
 \usage{
 synchrony(scene, method, subject = "all", averageType = "mean",
-  syncNN = 1, compareToSelf = FALSE, frame = "within")
+  syncNN = 1, compareToSelf = FALSE, frame = "within",
+  resolution = "daily")
 }
 \arguments{
 \item{scene}{a matingScene object that includes the flowering schedule for the
