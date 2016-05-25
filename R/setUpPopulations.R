@@ -11,8 +11,20 @@
 ##' @param sdDur standard deviation of duration in days
 ##' @param xRange range of spatial extent of individuals along x-axis
 ##' @param yRange range of spatial extent of individuals along y-axis
-##' @param distro unimplemented
+##' @param distroSp unimplemented
 ##' @param sAlleles integer count of S-Alleles that could be in the population
+##' @param distroSD the distribution of the start date, can be "normal" or
+##' "uniform"
+##' @param distroDur the distribution of the start date, can be "normal" or
+##' "uniform"
+##' @param minSD the minimum value for the start date if \code{distroSD}
+##' is "uniform." If set to NULL, it is calculated using meanSD and sdSD.
+##' @param maxSD the maximum value for the start date if \code{distroSD}
+##' is "uniform." If set to NULL, it is calculated using meanSD and sdSD.
+##' @param minDur the minimum value for the duration if \code{distroDur}
+##' is "uniform." If set to NULL, it is calculated using meanDur and sdDur.
+##' @param maxDur the maximum value for the duration if \code{distroDur}
+##' is "uniform." If set to NULL, it is calculated using meanDur and sdDur.
 ##'
 ##' @return matingScene data frame -- see \code{\link{makeScene}}
 ##' @seealso \code{\link{makeScene}}
@@ -22,12 +34,38 @@
 ##' \dontrun{simulateScene(NULL)}
 simulateScene <- function(size = 30, meanSD = "2012-07-12", sdSD = 6, meanDur = 11,
                           sdDur = 3, skSD = 0 ,xRange = c(0, 100), yRange = c(0, 100),
-                          distro = "unif", sAlleles = 10) {
+                          distroSp = "unif", sAlleles = 10, distroSD = "normal",
+                          distroDur = "normal", minSD = NULL, maxSD = NULL,
+                          minDur = NULL, maxDur = NULL) {
+  
+  distroSD <- match.arg(sdDistro, c("normal", "unif"))
+  distroDur <- match.arg(durDistro, c("normal", "unif"))
+  
   md <- as.integer(as.Date(meanSD, "%Y-%m-%d"))
-  sd <- as.integer(md + round(sn::rsn(n = size, 0, omega = sdSD, alpha = skSD), 0))
-  ed <- as.integer(sd + abs(round(rnorm(size, meanDur, sdDur), 0)))
+  if (distroSD == "normal") {
+    sd <- as.integer(md + round(sn::rsn(n = size, 0, omega = sdSD, alpha = skSD), 0))
+  } else if (distroSD == "uniform") {
+    if (is.null(minSD)) {
+      minSD <- md - sdSD*sqrt(3)
+    }
+    if (is.null(maxSD)) {
+      maxSD <- md + sdSD*sqrt(3)
+    }
+    sd <- as.integer(round(runif(size, minSD, maxSD), 0))
+  }
+  if (distroDur == "normal") {
+    ed <- as.integer(sd + abs(round(rnorm(size, meanDur, sdDur), 0)))
+  } else if (distroDur == "uniform") {
+    if (is.null(minDur)) {
+      minDur <- md - sdDur*sqrt(3)
+    }
+    if (is.null(maxDur)) {
+      maxDur <- md + sdDur*sqrt(3)
+    }
+    ed <- as.integer(sd + abs(round(runif(size, minDur, maxDur), 0)))
+  }  
 
-  if (distro != "unif")
+  if (spDistro != "unif")
     warning("distro must be unif")
   xv <- runif(size, min = xRange[1], max = xRange[2])
   yv <- runif(size, min = yRange[1], max = yRange[2])
