@@ -8,16 +8,16 @@
 ##' @param nn.constant logical; indicates whether the nearest neighbors used in calculations should be the nearest on a given day (\code{nn.constant = FALSE}) or the nearest neighbors over an entire season (\code{nn.constant = TRUE})
 ##' @return a named matrix with a row for each id and a column for each day, and entries corresponding to ids' OMP each day
 ##' @details The days to calculate OMP for should be input as integers as they are in the start and end columns of a matingScene object. If the number of ids receptive on a day is less than k, OMP will be calculated for the maximum number of neighbors.
-##' @seealso \code{\link{makeScene}}
-##' @author Stuart Wagenius
+##' @seealso \code{\link{makeScene}}, \code{\link{proximity}}, \code{\link{receptivityByDay}}, \code{\link{synchrony}}
+##' @author Amy Waananen
 ##' @examples
 ##' pop <- simulateScene()
 ##' omp <- dailyOMP(pop)
-##' omp.1 <- dailyOMP(pop, nn.constant = T) # calculates OMP for individuals based on the same nearest neighbors throughout the season
+##' omp.1 <- dailyOMP(pop, nn.constant = TRUE) # calculates OMP for individuals based on the same nearest neighbors throughout the season
 
 
 
-dailyOMP <- function(scene, k = 4, days = min(scene$start):max(scene$end), alpha = 1/13, nn.constant = FALSE){
+dailyOMP <- function(scene, k = 4, days = min(scene$start):max(scene$end), alpha = 1/13.3, nn.constant = FALSE){
   out <- matrix(nrow  = nrow(scene), ncol = length(days), dimnames = list(scene$id, as.character(days + attr(scene, 'origin'))))
   rbd <- receptivityByDay(scene)
   if(!nn.constant){
@@ -45,3 +45,5 @@ dailyOMP <- function(scene, k = 4, days = min(scene$start):max(scene$end), alpha
   }
   out
 }
+
+
