@@ -290,7 +290,7 @@ synchrony <- function(scene, method, subject = "all", averageType = "mean",
     if(frame == 'between'){
       if(method =='sync_prop' | method == 'mean_interactions'){
         if(resolution =='yearly'){
-          ids <- unique(unlist(lapply(scene, function(x)x$id)))
+          ids <- sort(unique(unlist(lapply(scene, function(x)x$id))))
           fl <- matrix(nrow = length(ids),ncol = length(scene))
           for (i in 1:length(ids)){
             id <- ids[i]
@@ -300,7 +300,7 @@ synchrony <- function(scene, method, subject = "all", averageType = "mean",
           minStart <- function(x) min(x$start) + attr(x,'origin')
           maxEnd <- function(x) max(x$end) + attr(x,'origin')
           allDays <- as.Date(min(unlist(lapply(scene, minStart))), origin = '1970-01-01'):as.Date(max(unlist(lapply(scene, maxEnd))), origin = '1970-01-01')
-          ids <- unique(unlist(lapply(scene,function(x)unique(x$id))))
+          ids <- sort(unique(unlist(lapply(scene,function(x)unique(x$id)))))
           fl <- matrix(nrow = length(ids), ncol = length(allDays),dimnames = list(ids,allDays))
 
           l2df <- function(x,id){
