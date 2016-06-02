@@ -274,7 +274,7 @@ synchrony <- function(scene, method, subject = "all", averageType = "mean",
 
   method <- match.arg(method, c("augspurger", "kempenaers", "sync_prop",
                                 "overlap", "sync_nn", "simple1", "simple2",
-                                "simple3"))
+                                "simple3", 'mean_interactions'))
   subject <- match.arg(subject, c("population", "pairwise",
                                   "individual", "all"),
                        several.ok = T)
@@ -288,7 +288,7 @@ synchrony <- function(scene, method, subject = "all", averageType = "mean",
 
   if (is.list(scene) & !is.data.frame(scene)) {
     if(frame == 'between'){
-      if(method =='sync_prop'){
+      if(method =='sync_prop' | method == 'mean_interactions'){
         if(resolution =='yearly'){
           ids <- sort(unique(unlist(lapply(scene, function(x)x$id))))
           fl <- matrix(nrow = length(ids),ncol = length(scene))
@@ -319,13 +319,20 @@ synchrony <- function(scene, method, subject = "all", averageType = "mean",
             }
           }
         }
-
         n <- sum(fl, na.rm = T) # number of flowering days/years for all individuals
         nind <- apply(fl,1, sum, na.rm = T) # number of flowering days/years per individual
-        prop <- apply(fl,2,function(x){sum(x, na.rm = T)/n}) # proportion of all flowering that occured each day/year
-        indProp <- t(apply(fl,1,function(x){x*prop}))
-        totalIndProp <- apply(indProp,1,sum, na.rm = T) # proportion of all flowering that occured on the days/years an individual was flowering
-        indSync <- data.frame(id = ids, synchrony = totalIndProp, time = nind)
+        if(method == 'sync_prop'){
+          prop <- apply(fl,2,function(x){sum(x, na.rm = T)/n}) # proportion of all flowering that occured each day/year
+          indProp <- t(apply(fl,1,function(x){x*prop}))
+          totalIndProp <- apply(indProp,1,sum, na.rm = T) # proportion of all flowering that occured on the days/years an individual was flowering
+          indSync <- data.frame(id = ids, synchrony = totalIndProp, time = nind)
+        }
+        if(method == 'mean_interactions'){
+          tot <- apply(fl,2,function(x){sum(x, na.rm = T)}) # number of flowering individuals per day
+          indInt <- apply(fl,1,function(x){sum(x*tot, na.rm = T)})
+          intPerDay <- indInt/nind
+          indSync <- data.frame(id = ids, synchrony = intPerDay, time = nind)
+        }
         pairSync <- NULL
         popSync <- average(indSync[,2])
       }

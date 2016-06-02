@@ -14,11 +14,12 @@
 ##' @examples
 ##' pop <- simulateScene()
 ##' omp <- dailyOMP(pop)
-##' omp.1 <- dailyOMP(pop, nn.constant = T) # calculates OMP for individuals based on the same nearest neighbors throughout the season
+##' omp.1 <- dailyOMP(pop, nn.constant = TRUE) # same nearest neighbors throughout the season
+##' omp.2 <- dailtOMP(pop, nn.constant = FALSE) # nearest flowering neighbors
 
 
 
-dailyOMP <- function(scene, k = 4, days = min(scene$start):max(scene$end), alpha = 1/13, nn.constant = FALSE){
+dailyOMP <- function(scene, k = 4, days = min(scene$start):max(scene$end), alpha = 1/13.3, nn.constant = FALSE){
   out <- matrix(nrow  = nrow(scene), ncol = length(days), dimnames = list(scene$id, as.character(days + attr(scene, 'origin'))))
   rbd <- receptivityByDay(scene)
   if(!nn.constant){
@@ -46,3 +47,5 @@ dailyOMP <- function(scene, k = 4, days = min(scene$start):max(scene$end), alpha
   }
   out
 }
+
+
