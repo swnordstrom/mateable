@@ -7,9 +7,10 @@
 ##' @param alpha parameter of exponential decay to be used in calculating OMP (defaults to 1/13)
 ##' @param nn.constant logical; indicates whether the nearest neighbors used in calculations should be the nearest on a given day (\code{nn.constant = FALSE}) or the nearest neighbors over an entire season (\code{nn.constant = TRUE})
 ##' @return a named matrix with a row for each id and a column for each day, and entries corresponding to ids' OMP each day
-##' @details The days to calculate OMP for should be input as integers as they are in the start and end columns of a matingScene object. If the number of ids receptive on a day is less than k, OMP will be calculated for the maximum number of neighbors.
-##' @seealso \code{\link{makeScene}}
-##' @author Stuart Wagenius
+##' @details Daily outcrossed mating potential is a weighted average of an individual's distance to their nearest neighbors on a given day (Wagenius et al. 2007). The days to calculate OMP for should be input as integers relative to the first day of flowering, as they are in the start and end columns of a matingScene object. If the number of ids receptive on a day is less than k, OMP will be calculated for the maximum number of neighbors.
+##' @references Wagenius, S., E. Lonsdorf, and C. Neuhauser. 2007. Patch aging and the S-Allee effect: breeding system effects on the demographic response of plants to habitat fragmentation. \emph{American Naturalist} \strong{169}:383-397.
+##' @seealso \code{\link{makeScene}}, \code{\link{proximity}}, \code{\link{synchrony}}, \code{\link{receptivityByDay}}
+##' @author Amy Waananen
 ##' @examples
 ##' pop <- simulateScene()
 ##' omp <- dailyOMP(pop)
