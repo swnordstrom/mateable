@@ -273,8 +273,8 @@ synchrony <- function(scene, method, subject = "all", averageType = "mean",
                       frame = 'within', resolution = 'daily') {
 
   method <- match.arg(method, c("augspurger", "kempenaers", "sync_prop",
-                                "overlap", "sync_nn", "simple1", "simple2",
-                                "simple3", 'mean_interactions'))
+                                "overlap", "sync_nn", "peak-n", "peak-observations",
+                                "average-peak", 'mean_interactions'))
   subject <- match.arg(subject, c("population", "pairwise",
                                   "individual", "all"),
                        several.ok = T)
