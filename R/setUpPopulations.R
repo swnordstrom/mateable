@@ -22,12 +22,10 @@
 ##' \dontrun{simulateScene(NULL)}
 simulateScene <- function(size = 30, meanSD = "2012-07-12", sdSD = 6, meanDur = 11,
                           sdDur = 3, skSD = 0 ,xRange = c(0, 100), yRange = c(0, 100),
-                          distro = "unif", sAlleles = 10, minSD = NULL, maxSD = NULL,
-                          minDur = NULL, maxDur = NULL) {
-
+                          distro = "unif", sAlleles = 10) {
   md <- as.integer(as.Date(meanSD, "%Y-%m-%d"))
   sd <- as.integer(md + round(sn::rsn(n = size, 0, omega = sdSD, alpha = skSD), 0))
-  ed <- as.integer(sda + abs(round(rnorm(size, meanDur, sdDur), 0)))
+  ed <- as.integer(sd + abs(round(rnorm(size, meanDur, sdDur), 0)))
 
   if (distro != "unif")
     warning("distro must be unif")
@@ -39,7 +37,7 @@ simulateScene <- function(size = 30, meanSD = "2012-07-12", sdSD = 6, meanDur = 
   } else {
     sP <- sapply(sM, FUN = function(x) sample((1:sAlleles)[-x], 1))
   }
-  df <- data.frame(id = 1:size, start = sda, end = ed, x = xv,
+  df <- data.frame(id = 1:size, start = sd, end = ed, x = xv,
                    y = yv, s1 = sM, s2 = sP)
   makeScene(df, startCol = "start", endCol = "end", xCol = "x", yCol = "y",
             idCol = "pla", dateFormat = "1970-01-01")
