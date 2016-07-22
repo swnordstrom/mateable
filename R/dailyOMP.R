@@ -15,7 +15,7 @@
 ##' pop <- simulateScene()
 ##' omp <- dailyOMP(pop)
 ##' omp.1 <- dailyOMP(pop, nn.constant = TRUE) # same nearest neighbors throughout the season
-##' omp.2 <- dailtOMP(pop, nn.constant = FALSE) # nearest flowering neighbors
+##' omp.2 <- dailyOMP(pop, nn.constant = FALSE) # nearest flowering neighbors
 
 
 

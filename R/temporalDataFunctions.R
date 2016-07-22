@@ -209,13 +209,13 @@ receptivityByDay <- function(scene, summary = FALSE, nameDate = TRUE) {
 ##' calculate a synchrony value based on the number of days both
 ##' individuals were flowering divided by the number of days either individual
 ##' was available for mating. "sync_nn" gives the average of the kth nearest
-##' neighbor, or rather the kth most synchronous individual. "simple1" will
+##' neighbor, or rather the kth most synchronous individual. "peak-n" will
 ##' calculate the number of individuals receptive on the peak day
 ##' (day with highest mating receptivity) divided by the number of individuals
-##' in the population. "simple2" will calculate the number of individuals
+##' in the population. "peak-observations" will calculate the number of individuals
 ##' receptive on the peak day divided by the total number of observations -
 ##' this method is useful for comparing to data that has no information on
-##' individuals. "simple3" calculates the average (determined by argument
+##' individuals. "average-peak" calculates the average (determined by argument
 ##' \code{averageType}) number of individuals receptive
 ##' per day divided by the maximum number of individuals receptive per day.
 ##' All "simple" methods do not have pairwise or individual values.
@@ -464,21 +464,21 @@ synchrony <- function(scene, method, subject = "all", averageType = "mean",
 
       popSync <- average(indSync[,2])
 
-    } else if (method == "simple1") {
+    } else if (method == "peak-n") {
       pairSync <- NULL
       indSync <- NULL
 
       indCols <- colSums(receptivityByDay(scene))
       popSync <- max(indCols)/n
 
-    } else if (method == "simple2") {
+    } else if (method == "peak-observations") {
       pairSync <- NULL
       indSync <- NULL
 
       indCols <- colSums(receptivityByDay(scene))
       popSync <- max(indCols)/sum(indCols)
 
-    } else if (method == "simple3") {
+    } else if (method == "average-peak") {
       pairSync <- NULL
       indSync <- NULL
 
