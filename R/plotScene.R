@@ -86,13 +86,19 @@ plotScene <- function(scene, dimension = "auto",
   }
 
   if(temp){
+    starts <- unlist(lapply(scene, function(x) min(x['start'])+ attr(x,'origin')))
+    minstart <- as.Date(min(starts), origin = '1970-01-01')
+    ends <- unlist(lapply(scene, function(x) max(x['end']) + attr(x,'origin')))
+    maxend <- as.Date(max(ends), origin = '1970-01-01')
     count <- max(unlist(lapply(scene, nrow)))
-    if(is.null(opening)){
-      opening <- min(unlist(lapply(scene, function(x) x['start'])))
-    }
-    if(is.null(closing)){
-      closing <- max(unlist(lapply(scene, function(x) x['end'])))
-    }
+    #     if(is.null(opening)){
+    #       opening <- min(unlist(lapply(scene, function(x) x['start'])))
+    #       print(opening)
+    #     }
+    #     if(is.null(closing)){
+    #       closing <- max(unlist(lapply(scene, function(x) x['end'])))
+    #       print(closing)
+    #     }
   }
 
   if(comp){
@@ -154,48 +160,48 @@ plotScene <- function(scene, dimension = "auto",
 
     if (temp){
       if (labelID){
-        plot.default(scene.i[, 'start'], scene.i$index, ylim = c(1,count), xlim = c(opening, closing), type = "n", xlab = 'date', ylab = "",xaxt = 'n',yaxt = 'n', ...)
+        plot.default(scene.i[, 'start'] + attr(scene.i, "origin"), scene.i$index, ylim = c(1,count), xlim = c(minstart, maxend), type = "n", xlab = 'date', ylab = "",xaxt = 'n',yaxt = 'n', ...)
 
-        segments(scene.i[, 'start'], scene.i$index, scene.i[, 'end'],scene.i$index, col = cols.seg, cex = 3, ...)
+        segments(scene.i[, 'start'] + attr(scene.i, "origin"), scene.i$index, scene.i[, 'end'] + attr(scene.i, "origin"),scene.i$index, col = cols.seg, cex = 3, ...)
         axis(2, labels = scene.i$id, at = scene.i$index, las = 1, cex.axis = 0.75)
         mtext(attr(scene.i,'originalNames')[1],side = 2,adj = 0.5, cex = 0.75, line = 7.5)
       } else {
-        plot.default(scene.i[, 'start'], scene.i$index, ylim = c(1,count), xlim = c(opening, closing), type = "n", xlab = 'date', ylab = "",xaxt = 'n',yaxt = 'n', ...)
-        segments(scene.i[, 'start'], scene.i$index, scene.i[, 'end'],scene.i$index, col = cols.seg, cex = 3, ...)
+        plot.default(scene.i[, 'start'] + attr(scene.i, "origin"), scene.i$index, ylim = c(1,count), xlim = c(minstart, maxend), type = "n", xlab = 'date', ylab = "",xaxt = 'n',yaxt = 'n', ...)
+        segments(scene.i[, 'start'] + attr(scene.i, "origin"), scene.i$index, scene.i[, 'end'] + attr(scene.i, "origin"),scene.i$index, col = cols.seg, cex = 3, ...)
         mtext('count',side = 2,adj = 0.5, cex = 0.75, line = 2.5)
         axis(2)
       }
       mtext(names(scene)[i],side = 2,adj = 0.5, cex = 0.75, line = 5, font = 2, las = 3)
 
       if (i == nr){
-        datLabs <- seq(opening,closing, by = 7)
-        axis(1, at = datLabs, labels = format(as.Date(attr(scene.i, 'origin') + datLabs, origin = as.Date("1970-01-01")),format = "%b %d"), tick=0.25, cex.axis = 0.9)
+        datLabs <- seq(minstart,maxend, by = 7)
+        axis(1, at = datLabs, labels = format(datLabs,format = "%b %d"), tick=0.25, cex.axis = 0.9)
         mtext('date',side = 1,adj = 0.5, cex = 0.75, line = 3)
       }
       if (i == 1 & nc > 1){
         mtext('temporal',side = 3, adj = 0.5, line = 1.5)
       }
       if (!is.null(sub)){
-        segments(scene.i[scene.i$id %in% sub, 'start'], scene.i[scene.i$id %in% sub, 'index'], scene.i[scene.i$id %in% sub, 'end'],scene.i[scene.i$id %in% sub, 'index'], col = cols.sub, ...)
+        segments(scene.i[scene.i$id %in% sub, 'start'] + attr(scene.i, "origin"), scene.i[scene.i$id %in% sub, 'index'], scene.i[scene.i$id %in% sub, 'end'] + attr(scene.i, "origin"),scene.i[scene.i$id %in% sub, 'index'], col = cols.sub, ...)
         if(label.sub){
-          text(scene.i[scene.i$id %in% sub, 'start']-0.02*closing, scene.i[scene.i$id %in% sub, 'index'], scene.i[scene.i$id %in% sub, 'id'], cex = text.cex)
+          text(scene.i[scene.i$id %in% sub, 'start'] + attr(scene.i, "origin")-0.02*closing, scene.i[scene.i$id %in% sub, 'index'], scene.i[scene.i$id %in% sub, 'id'], cex = text.cex)
         }
       }
       if (dailyPoints == TRUE){
         rbd <- receptivityByDay(scene.i)
         fl.density <- colSums(rbd)
-        points(as.numeric(names(fl.density)), fl.density, pch = pch, cex = pt.cex, ...)
+        points(as.numeric(names(fl.density)) + attr(scene.i, 'origin'), fl.density, pch = pch, cex = pt.cex, ...)
       }
       if (drawQuartiles ==TRUE){
         rbd <- receptivityByDay(scene.i)
         fl.density <- colSums(rbd)
-        abline(v = median(scene.i$start), col = quartile.col, lwd = quartile.lwd, lty = 2)
-        abline(v = median(scene.i$end), col = quartile.col, lwd = quartile.lwd, lty = 2)
+        abline(v = median(scene.i$start + attr(scene.i, "origin")), col = quartile.col, lwd = quartile.lwd, lty = 2)
+        abline(v = median(scene.i$end  + attr(scene.i, "origin")), col = quartile.col, lwd = quartile.lwd, lty = 2)
         if (length(fl.density[fl.density == max(fl.density)])>1){
-          peak <- median(as.numeric(names(fl.density[fl.density == max(fl.density)])))
+          peak <- median(as.numeric(names(fl.density[fl.density == max(fl.density)])))+ attr(scene.i, 'origin')
           abline(v = peak, col = peak.col, cex = quartile.lwd, ...)
         } else {
-          abline(v = as.numeric(names(fl.density[fl.density == max(fl.density)])), col = peak.col, cex = quartile.lwd, ...)
+          abline(v = as.numeric(names(fl.density[fl.density == max(fl.density)]))+ attr(scene.i, 'origin'), col = peak.col, cex = quartile.lwd, ...)
         }
       }
     }
