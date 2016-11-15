@@ -266,12 +266,12 @@ plotScene <- function(scene, dimension = "auto",
           }
         }
         ptWt<- aggregate(id ~ s1 + s2, data = scene.i, length)
-        ptWt$scale <- (ptWt$id - min(ptWt$id)) / diff(range(ptWt$id))
-        plot(ptWt$s1, ptWt$s2, cex = 2*ptWt$scale, pch = pch, xlim = c(smin, smax), ylim = c(smin,smax), ylab = "", xaxt = 'n', yaxt = 'n')
+        ptWt$scale <- (ptWt$id - min(ptWt$id)) / diff(range(ptWt$id)) + 1
+        plot(ptWt$s1, ptWt$s2, cex = ptWt$scale, pch = pch, xlim = c(smin, smax), ylim = c(smin,smax), ylab = "", xaxt = 'n', yaxt = 'n')
         mtext('s2',side = 2,adj = 0.5, cex = 0.75, line = 2.5)
         axis(2, at = smin:smax, labels = smin:smax, tick = 0.25)
         leg.text <- levels(as.factor(ptWt$id))
-        legend('topleft',legend = leg.text, pt.cex = 1+(as.numeric(leg.text) - min(as.numeric(leg.text)))/diff(range(as.numeric(leg.text))), pch = pch)
+        legend('topleft',legend = leg.text, pt.cex = 1+(as.numeric(leg.text) - min(as.numeric(leg.text)))/diff(range(as.numeric(leg.text))), pch = pch, title = 'count')
         if (i == nr){
           mtext('s1',side = 1,adj = 0.5, cex = 0.75, line = 3)
           axis(1, at = smin:smax, labels = smin:smax)
