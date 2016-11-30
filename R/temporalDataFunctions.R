@@ -363,10 +363,11 @@ synchrony <- function(scene, method, subject = "all", averageType = "mean",
   } else {
     n <- nrow(scene) # population size
     if (n < 2) {
-      stop("Can't calculate synchrony for population size less than 2")
-    }
-
-    if (method == "augspurger") {
+      warning("Can't calculate synchrony for population size less than 2")
+      indSync <- NA
+      pairSync <- NA
+      popSync <- NA
+    } else if (method == "augspurger") {
       if (subject %in% c("pair", "all")) {
         syncMatrix <- overlap(scene, "overlap", compareToSelf = T)
         pairSync <- syncMatrix/scene$duration
@@ -510,6 +511,4 @@ synchrony <- function(scene, method, subject = "all", averageType = "mean",
     potential
   }
 }
-
-
 
