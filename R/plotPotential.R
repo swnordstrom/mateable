@@ -55,8 +55,8 @@ plotPotential <-   function(matPot,
   }
 
   if(!'pair' %in% names(matPot[[1]]) & 'pair' %in% subject){
-      warning("mating potential object must have pairwise potential for subject to be 'pair'")
-      subject <- 'ind'
+    warning("mating potential object must have pairwise potential for subject to be 'pair'")
+    subject <- 'ind'
   }
 
   if ('auto' %in% pt){
@@ -126,10 +126,10 @@ plotPotential <-   function(matPot,
           im <- poti[['ind']][which(iids %in% sub.iids), potential]
           lab.cex <- 1 + (im - min(im))/(max(im) - min(im))
           if(sum(subMat >= 1) > 4){
-            plot_web3(subMat, names = sub.iids, val = FALSE, minflow = 0, maxarrow = 3, minarrow = 1, legend = FALSE, length = 0,
+            plot_web3(subMat, names = sub.iids, minflow = 0, maxarrow = 3, minarrow = 1,
                       labz.size = lab.cex, ...)
           } else {
-            plot_web3(subMat, names = sub.iids, val = FALSE, minflow = 0, legend = FALSE, length = 0,
+            plot_web3(subMat, names = sub.iids, minflow = 0,
                       labz.size = lab.cex, ...)
           }
         }
@@ -145,7 +145,7 @@ plotPotential <-   function(matPot,
           if (potential == "compatibility") {
             diag(subMat) <- 0
           } else {
-            diag(subMat) <- 1 
+            diag(subMat) <- 1
           }
           subMat[upper.tri(subMat, diag = FALSE)] <- NA
           leg.labs <- round(seq(max(subMat, na.rm = T),min(subMat, na.rm = T),length.out = 9), digits = 2)
@@ -183,29 +183,12 @@ plotPotential <-   function(matPot,
 
 
 plot_web3 <- function (flowmat, names = NULL, lab.size = 1.5, add = FALSE,
-                       fig.size = 1.3, main = "", sub = "", sub2 = "", log = FALSE,
-                       mar = c(0.25, 0.25, 0.25, 0.25), nullflow = NULL, minflow = NULL, maxflow = NULL,
-                       legend = TRUE, leg.digit = 5, leg.title = NULL, lcol = "black",
-                       arr.col = "black", val = FALSE, val.digit = 5, val.size = 0.6,
-                       val.col = "red", val.title = NULL, val.ncol = 1, budget = FALSE,
-                       bud.digit = 5, bud.size = 0.6, bud.title = "budget", bud.ncol = 1,
-                       maxarrow = 10, minarrow = 1, length = 0.1, dcirc = 1.2, bty = "o",
+                       fig.size = 1.3, mar = c(0.25, 0.25, 0.25, 0.25), nullflow = NULL, minflow = NULL, maxflow = NULL,
+                       maxarrow = 10, minarrow = 1, dcirc = 1.2, bty = "o",
                        labz.size = 1.5, ...){
   nm <- par("mar")
-  if (ncol(flowmat) != nrow(flowmat))
-    stop("flowmat has to be square")
   components <- names
-  if (is.null(components))
-    components <- colnames(flowmat)
-  if (is.null(components))
-    components <- rownames(flowmat)
-  if (is.null(components))
-    components <- as.character(1:ncol(flowmat))
   numcomp <- length(components)
-  if (ncol(flowmat) != numcomp)
-    stop("flowmat and names not compatible")
-  if (length(arr.col) == 1)
-    arr.col <- matrix(nrow = numcomp, ncol = numcomp, arr.col)
   flowmatrix <- flowmat
   if (!is.null(nullflow)) {
     flowmatrix[flowmatrix < nullflow[1]] <- 0
@@ -213,132 +196,55 @@ plot_web3 <- function (flowmat, names = NULL, lab.size = 1.5, add = FALSE,
       flowmatrix[flowmatrix > nullflow[2]] <- 0
   }
   zero <- 0
-  if (log) {
-    flowmatrix <- log10(flowmatrix + 1e-20)
-    flowmatrix[flowmatrix == -20] <- 0
-  }
   if (is.null(maxflow))
     maxflow <- max(flowmatrix)
-  else if (log)
-    maxflow <- log10(maxflow)
   if (is.null(minflow))
     minflow <- min(flowmatrix[flowmatrix != zero])
-  else if (log)
-    minflow <- log10(minflow)
-  if (!add) {
-    figlim <- c(-fig.size, fig.size)
-    if (val)
-      mar <- mar + c(0, -2, 0, 2)
-    mar <- pmax(mar, 0)
-    par(mar = mar)
-    plot(c(0, 0), type = "n", ylab = "", asp = 1, xaxt = "n",
-         yaxt = "n", frame.plot = FALSE, xlim = figlim, ylim = figlim,
-         main = main, xlab = "")
-    mtext(side = 3, line = -1, sub)
-    mtext(side = 1, adj = 0.5, text = sub2)
-  }
-  alpha0 <- pi/2
-  alpha <- alpha0 - (1:numcomp) * 2 * pi/numcomp
+  figlim <- c(-fig.size, fig.size)
+  mar <- pmax(mar, 0)
+  par(mar = mar)
+  plot(c(0, 0), type = "n", ylab = "", asp = 1, xaxt = "n",
+       yaxt = "n", frame.plot = FALSE, xlim = figlim, ylim = figlim,
+       main = '', xlab = "")
+  alpha <- pi/2 - (1:numcomp) * 2 * pi/numcomp
   xl <- cos(alpha)
   yl <- sin(alpha)
   if(length(labz.size) == 1) labz.size <- rep(labz.size, numcomp)
   for (i in 1:numcomp) {
     if (xl[i] > 0)
-      adjustx = 0
+      adjustx = -0.5
     if (xl[i] < 0)
-      adjustx = 1
+      adjustx = 1.5
     if (abs(xl[i]) < 1e-04)
-      adjustx = 0.5
+      adjustx = 1
     if (yl[i] > 0)
-      adjusty = 0
+      adjusty = -0.5
     if (yl[i] < 0)
-      adjusty = 1
+      adjusty = 1.5
     if (abs(yl[i]) < 1e-04)
-      adjusty = 0.5
+      adjusty = 1
     text(xl[i], yl[i], components[i], adj = c(adjustx, adjusty),
          cex = par("cex") * labz.size[i])
   }
-  circle <- function(i, lwd, col) {
-    cx <- xl[i] * dcirc
-    cy <- yl[i] * dcirc
-    r <- 0.1
-    x <- c(seq(-pi, pi, by = 0.01), pi)
-    lines(cx + r * sin(x), cy + r * cos(x), lwd = lwd, col = col)
-  }
-  par(lend = 1)
+  par(lend = 'round')
   darrow <- (maxarrow - minarrow)/(maxflow - minflow)
-  dr <- 0.02
-  xi <- xl - dr * cos(alpha)
-  yi <- yl - dr * sin(alpha)
-  iflow <- 1
-  offset <- 1
-  ltext <- NULL
+  xi <- xl - 0.02 * cos(alpha)
+  yi <- yl - 0.02 * sin(alpha)
   for (i in 1:numcomp) {
     x2 <- xi[i]
     y2 <- yi[i]
     for (j in 1:i) {
       if (flowmatrix[i, j] > zero | flowmatrix[j, i] >
           zero) {
-        Arr.col <- arr.col[i, j]
         x1 <- xi[j]
         y1 <- yi[j]
         dx <- x2 - x1
         dy <- y2 - y1
-        ifelse(i == j, fsize <- flowmatrix[i, j], fsize <- flowmatrix[i,j] - flowmatrix[j, i])
-        if (fsize > 0) {
-          code <- 1
-        }
-        else {
-          code <- 2
-          Arr.col <- arr.col[j, i]
-        }
+        fsize <- flowmatrix[i,j] - flowmatrix[j, i]
         size <- minarrow + darrow * (abs(fsize) - minflow)
-        if (i != j)
-          arrows(x1 + dr * dx, y1 + dr * dy, x2 - dr *
-                   dx, y2 - dr * dy, length = length, code = code,
-                 lwd = size, col = Arr.col, ...)
-        if (i == j)
-          circle(i, lwd = size, col = Arr.col)
-        if (val) {
-          text(x = (x1 + x2) * 0.5, y = (y1 + y2) * 0.5,
-               labels = iflow, offset = offset, col = val.col)
-          ltext <- c(ltext, paste(iflow, ":", format.pval(abs(fsize),val.digit)))
-        }
-        iflow <- iflow + 1
+        arrows(x1 + 0.02 * dx, y1 + 0.02 * dy, x2 - 0.02 *dx, y2 - 0.02 * dy, length = 0, lwd = size, col = 'black', ...)
       }
     }
-  }
-  if (legend) {
-    sizeleg = par("cex") * lab.size
-    if (!log) {
-      tmax <- maxflow
-      tmin <- minflow
-      title = leg.title
-    }
-    else {
-      tmax <- 10^maxflow
-      tmin <- 10^minflow
-      title = paste("logarithmic scale", leg.title)
-    }
-    legend("bottomright", legend = c(format.pval(tmax, leg.digit),format.pval(tmin, leg.digit)), cex = sizeleg, title = title,lwd = c(maxarrow, minarrow), bty = bty)
-  }
-  if (!val & !budget)
-    return
-  if (!add) {
-    par(mar = c(0, 0, 0, 0))
-    par(new = TRUE)
-    plot(c(0, 0), type = "n", ylab = "", xaxt = "n", yaxt = "n",
-         frame.plot = FALSE, main = "", xlab = "")
-  }
-  if (val)
-    legend("topright", legend = ltext, cex = val.size, title = val.title,
-           ncol = val.ncol, bty = bty)
-  if (budget) {
-    rate <- NULL
-    for (i in 1:numcomp) rate <- c(rate, paste(components[i],
-                                               ":", format.pval(sum(flowmat[, i]) - sum(flowmat[i, ]), bud.digit)))
-    legend("topleft", legend = rate, cex = bud.size, title = bud.title,
-           ncol = bud.ncol, bty = bty)
   }
   par(mar = nm)
 }
