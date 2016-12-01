@@ -49,16 +49,19 @@ plotPotential <-   function(matPot,
   if(attr(matPot[[1]],'t')){
     potential <- 'synchrony'
   } else if(attr(matPot[[1]],'s')){
-    potential <- 'proximity'
+    if(!is.null(matPot[[1]][['ind']]) & 'knn.dist' %in% colnames(matPot[[1]][['ind']])){
+      potential <- 'knn.dist'
+    } else {
+      potential <- 'proximity'
+    }
   } else if(attr(matPot[[1]],'c')){
     potential <- 'compatibility'
   }
-
   if(!'pair' %in% names(matPot[[1]]) & 'pair' %in% subject){
     warning("mating potential object must have pairwise potential for subject to be 'pair'")
     subject <- 'ind'
   }
-
+  print (potential)
   if ('auto' %in% pt){
     if (subject %in% 'pair'){
       pt <- c('heat','hist','net')
@@ -126,11 +129,11 @@ plotPotential <-   function(matPot,
           im <- poti[['ind']][which(iids %in% sub.iids), potential]
           lab.cex <- 1 + (im - min(im))/(max(im) - min(im))
           if(sum(subMat >= 1) > 4){
-            plot_web3(subMat, names = sub.iids, minflow = 0, maxarrow = 3, minarrow = 1,
-                      labz.size = lab.cex, ...)
+            plot_net(subMat, names = sub.iids, minflow = 0, maxarrow = 3, minarrow = 1,
+                     labz.size = lab.cex, ...)
           } else {
-            plot_web3(subMat, names = sub.iids, minflow = 0,
-                      labz.size = lab.cex, ...)
+            plot_net(subMat, names = sub.iids, minflow = 0,
+                     labz.size = lab.cex, ...)
           }
         }
         if (! 'hist' %in% pt){
@@ -174,6 +177,9 @@ plotPotential <-   function(matPot,
         if (density){
           lines(density(poti[[subject]][,potential], na.rm = T))
         }
+        if(potential %in% 'knn.dist'){
+          mtext(paste('k = ',matPot[[1]][['ind']][1,'k']), side = 3, adj = 0.95, outer = T)
+        }
       }
     }
   }
@@ -182,10 +188,10 @@ plotPotential <-   function(matPot,
 
 
 
-plot_web3 <- function (flowmat, names = NULL, lab.size = 1.5, add = FALSE,
-                       fig.size = 1.3, mar = c(0.25, 0.25, 0.25, 0.25), nullflow = NULL, minflow = NULL, maxflow = NULL,
-                       maxarrow = 10, minarrow = 1, dcirc = 1.2, bty = "o",
-                       labz.size = 1.5, ...){
+plot_net <- function (flowmat, names = NULL, lab.size = 1.5, add = FALSE,
+                      fig.size = 1.3, mar = c(0.25, 0.25, 0.25, 0.25), nullflow = NULL, minflow = NULL, maxflow = NULL,
+                      maxarrow = 10, minarrow = 1, dcirc = 1.2, bty = "o",
+                      labz.size = 1.5, ...){
   nm <- par("mar")
   components <- names
   numcomp <- length(components)

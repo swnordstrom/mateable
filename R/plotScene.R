@@ -91,14 +91,6 @@ plotScene <- function(scene, dimension = "auto",
     ends <- unlist(lapply(scene, function(x) max(x['end']) + attr(x,'origin')))
     maxend <- as.Date(max(ends), origin = '1970-01-01')
     count <- max(unlist(lapply(scene, nrow)))
-    #     if(is.null(opening)){
-    #       opening <- min(unlist(lapply(scene, function(x) x['start'])))
-    #       print(opening)
-    #     }
-    #     if(is.null(closing)){
-    #       closing <- max(unlist(lapply(scene, function(x) x['end'])))
-    #       print(closing)
-    #     }
   }
 
   if(comp){
