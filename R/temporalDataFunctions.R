@@ -489,21 +489,34 @@ synchrony <- function(scene, method, subject = "all", averageType = "mean",
 
 
     # return
-    potential <- list()
-    if ("population" %in% subject) {
-      potential$pop <- popSync
+    if (length(subject) > 1 | "all" %in% subject){
+      potential <- list()
+      if ("population" %in% subject) {
+        potential$pop <- popSync
+      }
+      if ("individual" %in% subject) {
+        potential$ind <- indSync
+      }
+      if ("pairwise" %in% subject) {
+        potential$pair <- pairSync
+      }
+      if ("all" %in% subject) {
+        potential$pop <- popSync
+        potential$ind <- indSync
+        potential$pair <- pairSync
+      }
+    } else{
+      if ("population" %in% subject) {
+        potential <- popSync
+      }
+      if ("individual" %in% subject) {
+        potential <- indSync
+      }
+      if ("pairwise" %in% subject) {
+        potential <- pairSync
+      }
     }
-    if ("individual" %in% subject) {
-      potential$ind <- indSync
-    }
-    if ("pairwise" %in% subject) {
-      potential$pair <- pairSync
-    }
-    if ("all" %in% subject) {
-      potential$pop <- popSync
-      potential$ind <- indSync
-      potential$pair <- pairSync
-    }
+
     attr(potential, "t") <- TRUE
     attr(potential, "s") <- FALSE
     attr(potential, "c") <- FALSE
