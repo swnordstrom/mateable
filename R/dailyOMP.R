@@ -6,6 +6,8 @@
 ##' @param days the day or range of days to calculate OMP for, default is all days in a scene (see Details)
 ##' @param alpha parameter of exponential decay to be used in calculating OMP (defaults to 1/13)
 ##' @param nn.constant logical; indicates whether the nearest neighbors used in calculations should be the nearest on a given day (\code{nn.constant = FALSE}) or the nearest neighbors over an entire season (\code{nn.constant = TRUE})
+##' @param sum logical; indicates if the return should be a sum of an individual's daily outcrossed mating potential over the range specified by days
+##' @param mean logical; indicates if the return should be the mean of an individual's daily outcrossed mating potential over the range specified by days
 ##' @return a named matrix with a row for each id and a column for each day, and entries corresponding to ids' OMP each day
 ##' @details Daily outcrossed mating potential is a weighted average of an individual's distance to their nearest neighbors on a given day (Wagenius et al. 2007). The days to calculate OMP for should be input as integers relative to the first day of flowering, as they are in the start and end columns of a matingScene object. If the number of ids receptive on a day is less than k, OMP will be calculated for the maximum number of neighbors.
 ##' @references Wagenius, S., E. Lonsdorf, and C. Neuhauser. 2007. Patch aging and the S-Allee effect: breeding system effects on the demographic response of plants to habitat fragmentation. \emph{American Naturalist} \strong{169}:383-397.
@@ -19,31 +21,49 @@
 
 
 
-dailyOMP <- function(scene, k = 4, days = min(scene$start):max(scene$end), alpha = 1/13.3, nn.constant = FALSE){
-  out <- matrix(nrow  = nrow(scene), ncol = length(days), dimnames = list(scene$id, as.character(days + attr(scene, 'origin'))))
-  rbd <- receptivityByDay(scene)
-  if(!nn.constant){
-    for (i in 1:length(days)){
-      day <- days[i]
-      idsDi <- which(rbd[,day])
-      nbrs <- k
-      if(length(idsDi) <= k) nbrs <- length(idsDi)-1
-      if(nbrs > 1){
-        knn <- unlist(get.knn(scene[idsDi,c('x','y')], k = nbrs))
-        dim(knn) <- c(length(idsDi), nbrs, 2)
-        out[idsDi,i] <- rowSums(exp(knn[,,2, drop = FALSE]*-1*alpha))
-      }
-    }
-    out[is.na(out)]<- 0
+dailyOMP <- function(scene, k = 4, days = NULL, alpha = 1/13.3, nn.constant = FALSE, sum = FALSE, mean = FALSE){
+  if(is.list(scene) & !is.data.frame(scene)){
+    out <- lapply(scene, dailyOMP, sum = sum, mean = mean)
   } else {
-    knn <- unlist(get.knn(scene[,c('x','y')], k = k))
-    dim(knn) <- c(nrow(scene), k, 2)
-    mat <- matrix(nrow = nrow(scene),ncol = nrow(scene))
-    for (y in 1:nrow(scene)){
-      mat[y,knn[y,,1]]<-exp(knn[y,,2, drop = FALSE]*-1*alpha)
+    if(is.null(days)){
+      days <- min(scene$start):max(scene$end)
+    } else{
+      days <- days
     }
-    mat[is.na(mat)]<- 0
-    out <- (mat %*% rbd)*rbd
+    out <- matrix(nrow  = nrow(scene), ncol = length(days), dimnames = list(scene$id, as.character(days + attr(scene, 'origin'))))
+    rbd <- receptivityByDay(scene)
+    if(!nn.constant){
+      for (i in 1:length(days)){
+        day <- days[i]
+        idsDi <- which(rbd[,day])
+        nbrs <- k
+        if(length(idsDi) <= k) nbrs <- length(idsDi)-1
+        if(nbrs > 1){
+          knn <- unlist(get.knn(scene[idsDi,c('x','y')], k = nbrs))
+          dim(knn) <- c(length(idsDi), nbrs, 2)
+          out[idsDi,i] <- rowSums(exp(knn[,,2, drop = FALSE]*-1*alpha))
+        }
+      }
+      out[is.na(out)]<- 0
+    } else {
+      knn <- unlist(get.knn(scene[,c('x','y')], k = k))
+      dim(knn) <- c(nrow(scene), k, 2)
+      mat <- matrix(nrow = nrow(scene),ncol = nrow(scene))
+      for (y in 1:nrow(scene)){
+        mat[y,knn[y,,1]]<-exp(knn[y,,2, drop = FALSE]*-1*alpha)
+      }
+      mat[is.na(mat)]<- 0
+      out <- (mat %*% rbd)*rbd
+    }
+
+    if(sum){
+      out <- apply(out,1,sum)
+      out <- data.frame(id = names(out), omp = out, row.names = 1:length(out))
+    } else if(mean){
+      out <- apply(out,1,mean)
+      out <- data.frame(id = names(out), omp = out, row.names = 1:length(out))
+    }
+
   }
   out
 }
