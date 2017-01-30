@@ -47,7 +47,8 @@ plotScene <- function(scene, dimension = "auto",
                       pch = 19, pt.cex = 0.75, text.cex = 0.8,
                       plot.lim.spat  = TRUE,
                       quartile.lwd = 1, quartile.col = 'gray55', peak.col = 'gray27',
-                      labelID = FALSE, mt1 = 'F', mt2 = 'M', leg.ncol = 1, ...){
+                      labelID = FALSE, mt1 = 'F', mt2 = 'M', leg.ncol = 1,
+                      mar = NULL, oma = NULL , main = NULL, ...){ # these arguments need to be implemented in function
 
   dimension <- match.arg(dimension, c("auto", "t", "s", "mt"),several.ok = TRUE)
   par.orig <- par("mar", "oma", "mfrow", "xpd")
@@ -71,11 +72,14 @@ plotScene <- function(scene, dimension = "auto",
   }
   nr <- length(scene)
   nc <- sum(temp,spat,comp)
-  par(mfrow = c(nr,nc), oma = c(5,3,4,1), xpd = F)
+  par(mfrow = c(nr,nc), xpd = F)
   if(is.null(colorBy)){
     par(oma = c(5,3,4,1))
   } else if (!is.null(colorBy) | labelID) {
     par(oma = c(8,3,4,1))
+  }
+  if(!is.null(oma)){
+    par(oma = oma)
   }
 
   if(spat){
@@ -127,7 +131,11 @@ plotScene <- function(scene, dimension = "auto",
       scene.i <- scene.i[order(orderVars[,1],orderVars[,2], orderVars[,3]),]
     }
     scene.i$index <- seq_along(scene.i[, 1])
-    par(mar = c(0.25,3.25,1,1))
+    if (is.null(mar)){
+      par(mar = c(0.25,3.25,1,1))
+    } else{
+      par(mar = mar)
+    }
     if (!is.null(colorBy)){
       if (is.numeric(scene.i[,colorBy])){
         palette(colorRampPalette(c('blue','red'))(9))
@@ -201,7 +209,11 @@ plotScene <- function(scene, dimension = "auto",
       if (is.null(xlab.spat)) xlab.spat <- 'easting'
       if (is.null(ylab.spat)) ylab.spat <- 'northing'
       if(!plot.lim.spat){
-        par(mar = c(1.25,3.25,1,1))
+        if (is.null(mar)){
+          par(mar = c(1.25,3.25,1,1))
+        } else{
+          par(mar = mar)
+        }
         plot.default(scene.i[, 'x'], scene.i[, 'y'], type = "n", ylab = "",xaxt = 'n', asp = 1, cex = pt.cex, col = cols.pt, ...)
         if(i != nr){
           axis(1, cex.axis = 0.75, padj = -1.5)
