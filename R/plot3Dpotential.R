@@ -28,7 +28,8 @@ plot3DPotential <-   function(matPots,
                               subject = NULL,
                               density = TRUE,
                               sub.ids = NULL, N = 3, sample = NA,
-                              main = NULL, text.cex = 0.7, pt.cex = 0.7){
+                              main = NULL, text.cex = 0.7, pt.cex = 0.7,
+                              mar = NULL, oma = NULL){
   nm <- par("mar")
   noma <- par('oma')
   nmfrow <- par('mfrow')
@@ -91,13 +92,25 @@ plot3DPotential <-   function(matPots,
   }
 
   par(mfrow = c(len,1))
-  par(mar = c(0.5,0.5,0.5,1.5))
-  if (len == 1){
-    par(oma = c(4,4,4,0))
-  } else {
-    par(oma = c(4,6,4,0))
-  }
 
+  if (is.null(mar)){
+    par(mar = c(0.5,0.5,0.5,1.5))
+  } else{
+    par(mar = mar)
+  }
+  if (len == 1){
+    if (is.null(oma)){
+      par(oma = c(4,4,4,0))
+    } else{
+      par(oma = oma)
+    }
+  } else {
+    if (is.null(oma)){
+      par(oma = c(4,6,4,0))
+    } else{
+      par(oma = oma)
+    }
+  }
   if (synchrony & proximity & compatibility){
     if(subject %in% 'ind'){
       ind <- mapply(function(x,y,z) merge(merge(x$ind, y$ind),z$ind), sync, prox, compat, SIMPLIFY = F)
@@ -153,12 +166,14 @@ plot3DPotential <-   function(matPots,
         mtext(ylab,2,cex = 0.75, outer = TRUE, line = 2.5)
       }
       mtext(names(matPots[[1]][i]), 2, cex = 0.7, outer = F, line = 5, font = 1)
-      if(!is.null(sub.ids) & any(ind[[i]][,'id'] %in% sub.ids)==T){
-        if(subject %in% 'ind'){
+      if(subject %in% 'ind'){
+        if(!is.null(sub.ids) & any(ind[[i]][,'id'] %in% sub.ids)==T){
           text(ind[[i]][ind[[i]][,'id'] %in% sub.ids,2],ind[[i]][ind[[i]][,'id'] %in% sub.ids,3],ind[[i]][ind[[i]][,'id'] %in% sub.ids,1], cex = text.cex, pos = 3)
           points(ind[[i]][ind[[i]][,'id'] %in% sub.ids,2],ind[[i]][ind[[i]][,'id'] %in% sub.ids,3], cex = pt.cex, col = 'purple', pch = 19)
         } else {
-          text(pair[[i]][attr(d1[[i]][['pair']],'idOrder') %in% sub.ids,,1], pair[[i]][attr(d1[[i]][['pair']],'idOrder') %in% sub.ids,,2], attr(d1[[i]][['pair']],'idOrder')[attr(d1[[i]][['pair']],'idOrder') %in% sub.ids] , pos = 3, cex = text.cex)
+          if(!is.null(sub.ids) & any(attr(d1[[i]][['pair']],'idOrder') %in% sub.ids) ==T) {
+            text(pair[[i]][attr(d1[[i]][['pair']],'idOrder') %in% sub.ids,,1], pair[[i]][attr(d1[[i]][['pair']],'idOrder') %in% sub.ids,,2], attr(d1[[i]][['pair']],'idOrder')[attr(d1[[i]][['pair']],'idOrder') %in% sub.ids] , pos = 3, cex = text.cex)
+          }
         }
       }
     }

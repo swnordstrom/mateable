@@ -218,7 +218,7 @@ receptivityByDay <- function(scene, summary = FALSE, nameDate = TRUE) {
 ##' individuals. "average-peak" calculates the average (determined by argument
 ##' \code{averageType}) number of individuals receptive
 ##' per day divided by the maximum number of individuals receptive per day.
-##' All "simple" methods do not have pairwise or individual values.
+##' All "simple" methods do not have pairwise or individual values. "mean_interactions" gives the mean number of potential mating interactions an individual obtains per unit time for the period that the individual was flowering.
 ##' @param subject one of "population", "pairwise", "individual", or "all"
 ##' - see Value for more details.
 ##' @param averageType character. Identifies whether to take the mean or median
@@ -363,10 +363,11 @@ synchrony <- function(scene, method, subject = "all", averageType = "mean",
   } else {
     n <- nrow(scene) # population size
     if (n < 2) {
-      stop("Can't calculate synchrony for population size less than 2")
-    }
-
-    if (method == "augspurger") {
+      warning("Can't calculate synchrony for population size less than 2")
+      indSync <- NA
+      pairSync <- NA
+      popSync <- NA
+    } else if (method == "augspurger") {
       if (subject %in% c("pair", "all")) {
         syncMatrix <- overlap(scene, "overlap", compareToSelf = T)
         pairSync <- syncMatrix/scene$duration
@@ -523,6 +524,4 @@ synchrony <- function(scene, method, subject = "all", averageType = "mean",
     potential
   }
 }
-
-
 
