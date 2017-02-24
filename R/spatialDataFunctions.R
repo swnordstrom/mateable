@@ -29,7 +29,7 @@ pairDist <- function(scene) {
 ##' @return a matrix where the rows are all individuals and the columns are
 ##' their k nearest neighbors
 ##' @export
-##' @seealso \code{\link{knn.dist}}
+##' @seealso \code{\link{knn.dist}}, \code{\link{proximity}}
 ##' @examples
 ##' pop <- simulateScene(10)
 ##' kNearNeighbors(pop, 3)
