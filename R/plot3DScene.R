@@ -59,11 +59,15 @@ plot3DScene <- function(scene, dimension = "auto",
   }
 
   nr <- length(scene)
-  if (nr > 1 ){
-    par(mfrow = c(nr,1), oma = c(4,4,4,1),mar = c(1,6,0,1), xpd = T)
-  } else {
-    par(mfrow = c(nr,1), oma = c(4,4,4,1),mar = c(1,3,0,1), xpd = T)
+  # if (nr > 1 ){
+  #   par(mfrow = c(nr,1), oma = c(4,4,4,1),mar = c(1,6,0,1), xpd = T)
+  # } else {
+  #   par(mfrow = c(nr,1), oma = c(4,4,4,1),mar = c(1,3,0,1), xpd = T)
+  #
+  # }
 
+  if (nr > 1 ){
+    par(mfrow = c(nr,1), xpd = T)
   }
 
   if(spat){
@@ -101,9 +105,9 @@ plot3DScene <- function(scene, dimension = "auto",
     }
     if(spat){
       if(zoom){
-        plot.default(scene.i[, 'x'], scene.i[, 'y'], type = "n", xaxt = 'n', ylab = "", asp = 1, cex = pt.cex, ...)
+        plot.default(scene.i[, 'x'], scene.i[, 'y'], type = "n", xaxt = 'n', ylab = "",xlab = '', asp = 1, cex = pt.cex, ...)
       } else {
-        plot.default(scene.i[, 'x'], scene.i[, 'y'], type = "n", xaxt = 'n', xlim = c(emin,emax),ylim = c(nmin,nmax), ylab = "", asp = 1, cex = pt.cex, ...)
+        plot.default(scene.i[, 'x'], scene.i[, 'y'], type = "n", xaxt = 'n', xlim = c(emin,emax),ylim = c(nmin,nmax), xlab = '', ylab = "", asp = 1, cex = pt.cex, ...)
       }
       mtext(ycoord, side = 2, cex = 0.75, adj = 0.5, line = 3)
       mtext(names(scene)[i],side = 2, cex = 0.75, font = 2, las = 1, adj = 0, line = 8)
