@@ -12,6 +12,7 @@
 ##' @param text.cex specify text expansion factor (text size relative to device default)
 ##' @param mt1 label for mating type '1', if dioecious; defaults to 'F'
 ##' @param mt2 label for mating type '2', if dioecious; defaults to 'M'
+##' @param main main title, optional
 ##' @param ... optional arguments for the plot function
 ##' @return nothing
 ##' @export
@@ -26,7 +27,8 @@
 plot3DScene <- function(scene, dimension = "auto",
                         sub= NULL, N = 3,
                         ycoord = 'northing', xcoord = 'easting',
-                        pch = 19, pt.cex = 0.7,text.cex = 0.7, mt1 = 'F', mt2 = 'M', ...){
+                        pch = 19, pt.cex = 0.7,text.cex = 0.7, mt1 = 'F', mt2 = 'M',
+                        zoom = TRUE, main = NULL, ...){
   dimension <- match.arg(dimension, c("auto", "t", "s", "mt"),several.ok = TRUE)
   par.orig <- par("mar", "oma", "mfrow", "xpd")
   on.exit(par(par.orig))
@@ -57,11 +59,15 @@ plot3DScene <- function(scene, dimension = "auto",
   }
 
   nr <- length(scene)
-  if (nr > 1 ){
-    par(mfrow = c(nr,1), oma = c(4,4,4,1),mar = c(1,6,0,1), xpd = T)
-  } else {
-    par(mfrow = c(nr,1), oma = c(4,4,4,1),mar = c(1,3,0,1), xpd = T)
+  # if (nr > 1 ){
+  #   par(mfrow = c(nr,1), oma = c(4,4,4,1),mar = c(1,6,0,1), xpd = T)
+  # } else {
+  #   par(mfrow = c(nr,1), oma = c(4,4,4,1),mar = c(1,3,0,1), xpd = T)
+  #
+  # }
 
+  if (nr > 1 ){
+    par(mfrow = c(nr,1), xpd = T)
   }
 
   if(spat){
@@ -98,7 +104,11 @@ plot3DScene <- function(scene, dimension = "auto",
       scene.i$cols <- findInterval(scene.i$start,vec)
     }
     if(spat){
-      plot.default(scene.i[, 'x'], scene.i[, 'y'], type = "n", xaxt = 'n', xlim = c(emin,emax),ylim = c(nmin,nmax), ylab = "", asp = 1, cex = pt.cex, ...)
+      if(zoom){
+        plot.default(scene.i[, 'x'], scene.i[, 'y'], type = "n", xaxt = 'n', ylab = "",xlab = '', asp = 1, cex = pt.cex, ...)
+      } else {
+        plot.default(scene.i[, 'x'], scene.i[, 'y'], type = "n", xaxt = 'n', xlim = c(emin,emax),ylim = c(nmin,nmax), xlab = '', ylab = "", asp = 1, cex = pt.cex, ...)
+      }
       mtext(ycoord, side = 2, cex = 0.75, adj = 0.5, line = 3)
       mtext(names(scene)[i],side = 2, cex = 0.75, font = 2, las = 1, adj = 0, line = 8)
     }
@@ -124,7 +134,11 @@ plot3DScene <- function(scene, dimension = "auto",
         }
       }
       if(i == nr){
-        mtext('spatial, temporal, and mating type plot', side = 3, line = 2, font = 2, outer = T)
+        if(!is.null(main)){
+          mtext(main, side = 3, line = 2, font = 2, outer = T)
+        } else {
+          mtext('spatial, temporal, and mating type plot', side = 3, line = 2, font = 2, outer = T)
+        }
         mtext(xcoord,side = 1,adj = 0.5, cex = 0.75, line = 2)
         axis(1, cex = 0.75)
         par(fig = c(0, 1, 0, 1), oma = c(0, 0, 0, 0), mar = c(0, 0, 0, 0), new = TRUE)
@@ -145,7 +159,11 @@ plot3DScene <- function(scene, dimension = "auto",
         }
       }
       if(i == nr){
-        mtext('spatial and temporal plot', side = 3, font = 2, line = 1.5, outer = T)
+        if(!is.null(main)){
+          mtext(main, side = 3, line = 2, font = 2, outer = T)
+        } else {
+          mtext('spatial and temporal plot', side = 3, font = 2, line = 1.5, outer = T)
+        }
         mtext(xcoord,side = 1,adj = 0.5, cex = 0.75, line = 3)
         axis(1, cex = 0.75)
         par(fig = c(0, 1, 0, 1), oma = c(0, 0, 0, 0), mar = c(0, 0, 0, 0), new = TRUE)
@@ -168,7 +186,11 @@ plot3DScene <- function(scene, dimension = "auto",
         }
       }
       if(i == nr){
-        mtext('spatial and mating type plot', font = 2, line = 2, side = 3, outer = T)
+        if(!is.null(main)){
+          mtext(main, side = 3, line = 2, font = 2, outer = T)
+        } else {
+          mtext('spatial and mating type plot', side = 3, font = 2, line = 2, outer = T)
+        }
         mtext(xcoord,side = 1,adj = 0.5, cex = 0.75, line = 3)
         axis(1, cex = 0.75)
       }
@@ -209,12 +231,20 @@ plot3DScene <- function(scene, dimension = "auto",
         }
         if (i == 1){
           legend('topleft', legend = c(format(attr(scene.i,'origin')+ minstart, format = "%b %d"),' ',' ',' ',format(attr(scene.i,'origin')+round(mean(c(minstart,maxstart))), format = "%b %d"),' ',' ',' ',format(attr(scene.i,'origin')+maxstart, format = "%b %d")), fill = colorRampPalette(c('blue','red'))(9),ncol = 1, bty = 'o',xpd = T, y.intersp = 0.68, title = 'start date', inset = c(0.02,0.03), cex = 0.75)
-          title(main = 'temporal and compatibility plot', outer = T)
+          if(!is.null(main)){
+            title(main = 'temporal and mating type plot', outer = T)
+          } else {
+            title(main = main, outer = T)
+          }
         }
         if(i == nr){
           axis(1, at = min(scene.i$s2):max(scene.i$s1), labels = min(scene.i$s2):max(scene.i$s1), cex.axis = 0.75)
           mtext('s1',side = 1,adj = 0.5, cex = 0.75, line = 3)
-          mtext('temporal and mating type plot', font = 2, line = 2, side = 3, outer = T)
+          if(!is.null(main)){
+            mtext(main, side = 3, line = 2, font = 2, outer = T)
+          } else {
+            mtext('temporal and mating type plot', side = 3, font = 2, line = 2, outer = T)
+          }
         }
       }
     }
