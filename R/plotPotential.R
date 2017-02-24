@@ -28,8 +28,7 @@ plotPotential <-   function(matPot,
                             subject = NULL,
                             plotType = 'auto',
                             density = T,
-                            sub.ids = NULL, N = 9, sample = "random",
-                            main = NULL, ...){
+                            sub.ids = NULL, N = 9, sample = "random", ...){
 
   par.orig <- par("mar", "oma", "mfrow", "xpd")
   on.exit(par(par.orig))
@@ -68,22 +67,22 @@ plotPotential <-   function(matPot,
     } else {pt <- 'hist'}
   }
 
-  if(is.null(main) & subject %in% 'ind') main <- paste('individual', potential)
-  if(is.null(main) & subject %in% 'pair') main <- paste('pairwise', potential)
+  # if(is.null(main) & subject %in% 'ind') main <- paste('individual', potential)
+  # if(is.null(main) & subject %in% 'pair') main <- paste('pairwise', potential)
 
   nr <- length(matPot)
   nc <- length(pt)
 
-  if (subject %in% 'ind'){
-    par(mfrow = c(nr,1), mar = c(4,6,0,1))
-    if (nr > 1){
-      par(oma = c(1,1,2,1))
-    } else {
-      par(oma = c(1,0,2,1))
-    }
-  } else {
-    par(mfrow = c(nr,nc), mar = c(4,0.5,0.5,2.5),oma = c(4,4,4,4) )
-  }
+  # if (subject %in% 'ind'){
+  #   par(mfrow = c(nr,1), mar = c(4,6,0,1))
+  #   if (nr > 1){
+  #     par(oma = c(1,1,2,1))
+  #   } else {
+  #     par(oma = c(1,0,2,1))
+  #   }
+  # } else {
+  #   par(mfrow = c(nr,nc), mar = c(4,0.5,0.5,2.5),oma = c(4,4,4,4) )
+  # }
 
   if (is.null(sub.ids)){
     if(sample == 'random'){
@@ -183,7 +182,7 @@ plotPotential <-   function(matPot,
       }
     }
   }
-  mtext(main, side = 3, line = 0, cex = 1.5, outer = TRUE)
+  # mtext(main, side = 3, line = 0, cex = 1.5, outer = TRUE)
 }
 
 
