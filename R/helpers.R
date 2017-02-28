@@ -25,3 +25,27 @@ matingSummary.df <- function(matSum){
 }
 
 
+simplify.potential.list <- function(s, subject){
+  subject <- match.arg(subject, c("population", "pairwise",
+                                  "individual", "all"),
+                       several.ok = T)
+  if('all' %in% subject){
+    subject <- c('population','pairwise','individual')
+  }
+  potential <- list()
+  if ('population' %in% subject){
+    pop <- data.frame(pop = names(s), synchrony = sapply(s,function(l)l[[which('pop' == names(l))]]))
+    row.names(pop) <- NULL
+    potential$pop <- pop
+  }
+  if ('individual' %in% subject){
+    ind <- as.data.frame(do.call(rbind,lapply(s,function(l)l[[which('ind' == names(l))]])))
+    row.names(ind) <- NULL
+    potential$ind <- ind
+  }
+  # if ('pairwise' %in% subject){
+  #   pair <- array(unlist(lapply(s,function(l)l[[which('pair' == names(l))]])), dim  = c(dim(s[[1]][[which('pair' == names(s[[1]]))]])[1],dim(s[[1]][[which('pair' == names(s[[1]]))]])[1],3))
+  #   potential$pair <- pair
+  # }
+  return(potential)
+}

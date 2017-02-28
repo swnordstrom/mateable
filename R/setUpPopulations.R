@@ -63,7 +63,7 @@ simulateScene <- function(size = 30, meanSD = "2012-07-12", sdSD = 6, meanDur = 
 ##' @param dateFormat character indicating either (1) the format of the start and end
 ##' date columns if those columns are characters or (2) the origin for the start
 ##' and end date columns if those columns are numeric. It is used in as.Date
-##' @param split character indicating a column to split the result into a list by the values of that column
+##' @param split character name for a column with values by which the result should be split
 ##'
 ##' @return a matingScene object, either a single dataframe in standard format
 ##' or a list of dataframes. Attributes of the matingScene object indicate the type of

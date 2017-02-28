@@ -29,7 +29,7 @@ pairDist <- function(scene) {
 ##' @return a matrix where the rows are all individuals and the columns are
 ##' their k nearest neighbors
 ##' @export
-##' @seealso \code{\link{knn.dist}}
+##' @seealso \code{\link{knn.dist}}, \code{\link{proximity}}
 ##' @examples
 ##' pop <- simulateScene(10)
 ##' kNearNeighbors(pop, 3)
@@ -48,7 +48,7 @@ kNearNeighbors <- function(scene, k) {
 ##'
 ##' @title Make potentials object--spatial proximity
 ##' @param scene a matingScene object
-##' @param method one of "maxProp", and "maxPropSqrd" see details for
+##' @param method one of "maxProp", "maxPropSqrd", or 'knn.dist'; see details for
 ##' further description
 ##' @param proximityFun a function used to calculate proximity. Not yet
 ##' implemented
@@ -57,6 +57,7 @@ kNearNeighbors <- function(scene, k) {
 ##' @param subject whether you want pair, individual, population, or all.
 ##' Specifying more than one is allowed.
 ##' @param zeroPotDist the distance at which potential should be equal to zero
+##' @param k the number of the nearest neighbor to search, if \code{method} is "knn.dist". Defaults to 6, but must be less than population size.
 ##' @return A potentials object containing one more more of the following, depending the
 ##' input for \code{subject}: \cr
 ##' If \code{subject} is "population" the return list will contain a numeric
@@ -69,14 +70,15 @@ kNearNeighbors <- function(scene, k) {
 ##' @details If \code{method} is "maxProp" then proximity between two
 ##' individuals will be calculated as 1 - distance/max(distance).
 ##' If \code{method} is "maxPropSqrd" then proximity between two
-##' individuals will be calculated as (1 - distance/max(distance))^2.
+##' individuals will be calculated as (1 - distance/max(distance))^2. If \code{method} is
+##' "knn.dist" then the function This uses \code{FNN::knn.dist} to return the Euclidian distance of the kth nearest neighbor.
 ##' @author Danny Hanson
 ##' @examples
 ##' pop <- simulateScene()
 ##' proximity(pop, "maxProp")
 proximity <- function(scene, method, proximityFun = NULL, averageType = "mean",
-                      subject = "all", zeroPotDist = NULL) {
-  method <- match.arg(method, c("maxProp", "maxPropSqrd"))
+                      subject = "all", zeroPotDist = NULL, k = 6) {
+  method <- match.arg(method, c("maxProp", "maxPropSqrd",'knn.dist'))
   subject <- match.arg(subject, c("all", "pair", "population", "individual"),
                        several.ok = TRUE)
   if (is.list(scene) & !is.data.frame(scene)) {
@@ -131,8 +133,12 @@ proximity <- function(scene, method, proximityFun = NULL, averageType = "mean",
       } else if (averageType == "median") {
         indProx$proximity <- row_medians(pairProx2)
       }
-
       popProx <- average(indProx[,2])
+    } else if (method == 'knn.dist'){
+        subject <- c('population','individual')
+        indProx <- data.frame(id = scene$id, knn.dist = -1, k = k)
+        indProx$knn.dist <- kNearNeighbors(pop, k)[,k]
+        popProx <- average(indProx$knn.dist)
     }
 
     # return
